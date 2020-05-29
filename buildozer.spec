@@ -19,12 +19,13 @@ source.include_exts = py,png,jpg,jpeg,ttf,md,kv,json
 source.include_patterns = assets/*
 
 # (str) Application versioning (method 2)
-version.regex = __version__ = ['"](.*)['"]
-version.filename = %(source.dir)s/../../kivymd/__init__.py
+#version.regex = __version__ = ['"](.*)['"]
+#version.filename = %(source.dir)s/../../kivymd/__init__.py
+version = 1.0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==1.11.1,git+https://github.com/HeaTTheatR/KivyMD.git,requests,hurry
+requirements = python3,kivy==1.11.1,git+https://github.com/HeaTTheatR/KivyMD.git,requests,hurry.filesize
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -69,7 +70,7 @@ android.skip_update = False
 android.accept_sdk_license = True
 
 # (str) Android logcat filters to use
-# android.logcat_filters = *:S python:D
+android.logcat_filters = *:S python:D
 
 # (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 android.arch = arm64-v8a
