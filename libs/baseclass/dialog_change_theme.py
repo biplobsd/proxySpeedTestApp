@@ -41,7 +41,7 @@ class PSTDialogInput(KitchenSinkBaseDialog):
             
         self.ids.query.text = currentSave
         
-        toast(f"Saved!", duration=0.7)
+        toast(f"Saved!")
 
 
 class KitchenSinkDialogLicense(KitchenSinkBaseDialog):

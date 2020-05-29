@@ -163,12 +163,6 @@ BoxLayout:
                                     halign: "center"
                                     theme_text_color: "Primary"
                                 MDSeparator:
-                    # ScrollView:
-                    #     MDGridLayout:
-                    #         adaptive_height: True
-                    #         cols: 1
-                    #         padding: "10dp"
-                    #         spacing: "10dp"
                     KitchenSinkBackdropFrontLayer:
                         id: backdrop_front_layer
                         backdrop: backdrop
@@ -371,7 +365,7 @@ BoxLayout:
                         MDBoxLayout:
                             size_hint: None, None
                             adaptive_size: True
-                            spacing: "15dp"
+                            spacing: "30dp"
 
                             MDCheckbox:
                                 group: "style_protocol"
@@ -385,7 +379,7 @@ BoxLayout:
 
                             Label:
                                 text: "HTTP"
-                                font_size: 12
+                                # font_size: 12
                                 color: app.theme_cls.text_color
 
                             MDCheckbox:
@@ -399,7 +393,7 @@ BoxLayout:
                                     app.save_Update(app.configs, filename='configs.json')
                             Label:
                                 text: "HTTPS"
-                                font_size: 12
+                                # font_size: 12
                                 color: app.theme_cls.text_color
                             
                             MDCheckbox:
@@ -414,7 +408,7 @@ BoxLayout:
 
                             Label:
                                 text: "SOCKS4"
-                                font_size: 12
+                                # font_size: 12
                                 color: app.theme_cls.text_color
                             
                             MDCheckbox:
@@ -428,7 +422,7 @@ BoxLayout:
                                     app.save_Update(app.configs, filename='configs.json')
                             Label:
                                 text: "SOCKS5"
-                                font_size: 12
+                                # font_size: 12
                                 color: app.theme_cls.text_color
 
                     MDSeparator:

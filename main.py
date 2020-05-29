@@ -2,7 +2,7 @@ import os
 import sys
 
 from kivy.lang import Builder
-from kivy.core.window import Window
+# from kivy.core.window import Window
 
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
@@ -39,7 +39,7 @@ else:
 os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
     os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
 )
-Window.softinput_mode = "below_target"
+# Window.softinput_mode = "below_target"
 # _small = 3
 # Window.size = (1080/_small, 1920/_small)
 
@@ -375,7 +375,7 @@ class ProxySpeedTestApp(MDApp):
                 )
     def copy_proxyip(self, data):
         from kivymd.toast import toast
-        toast(f"Copied: {data}", duration=0.7)
+        toast(f"Copied: {data}")
         # print("Clicked!")
         Clipboard.copy(data)
     
