@@ -1,3 +1,4 @@
+import gc; gc.collect()
 import os
 import sys
 
