@@ -17,7 +17,6 @@ from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
 
 from datetime import datetime
 from threading import Thread
-from multiprocessing import Value
 import requests
 from kivy.core.clipboard import Clipboard
 from kivy.properties import (
@@ -96,8 +95,10 @@ class ProxySpeedTestApp(MDApp):
         self.dialog_change_theme = None
         self.toolbar = None
         self.data_screens = {}
-        self.scaning = Value('i', 0)
-        self.running = Value('i', 0)
+        self.scaning = Queue(maxsize=1)
+        self.scaning.put_nowait(0)
+        self.running = Queue(maxsize=1)
+        self.running.put_nowait(0)
         self.currentSpeed = Queue()
         self.configs = {
             'protocol': 'http',
@@ -161,18 +162,30 @@ class ProxySpeedTestApp(MDApp):
         if instance.text == "Start":
             instance.text = "Stop"
             instance.md_bg_color = get_color_from_hex("#f44336")
-            self.scaning.value = 1
+            p = self.scaning.get_nowait()
+            if not p == 1:
+                self.scaning.put_nowait(1)
+            else:
+                self.scaning.put_nowait(p)
             Thread(target=self.proxySpeedTest, args=("start",)).start()
             # self.proxySpeedTest('start')
         else:
-            self.scaning.value = 0
-            if not bool(self.running.value):
+            p = self.scaning.get_nowait()
+            if not p == 0:
+                self.scaning.put_nowait(0)
+            else:
+                self.scaning.get_nowait(p)
+            
+            r = self.running.get_nowait()
+            self.running.put_nowait(r)
+            if not bool(r):
                 instance.text = "Start"
                 instance.md_bg_color = self.theme_cls.primary_color
             else:
                 instance.text = "Stoping"
                 instance.text_color
                 instance.md_bg_color = get_color_from_hex("#757575")
+            
     
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
         file_size = 1062124 
@@ -274,8 +287,14 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.totalpb.max = len(proxys)
         self.root.ids.totalpb.value = 0
         for part in proxys:
-            self.running.value = 1
-            if not bool(self.scaning.value):break        
+            r = self.running.get()
+            if not r == 1:
+                self.running.put(1)
+            else:
+                self.running.put(r)
+            s = self.scaning.get()
+            self.scaning.put(s)
+            if not bool(s):break        
             proxy_ip = part.strip()
             self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
             # Removing before test chunk file
@@ -328,10 +347,18 @@ class ProxySpeedTestApp(MDApp):
             comP = (self.root.ids.totalpb.value/len(proxys))*100
             self.root.ids.totalpbText.text = f"{round(comP)}%"
             # return True
-        self.scaning.value = 0
+        s = self.scaning.get()
+        if not s == 0:
+            self.scaning.put(0)
+        else:
+            self.scaning.put(s)
         self.root.ids.start_stop.text = "Start"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
-        self.running.value = 0
+        r = self.running.get()
+        if not r == 0:
+            self.running.put(0)
+        else:
+            self.running.put(r)
         print("Finished!")
 
     def show_List(self, data):
@@ -356,7 +383,9 @@ class ProxySpeedTestApp(MDApp):
         print(msg)
         chunkSize = 0
         start = datetime.now()
-        while bool(self.running.value):
+        r = self.running.get()
+        self.running.put(r)
+        while bool(r):
             end = datetime.now()
             if .5 <= (end-start).seconds:
                 delta = round(float((end - start).seconds) +
@@ -372,5 +401,8 @@ class ProxySpeedTestApp(MDApp):
                     chunkSize += self.currentSpeed.get_nowait()
             except Empty:
                 pass
+            
+            r = self.running.get()
+            self.running.put(r)
 
 ProxySpeedTestApp().run()
