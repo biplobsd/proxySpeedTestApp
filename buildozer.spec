@@ -44,7 +44,7 @@ orientation = portrait
 fullscreen = 0
 
 # (string) Presplash background color (for new android toolchain)
-android.presplash_color = #FFFFFF
+android.presplash_color = #000000
 
 # (list) Permissions
 android.permissions = INTERNET

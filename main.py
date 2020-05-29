@@ -40,8 +40,8 @@ os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
     os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
 )
 Window.softinput_mode = "below_target"
-_small = 3
-Window.size = (1080/_small, 1920/_small)
+# _small = 3
+# Window.size = (1080/_small, 1920/_small)
 
 
 class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
