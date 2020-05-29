@@ -1,0 +1,529 @@
+#:import environ os.environ
+#:import Home libs.baseclass.home.Home
+#:import KitchenSinkDialogLicense libs.baseclass.dialog_change_theme.KitchenSinkDialogLicense
+#:import KitchenSinkDialogDev libs.baseclass.dialog_change_theme.KitchenSinkDialogDev
+#:import PSTDialogInput libs.baseclass.dialog_change_theme.PSTDialogInput
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+#:import urlparse urllib.parse.urlparse
+
+
+BoxLayout:
+    orientation: "vertical"
+
+    BoxLayout:
+        id: toolbar_box
+        size_hint_y: None
+        height: self.minimum_height
+
+    ScreenManager:
+        id: screen_manager
+        transition: FadeTransition(duration=.2, clearcolor=app.theme_cls.bg_dark)
+
+        Home:
+            id: home
+            name: "home"
+
+            MDBackdrop:
+                id: backdrop
+                on_open: home.opening_animation_backdrop_components(backdrop, backlayer)
+                on_close:
+                    backlayer.ids.screen_manager.current = "settings"
+                    home.closing_animation_backdrop_components(backdrop, backlayer)
+                left_action_items: [['menu', lambda x: self.open()]]
+                title: "Proxy speed test"
+                header: False
+
+                MDBackdropBackLayer:
+
+                    KitchenSinkBackdropBackLayer:
+                        id: backlayer
+                        backdrop: backdrop
+                        root_screen_manager: screen_manager
+
+                MDBackdropFrontLayer:
+                    id: front_layer
+                    orientation: "vertical"
+                    MDBoxLayout:
+                        size_hint_y: .2
+                        orientation: "vertical"
+                        MDLabel:
+                            id: currentIP
+                            pos_hint: {"center_y": .35}
+                            text: ""
+                            bold: True
+                            font_size: 7
+                            halign: "center"
+                            theme_text_color: "Primary"
+                        MDLabel:
+                            id: top_text
+                            pos_hint: {"center_y": .35}
+                            text: "0 KB/s"
+                            bold: True
+                            font_size: 30
+                            halign: "center"
+                            theme_text_color: "Primary"
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        size_hint_y: None
+                        MDBoxLayout:
+                            padding: 10, 0, 10, 0 
+                            MDLabel:
+                                id: totaltx
+                                text: "Total"
+                                font_size: 10
+                                size_hint_x: .1
+                                halign: "center" 
+                                theme_text_color: "Primary"
+                            MDProgressBar:
+                                id: totalpb
+                                max: 100
+                                value: 0
+                                heigh: dp(100)
+                            MDLabel:
+                                id: totalpbText
+                                text: f"{(totalpb.value/totalpb.max)*100}%"
+                                font_size: totaltx.font_size
+                                size_hint_x: totaltx.size_hint_x
+                                halign: totaltx.halign
+                                theme_text_color: "Primary"
+                        MDBoxLayout:
+                            padding: 10
+                            spacing: 4
+                            orientation: "vertical"
+                            MDProgressBar:
+                                id: progressBar1
+                                max: 1024
+                                value: 0
+                            MDProgressBar:
+                                id: progressBar2
+                                max: 1024
+                                value: 0
+                            MDProgressBar:
+                                id: progressBar3
+                                max: 1024
+                                value: 0
+                        MDBoxLayout:
+                            padding: 10, 0, 30, 0
+                            # orientation: "vertical"
+                            pos_hint: {"center_y": .5}
+                            id: header_text
+                            font_size: 7
+                            MDLabel:
+                                id: Sprotocol
+                                font_size: header_text.font_size
+                                halign: "center"
+                                theme_text_color: "Primary"
+                            MDLabel:
+                                id: Tproxys
+                                font_size: header_text.font_size
+                                halign: "center"
+                                theme_text_color: "Primary"
+                            MDLabel:
+                                id: Smirror
+                                font_size: header_text.font_size
+                                halign: "center"
+                                theme_text_color: "Primary"
+                        MDBoxLayout:
+                            padding: 10
+                            # orientation: "vertical"
+                            id: header_text
+                            font_size: 7
+                            MDBoxLayout:
+                                size_hint_x: .83
+                                # size_hint_y: None
+                                MDSeparator:
+                                MDLabel:
+                                    text: "SERVER"
+                                    font_size: header_text.font_size
+                                    halign: "center"
+                                    theme_text_color: "Primary"
+                                MDSeparator:
+                            MDBoxLayout:
+                                size_hint_x: .35
+                                MDLabel:
+                                    text: "SIZE"
+                                    font_size: header_text.font_size
+                                    halign: "center"
+                                    theme_text_color: "Primary"
+                                MDSeparator:
+                            MDBoxLayout:
+                                size_hint_x: .27
+                                MDLabel:
+                                    text: "TIME"
+                                    font_size: header_text.font_size
+                                    halign: "center"
+                                    theme_text_color: "Primary"
+                                MDSeparator:
+                            MDBoxLayout:
+                                size_hint_x: .28
+                                MDLabel:
+                                    text: "SPEED"
+                                    font_size: header_text.font_size
+                                    halign: "center"
+                                    theme_text_color: "Primary"
+                                MDSeparator:
+                    # ScrollView:
+                    #     MDGridLayout:
+                    #         adaptive_height: True
+                    #         cols: 1
+                    #         padding: "10dp"
+                    #         spacing: "10dp"
+                    KitchenSinkBackdropFrontLayer:
+                        id: backdrop_front_layer
+                        backdrop: backdrop
+                        backlayer: backlayer
+                    MDBoxLayout:
+                        size_hint_y: .15
+                        padding: 10
+                        orientation: "vertical"
+                        MDFillRoundFlatButton:
+                            id: start_stop
+                            pos_hint: {"center_x": .5, "center_y": .5}
+                            text: "Start"
+                            increment_width: "164dp"
+                            # md_bg_color: get_color_from_hex("#f44336")
+                            on_release: app.start_scan(self)
+                        
+        Screen:
+            name: "shrine demo"
+            on_enter: app.show_demo_shrine(self)
+            on_leave:
+                backlayer.ids.screen_manager.current = "settings"
+                self.clear_widgets()
+
+<ProxyShowList>
+    size_hint_y: None
+    divider: "Full"
+    canvas:
+        Color:
+            rgba:
+                self.theme_cls.divider_color if root.divider is not None\
+                else (0, 0, 0, 0)
+        Line:
+            points: (root.x ,root.y, root.x+self.width, root.y) if root.divider == 'Full' else (root.x+root._txt_left_pad, root.y, root.x+self.width-root._txt_left_pad-root._txt_right_pad, root.y)
+        Color:
+            rgba: root.bg_color if root.bg_color else (0, 0, 0, 0)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        id: _text_container
+        # orientation: 'vertical'
+        pos: root.pos
+        padding:
+            root._txt_left_pad, root._txt_top_pad,\
+            root._txt_right_pad, root._txt_bot_pad
+        MDLabel:
+            id: _lbl_primary
+            text: root.text
+            font_style: root.font_style
+            halign: "center"
+            theme_text_color: root.theme_text_color
+            text_color: root.text_color
+            size_hint_y: None
+            size_hint_x: .7
+            height: self.texture_size[1]
+            markup: True
+            shorten_from: 'right'
+            shorten: True
+        MDLabel:
+            id: _lbl_primary
+            text: root.text1
+            font_style: root.font_style
+            halign: "center"
+            theme_text_color: root.theme_text_color
+            text_color: root.text_color
+            size_hint_y: None
+            size_hint_x: .4
+            height: self.texture_size[1]
+            markup: True
+            shorten_from: 'right'
+            shorten: True
+        MDLabel:
+            id: _lbl_primary
+            text: root.text2
+            font_style: root.font_style
+            halign: "center"
+            theme_text_color: root.theme_text_color
+            text_color: root.text_color
+            size_hint_y: None
+            size_hint_x: .27
+            height: self.texture_size[1]
+            markup: True
+            shorten_from: 'right'
+            shorten: True
+        MDLabel:
+            id: _lbl_primary
+            text: root.text3
+            font_style: root.font_style
+            halign: "center"
+            theme_text_color: root.theme_text_color
+            text_color: root.text_color
+            size_hint_y: None
+            size_hint_x: .28
+            height: self.texture_size[1]
+            markup: True
+            shorten_from: 'right'
+            shorten: True
+
+<KitchenSinkBackdropFrontLayer@RecycleView>
+    backdrop: None
+    backlayer: None
+    key_viewclass: 'viewclass'
+    key_size: 'height'
+    RecycleBoxLayout:
+        default_size: None, dp(20)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+
+<KitchenSinkBackdropBackLayer@FloatLayout>
+    scale_x: 0
+    scale_y: 0
+    backdrop: None
+    root_screen_manager: None
+
+    Image:
+        canvas.before:
+            PushMatrix
+            Scale:
+                origin: self.center
+                x: root.scale_x
+                y: root.scale_y
+        canvas.after:
+            PopMatrix
+
+        opacity: .2
+        source: f"{os.environ['KITCHEN_SINK_ASSETS']}icon.png"
+        pos_hint: {"center_y": .55}
+
+    ScreenManager:
+        id: screen_manager
+        transition: FadeTransition(duration=.2, clearcolor=(0, 0, 0, 0))
+
+        Screen:
+            name: "settings"
+
+            ScrollView:
+
+                MDGridLayout:
+                    adaptive_height: True
+                    cols: 1
+                    padding: "10dp"
+                    spacing: "10dp"
+
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        adaptive_height: True
+                        padding: "5dp"
+                        spacing: "10dp"
+
+                        MDLabel:
+                            text: "Change Style"
+                            bold: True
+                            theme_text_color: "Primary"
+
+                        MDBoxLayout:
+                            size_hint: None, None
+                            adaptive_size: True
+                            spacing: "30dp"
+
+                            MDCheckbox:
+                                group: "style"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.theme_cls.theme_style == "Light" else False
+                                on_active:
+                                    if self.active: app.theme_cls.theme_style = "Light"
+                                    root.backdrop.ids._front_layer.md_bg_color = [0, 0, 0, 0]
+
+                            Label:
+                                text: "Light"
+                                color: app.theme_cls.text_color
+
+                            MDCheckbox:
+                                group: "style"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.theme_cls.theme_style == "Dark" else False
+                                on_active:
+                                    if self.active: app.theme_cls.theme_style = "Dark"
+                                    root.backdrop.ids._front_layer.md_bg_color = [0, 0, 0, 0]
+
+                            Label:
+                                text: "Dark"
+                                color: app.theme_cls.text_color
+
+                    MDSeparator:
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        adaptive_height: True
+                        padding: "5dp"
+                        spacing: "10dp"
+
+                        MDLabel:
+                            text: "Select protocol"
+                            bold: True
+                            theme_text_color: "Primary"
+
+                        MDBoxLayout:
+                            size_hint: None, None
+                            adaptive_size: True
+                            spacing: "15dp"
+
+                            MDCheckbox:
+                                group: "style_protocol"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "http" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "http"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
+
+                            Label:
+                                text: "HTTP"
+                                font_size: 12
+                                color: app.theme_cls.text_color
+
+                            MDCheckbox:
+                                group: "style_protocol"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "https" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "https"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
+                            Label:
+                                text: "HTTPS"
+                                font_size: 12
+                                color: app.theme_cls.text_color
+                            
+                            MDCheckbox:
+                                group: "style_protocol"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "socks4" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "socks4"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
+
+                            Label:
+                                text: "SOCKS4"
+                                font_size: 12
+                                color: app.theme_cls.text_color
+                            
+                            MDCheckbox:
+                                group: "style_protocol"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "socks5" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "socks5"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
+                            Label:
+                                text: "SOCKS5"
+                                font_size: 12
+                                color: app.theme_cls.text_color
+
+                    MDSeparator:
+
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        adaptive_height: True
+                        padding: "5dp"
+                        spacing: "10dp"
+
+                        MDLabel:
+                            text: "Mirror"
+                            bold: True
+                            theme_text_color: "Primary"
+
+                        MDBoxLayout:
+                            # size_hint: 1, None
+                            # size: 1, 1
+                            adaptive_height: True
+                            # adaptive_size: True
+                            # spacing: "15dp"
+                            MDTextFieldRect:
+                                # size: 1, None
+                                # size_hint: .1, None
+                                id: mirrorSave
+                                required: True
+                                allow_copy: True
+                                multiline: False
+                                background_color: 0, 0, 0, .4
+                                height: "30dp"
+                                hint_text: "http://"
+                                text: app.configs['mirror']
+                                size_hint: 1, None
+                            MDFillRoundFlatButton:
+                                text: "Save"
+                                text_color: 1, 1, 1, .9
+                                on_release: 
+                                    if mirrorSave.text: app.configs['mirror'] = mirrorSave.text
+                                    app.root.ids.Smirror.text = f"Mirror: {urlparse(app.configs['mirror']).netloc}"
+                                    app.save_Update(app.configs, filename='configs.json')
+
+                    MDSeparator:
+
+                    MDLabel:
+                        id: label_theme
+                        text: "Current theme: {}".format(app.theme_cls.primary_palette)
+                        bold: True
+                        theme_text_color: "Primary"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+
+                    KitchenSinkOneLineIconListItem:
+                        text: "Change Theme"
+                        icon: "palette-outline"
+                        divider: None
+                        on_release: app.show_dialog_change_theme()
+
+                    MDSeparator:
+
+                    MDLabel:
+                        id: label_theme
+                        text: "Input proxy list"
+                        bold: True
+                        theme_text_color: "Primary"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+
+                    KitchenSinkOneLineIconListItem:
+                        text: "Input"
+                        icon: "file-document-box-plus-outline"
+                        divider: None
+                        on_release: PSTDialogInput().open()
+
+                    MDSeparator:
+
+                    MDLabel:
+                        id: label_theme
+                        text: "About Us"
+                        bold: True
+                        theme_text_color: "Primary"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+
+                    KitchenSinkOneLineIconListItem:
+                        text: "Developers"
+                        icon: "dev-to"
+                        divider: None
+                        on_release: KitchenSinkDialogDev().open()
+
+                    KitchenSinkOneLineIconListItem:
+                        text: "License"
+                        icon: "license"
+                        divider: None
+                        on_release: KitchenSinkDialogLicense().open()
+
+                    Widget:
+                        size_hint_y: None
+                        height: app.theme_cls.standard_increment

@@ -1,0 +1,6 @@
+libs/__pycache__
+libs/baseclass/__pycache__
+.buildozer/
+bin/
+# .vscode/
+proxys.txt
