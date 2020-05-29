@@ -52,7 +52,7 @@ BoxLayout:
                             pos_hint: {"center_y": .35}
                             text: ""
                             bold: True
-                            font_size: 7
+                            font_style: "Overline"
                             halign: "center"
                             theme_text_color: "Primary"
                         MDLabel:
@@ -60,7 +60,7 @@ BoxLayout:
                             pos_hint: {"center_y": .35}
                             text: "0 KB/s"
                             bold: True
-                            font_size: 30
+                            font_style: "H2"
                             halign: "center"
                             theme_text_color: "Primary"
                     MDBoxLayout:
@@ -71,7 +71,7 @@ BoxLayout:
                             MDLabel:
                                 id: totaltx
                                 text: "Total"
-                                font_size: 10
+                                font_style: "Overline"
                                 size_hint_x: .1
                                 halign: "center" 
                                 theme_text_color: "Primary"
@@ -79,11 +79,11 @@ BoxLayout:
                                 id: totalpb
                                 max: 100
                                 value: 0
-                                heigh: dp(100)
+                                # heigh: dp(100)
                             MDLabel:
                                 id: totalpbText
                                 text: f"{(totalpb.value/totalpb.max)*100}%"
-                                font_size: totaltx.font_size
+                                font_style: "Overline"
                                 size_hint_x: totaltx.size_hint_x
                                 halign: totaltx.halign
                                 theme_text_color: "Primary"
@@ -108,34 +108,32 @@ BoxLayout:
                             # orientation: "vertical"
                             pos_hint: {"center_y": .5}
                             id: header_text
-                            font_size: 7
                             MDLabel:
                                 id: Sprotocol
-                                font_size: header_text.font_size
+                                font_style: "Overline"
                                 halign: "center"
                                 theme_text_color: "Primary"
                             MDLabel:
                                 id: Tproxys
-                                font_size: header_text.font_size
+                                font_style: "Overline"
                                 halign: "center"
                                 theme_text_color: "Primary"
                             MDLabel:
                                 id: Smirror
-                                font_size: header_text.font_size
+                                font_style: "Overline"
                                 halign: "center"
                                 theme_text_color: "Primary"
                         MDBoxLayout:
                             padding: 10
                             # orientation: "vertical"
                             id: header_text
-                            font_size: 7
                             MDBoxLayout:
                                 size_hint_x: .83
                                 # size_hint_y: None
                                 MDSeparator:
                                 MDLabel:
                                     text: "SERVER"
-                                    font_size: header_text.font_size
+                                    font_style: "Overline"
                                     halign: "center"
                                     theme_text_color: "Primary"
                                 MDSeparator:
@@ -143,7 +141,7 @@ BoxLayout:
                                 size_hint_x: .35
                                 MDLabel:
                                     text: "SIZE"
-                                    font_size: header_text.font_size
+                                    font_style: "Overline"
                                     halign: "center"
                                     theme_text_color: "Primary"
                                 MDSeparator:
@@ -151,7 +149,7 @@ BoxLayout:
                                 size_hint_x: .27
                                 MDLabel:
                                     text: "TIME"
-                                    font_size: header_text.font_size
+                                    font_style: "Overline"
                                     halign: "center"
                                     theme_text_color: "Primary"
                                 MDSeparator:
@@ -159,7 +157,7 @@ BoxLayout:
                                 size_hint_x: .28
                                 MDLabel:
                                     text: "SPEED"
-                                    font_size: header_text.font_size
+                                    font_style: "Overline"
                                     halign: "center"
                                     theme_text_color: "Primary"
                                 MDSeparator:
@@ -290,7 +288,7 @@ BoxLayout:
             PopMatrix
 
         opacity: .2
-        source: f"{os.environ['KITCHEN_SINK_ASSETS']}icon.png"
+        source: f"{os.environ['KITCHEN_SINK_ASSETS']}presplash.png"
         pos_hint: {"center_y": .55}
 
     ScreenManager:
