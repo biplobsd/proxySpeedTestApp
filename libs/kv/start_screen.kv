@@ -65,7 +65,7 @@ BoxLayout:
                             theme_text_color: "Primary"
                     MDBoxLayout:
                         orientation: 'vertical'
-                        size_hint_y: .5
+                        size_hint_y: .4
 
                         MDBoxLayout:
                             padding: 10, 0, 10, 0 
@@ -278,19 +278,19 @@ BoxLayout:
     backdrop: None
     root_screen_manager: None
 
-    Image:
-        canvas.before:
-            PushMatrix
-            Scale:
-                origin: self.center
-                x: root.scale_x
-                y: root.scale_y
-        canvas.after:
-            PopMatrix
+    # Image:
+    #     canvas.before:
+    #         PushMatrix
+    #         Scale:
+    #             origin: self.center
+    #             x: root.scale_x
+    #             y: root.scale_y
+    #     canvas.after:
+    #         PopMatrix
 
-        opacity: .2
-        source: f"{os.environ['KITCHEN_SINK_ASSETS']}presplash.png"
-        pos_hint: {"center_y": .55}
+    #     opacity: .2
+    #     source: f"{os.environ['KITCHEN_SINK_ASSETS']}presplash.png"
+    #     pos_hint: {"center_y": .55}
 
     ScreenManager:
         id: screen_manager
