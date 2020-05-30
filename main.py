@@ -14,6 +14,7 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.floatlayout import FloatLayout
 import kivymd.material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
+from kivymd.toast import toast
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
@@ -175,16 +176,7 @@ class ProxySpeedTestApp(MDApp):
 
         sort = self.save_Update()
         if sort:
-            for parServer in sort:
-                self.root.ids.backdrop_front_layer.data.append(
-                    {
-                        "viewclass": "ProxyShowList",
-                        "text": parServer['IP'],
-                        "text1": f"{parServer['SIZE']} MB",
-                        "text2": parServer['TIME'],
-                        "text3": f"{parServer['SPEED']} KB/s",
-                        "on_release": lambda x=parServer['IP']: self.copy_proxyip(x),
-                    })
+            self.show_List(sort)
             self.root.ids.Tproxys.text = f"Total proxys: {len(sort)}"
         else:
             self.root.ids.Tproxys.text = f"Total proxys: 0"
@@ -420,7 +412,6 @@ class ProxySpeedTestApp(MDApp):
                 }
                 )
     def copy_proxyip(self, data):
-        from kivymd.toast import toast
         toast(f"Copied: {data}")
         # print("Clicked!")
         Clipboard.copy(data)

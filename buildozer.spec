@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,kivymd,requests,pysocks,hurry.filesize
+requirements = hostpython3==3.7.5,python3==3.7.5,kivy==9aaca29d2f4e72aac71afba5c23c6cc8128b9e3c,kivymd,requests,pysocks,hurry.filesize
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
