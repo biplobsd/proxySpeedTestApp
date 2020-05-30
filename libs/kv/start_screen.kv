@@ -73,16 +73,16 @@ BoxLayout:
                                 id: totaltx
                                 text: "Total"
                                 font_style: "Overline"
-                                size_hint_x: .1
+                                size_hint_x: .2
                                 halign: "center" 
                                 theme_text_color: "Primary"
                             MDProgressBar:
                                 id: totalpb
                                 max: 100
                                 value: 0
-                                # heigh: dp(100)
                             MDLabel:
                                 id: totalpbText
+                                size_hint_x: .2
                                 text: f"{(totalpb.value/totalpb.max)*100}%"
                                 font_style: "Overline"
                                 size_hint_x: totaltx.size_hint_x
@@ -279,19 +279,19 @@ BoxLayout:
     backdrop: None
     root_screen_manager: None
 
-    # Image:
-    #     canvas.before:
-    #         PushMatrix
-    #         Scale:
-    #             origin: self.center
-    #             x: root.scale_x
-    #             y: root.scale_y
-    #     canvas.after:
-    #         PopMatrix
+    Image:
+        canvas.before:
+            PushMatrix
+            Scale:
+                origin: self.center
+                x: root.scale_x
+                y: root.scale_y
+        canvas.after:
+            PopMatrix
 
-    #     opacity: .2
-    #     source: f"{os.environ['KITCHEN_SINK_ASSETS']}presplash.png"
-    #     pos_hint: {"center_y": .55}
+        opacity: .2
+        source: f"{os.environ['KITCHEN_SINK_ASSETS']}icon.png"
+        pos_hint: {"center_y": .55}
 
     ScreenManager:
         id: screen_manager

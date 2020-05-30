@@ -150,15 +150,6 @@ class ProxySpeedTestApp(MDApp):
     @run_on_ui_thread
     def _statusBarColor(self, color="#03A9F4"):
         
-        # WindowManager = autoclass('android.view.WindowManager$LayoutParams')
-        # R = autoclass('android.R')
-        # activity = autoclass('org.kivy.android.PythonActivity').mActivity
-
-        # window = activity.getWindow()
-        # window.clearFlags(WindowManager.FLAG_TRANSLUCENT_STATUS)
-        # window.addFlags(WindowManager.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        # window.setStatusBarColor(activity.getResources().getColor(R.color.my_statusbar_color))
-
         window = activity.getWindow()
         window.clearFlags(WindowManager.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -182,17 +173,15 @@ class ProxySpeedTestApp(MDApp):
             self.root.ids.Tproxys.text = f"Total proxys: 0"
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}"
-        
-        
-        
-    def back_to_home_screen(self):
-        self.root.ids.screen_manager.current = "home"
 
     
     def start_scan(self, instance):
         from kivy.utils import get_color_from_hex
         # print("Clicked!!")
         if instance.text == "Start":
+            if int(self.root.ids.Tproxys.text[-1:]) == 0:
+                toast("First input proxys ip:port list then start scan.")
+                return
             instance.text = "Stop"
             color = "#f44336"
             instance.md_bg_color = get_color_from_hex(color)
