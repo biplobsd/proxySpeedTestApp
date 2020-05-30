@@ -146,7 +146,7 @@ class ProxySpeedTestApp(MDApp):
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
 
-    # @run_on_ui_thread
+    @run_on_ui_thread
     def _statusBarColor(self, color="#03A9F4"):
         
         # WindowManager = autoclass('android.view.WindowManager$LayoutParams')
@@ -211,7 +211,10 @@ class ProxySpeedTestApp(MDApp):
             else:
                 self.scaning.put_nowait(p)
             Thread(target=self.proxySpeedTest, args=("start",)).start()
+        
             # self.proxySpeedTest('start')
+        elif instance.text == "Stoping":
+            toast(f"Waiting for finish {self.root.ids.currentIP.text[8:]}!")
         else:
             p = self.scaning.get_nowait()
             if not p == 0:
@@ -221,11 +224,7 @@ class ProxySpeedTestApp(MDApp):
             
             r = self.running.get_nowait()
             self.running.put_nowait(r)
-            if not bool(r):
-                instance.text = "Start"
-                instance.md_bg_color = self.theme_cls.primary_color
-                if platform == "android":self._statusBarColor()
-            else:
+            if bool(r):
                 instance.text = "Stoping"
                 # instance.text_color
                 color = "#757575"
@@ -452,4 +451,5 @@ class ProxySpeedTestApp(MDApp):
             r = self.running.get()
             self.running.put(r)
 
-ProxySpeedTestApp().run()
+if __name__ == "__main__":
+    ProxySpeedTestApp().run()
