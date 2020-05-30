@@ -5,6 +5,8 @@ import sys
 from kivy.lang import Builder
 # from kivy.core.window import Window
 
+from kivy.utils import platform
+
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.behaviors import RectangularRippleBehavior
@@ -32,12 +34,13 @@ from urllib import parse
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
 
-from android.runnable import run_on_ui_thread
-from jnius import autoclass
+if platform == "android":
+    from android.runnable import run_on_ui_thread
+    from jnius import autoclass
 
-Color = autoclass("android.graphics.Color")
-WindowManager = autoclass('android.view.WindowManager$LayoutParams')
-activity = autoclass('org.kivy.android.PythonActivity').mActivity
+    Color = autoclass("android.graphics.Color")
+    WindowManager = autoclass('android.view.WindowManager$LayoutParams')
+    activity = autoclass('org.kivy.android.PythonActivity').mActivity
 
 
 if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
@@ -131,7 +134,8 @@ class ProxySpeedTestApp(MDApp):
                 return False
 
     def build(self):
-        self._statusBarColor()
+        if platform == "android":
+            self._statusBarColor()
         Builder.load_file(
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/list_items.kv"
         )
@@ -142,7 +146,7 @@ class ProxySpeedTestApp(MDApp):
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
 
-    @run_on_ui_thread
+    # @run_on_ui_thread
     def _statusBarColor(self, color="#03A9F4"):
         
         # WindowManager = autoclass('android.view.WindowManager$LayoutParams')
@@ -171,7 +175,16 @@ class ProxySpeedTestApp(MDApp):
 
         sort = self.save_Update()
         if sort:
-            self.show_List(sort)
+            for parServer in sort:
+                self.root.ids.backdrop_front_layer.data.append(
+                    {
+                        "viewclass": "ProxyShowList",
+                        "text": parServer['IP'],
+                        "text1": f"{parServer['SIZE']} MB",
+                        "text2": parServer['TIME'],
+                        "text3": f"{parServer['SPEED']} KB/s",
+                        "on_release": lambda x=parServer['IP']: self.copy_proxyip(x),
+                    })
             self.root.ids.Tproxys.text = f"Total proxys: {len(sort)}"
         else:
             self.root.ids.Tproxys.text = f"Total proxys: 0"
@@ -191,7 +204,7 @@ class ProxySpeedTestApp(MDApp):
             instance.text = "Stop"
             color = "#f44336"
             instance.md_bg_color = get_color_from_hex(color)
-            self._statusBarColor(color)
+            if platform == "android":self._statusBarColor(color)
             p = self.scaning.get_nowait()
             if not p == 1:
                 self.scaning.put_nowait(1)
@@ -211,13 +224,13 @@ class ProxySpeedTestApp(MDApp):
             if not bool(r):
                 instance.text = "Start"
                 instance.md_bg_color = self.theme_cls.primary_color
-                self._statusBarColor()
+                if platform == "android":self._statusBarColor()
             else:
                 instance.text = "Stoping"
                 # instance.text_color
                 color = "#757575"
                 instance.md_bg_color = get_color_from_hex(color)
-                self._statusBarColor(color)
+                if platform == "android":self._statusBarColor(color)
             
     
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
@@ -387,7 +400,7 @@ class ProxySpeedTestApp(MDApp):
             self.scaning.put(s)
         self.root.ids.start_stop.text = "Start"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
-        self._statusBarColor()
+        if platform == "android":self._statusBarColor()
         r = self.running.get()
         if not r == 0:
             self.running.put(0)

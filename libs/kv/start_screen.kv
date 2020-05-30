@@ -125,6 +125,7 @@ BoxLayout:
                                 halign: "center"
                                 theme_text_color: "Primary"
                         MDBoxLayout:
+                            adaptive_height: True
                             padding: 10
                             # orientation: "vertical"
                             id: header_text
@@ -221,7 +222,6 @@ BoxLayout:
             size_hint_y: None
             size_hint_x: .7
             height: self.texture_size[1]
-            markup: True
             shorten_from: 'right'
             shorten: True
         MDLabel:
@@ -234,7 +234,6 @@ BoxLayout:
             size_hint_y: None
             size_hint_x: .4
             height: self.texture_size[1]
-            markup: True
             shorten_from: 'right'
             shorten: True
         MDLabel:
@@ -247,7 +246,6 @@ BoxLayout:
             size_hint_y: None
             size_hint_x: .27
             height: self.texture_size[1]
-            markup: True
             shorten_from: 'right'
             shorten: True
         MDLabel:
@@ -260,7 +258,6 @@ BoxLayout:
             size_hint_y: None
             size_hint_x: .28
             height: self.texture_size[1]
-            markup: True
             shorten_from: 'right'
             shorten: True
 
@@ -365,69 +362,67 @@ BoxLayout:
                             bold: True
                             theme_text_color: "Primary"
                         
-                        ScrollView:
-                            MDBoxLayout:
+                        MDBoxLayout:
+                            size_hint: None, None
+                            adaptive_size: True
+                            spacing: "20dp"
+
+                            MDCheckbox:
+                                group: "style_protocol"
                                 size_hint: None, None
-                                adaptive_size: True
-                                spacing: "30dp"
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "http" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "http"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
 
-                                MDCheckbox:
-                                    group: "style_protocol"
-                                    size_hint: None, None
-                                    size: "48dp", '48dp'
-                                    active: True if app.configs['protocol'] == "http" else False
-                                    on_active:
-                                        if self.active: app.configs['protocol'] = "http"
-                                        app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                        app.save_Update(app.configs, filename='configs.json')
+                            Label:
+                                text: "HTTP"
+                                color: app.theme_cls.text_color
 
-                                Label:
-                                    text: "HTTP"
-                                    # font_size: 12
-                                    color: app.theme_cls.text_color
+                            MDCheckbox:
+                                group: "style_protocol"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "https" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "https"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
+                            Label:
+                                text: "HTTPS"
+                                # font_size: 12
+                                color: app.theme_cls.text_color
+                            
+                            MDCheckbox:
+                                group: "style_protocol"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "socks4" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "socks4"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
 
-                                MDCheckbox:
-                                    group: "style_protocol"
-                                    size_hint: None, None
-                                    size: "48dp", '48dp'
-                                    active: True if app.configs['protocol'] == "https" else False
-                                    on_active:
-                                        if self.active: app.configs['protocol'] = "https"
-                                        app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                        app.save_Update(app.configs, filename='configs.json')
-                                Label:
-                                    text: "HTTPS"
-                                    # font_size: 12
-                                    color: app.theme_cls.text_color
-                                
-                                MDCheckbox:
-                                    group: "style_protocol"
-                                    size_hint: None, None
-                                    size: "48dp", '48dp'
-                                    active: True if app.configs['protocol'] == "socks4" else False
-                                    on_active:
-                                        if self.active: app.configs['protocol'] = "socks4"
-                                        app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                        app.save_Update(app.configs, filename='configs.json')
-
-                                Label:
-                                    text: "SOCKS4"
-                                    # font_size: 12
-                                    color: app.theme_cls.text_color
-                                
-                                MDCheckbox:
-                                    group: "style_protocol"
-                                    size_hint: None, None
-                                    size: "48dp", '48dp'
-                                    active: True if app.configs['protocol'] == "socks5" else False
-                                    on_active:
-                                        if self.active: app.configs['protocol'] = "socks5"
-                                        app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                        app.save_Update(app.configs, filename='configs.json')
-                                Label:
-                                    text: "SOCKS5"
-                                    # font_size: 12
-                                    color: app.theme_cls.text_color
+                            Label:
+                                text: "SOCKS4"
+                                # font_size: 12
+                                color: app.theme_cls.text_color
+                            
+                            MDCheckbox:
+                                group: "style_protocol"
+                                size_hint: None, None
+                                size: "48dp", '48dp'
+                                active: True if app.configs['protocol'] == "socks5" else False
+                                on_active:
+                                    if self.active: app.configs['protocol'] = "socks5"
+                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
+                                    app.save_Update(app.configs, filename='configs.json')
+                            Label:
+                                text: "SOCKS5"
+                                # font_size: 12
+                                color: app.theme_cls.text_color
 
                     MDSeparator:
 
