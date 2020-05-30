@@ -32,6 +32,14 @@ from urllib import parse
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
 
+from android.runnable import run_on_ui_thread
+from jnius import autoclass
+
+Color = autoclass("android.graphics.Color")
+WindowManager = autoclass('android.view.WindowManager$LayoutParams')
+activity = autoclass('org.kivy.android.PythonActivity').mActivity
+
+
 if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
     os.environ["KITCHEN_SINK_ROOT"] = sys._MEIPASS
 else:
@@ -123,6 +131,7 @@ class ProxySpeedTestApp(MDApp):
                 return False
 
     def build(self):
+        self._statusBarColor()
         Builder.load_file(
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/list_items.kv"
         )
@@ -132,6 +141,24 @@ class ProxySpeedTestApp(MDApp):
         return Builder.load_file(
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
+
+    @run_on_ui_thread
+    def _statusBarColor(self, color="#03A9F4"):
+        
+        # WindowManager = autoclass('android.view.WindowManager$LayoutParams')
+        # R = autoclass('android.R')
+        # activity = autoclass('org.kivy.android.PythonActivity').mActivity
+
+        # window = activity.getWindow()
+        # window.clearFlags(WindowManager.FLAG_TRANSLUCENT_STATUS)
+        # window.addFlags(WindowManager.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        # window.setStatusBarColor(activity.getResources().getColor(R.color.my_statusbar_color))
+
+        window = activity.getWindow()
+        window.clearFlags(WindowManager.FLAG_TRANSLUCENT_STATUS)
+        window.addFlags(WindowManager.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.setStatusBarColor(Color.parseColor(color)) 
+        window.setNavigationBarColor(Color.parseColor(color))
 
     def show_dialog_change_theme(self):
         if not self.dialog_change_theme:
@@ -162,7 +189,9 @@ class ProxySpeedTestApp(MDApp):
         # print("Clicked!!")
         if instance.text == "Start":
             instance.text = "Stop"
-            instance.md_bg_color = get_color_from_hex("#f44336")
+            color = "#f44336"
+            instance.md_bg_color = get_color_from_hex(color)
+            self._statusBarColor(color)
             p = self.scaning.get_nowait()
             if not p == 1:
                 self.scaning.put_nowait(1)
@@ -182,10 +211,13 @@ class ProxySpeedTestApp(MDApp):
             if not bool(r):
                 instance.text = "Start"
                 instance.md_bg_color = self.theme_cls.primary_color
+                self._statusBarColor()
             else:
                 instance.text = "Stoping"
-                instance.text_color
-                instance.md_bg_color = get_color_from_hex("#757575")
+                # instance.text_color
+                color = "#757575"
+                instance.md_bg_color = get_color_from_hex(color)
+                self._statusBarColor(color)
             
     
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
@@ -355,6 +387,7 @@ class ProxySpeedTestApp(MDApp):
             self.scaning.put(s)
         self.root.ids.start_stop.text = "Start"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
+        self._statusBarColor()
         r = self.running.get()
         if not r == 0:
             self.running.put(0)
