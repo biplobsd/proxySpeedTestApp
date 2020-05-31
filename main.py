@@ -213,7 +213,7 @@ class ProxySpeedTestApp(MDApp):
                 # instance.text_color
                 color = "#757575"
                 instance.md_bg_color = get_color_from_hex(color)
-                self.theme_cls.primary_palette = "BlueGray"
+                self.theme_cls.primary_palette = "Gray"
                 if platform == "android":self._statusBarColor(color)
             
     

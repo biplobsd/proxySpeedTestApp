@@ -74,7 +74,7 @@ BoxLayout:
                                 id: totaltx
                                 text: "Total"
                                 font_style: "Overline"
-                                size_hint_x: .1
+                                size_hint_x: .2
                                 halign: "center" 
                                 theme_text_color: "Primary"
                             MDProgressBar:
@@ -83,7 +83,7 @@ BoxLayout:
                                 value: 0
                             MDLabel:
                                 id: totalpbText
-                                size_hint_x: .1
+                                size_hint_x: .2
                                 text: f"{(totalpb.value/totalpb.max)*100}%"
                                 font_style: "Overline"
                                 size_hint_x: totaltx.size_hint_x
