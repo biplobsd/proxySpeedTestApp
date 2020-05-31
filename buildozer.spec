@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = Proxy Speed Test v2
+title = Proxy Speed Test
 
 # (str) Package name
 package.name = proxyspeedtest
@@ -28,7 +28,7 @@ source.include_patterns = assets/*
 source.exclude_patterns = LICENSE
 
 # (str) Application versioning (method 1)
-version = 0.1
+version = 1.0
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -91,7 +91,7 @@ android.permissions = INTERNET
 android.api = 29
 
 # (int) Minimum API your APK will support.
-android.minapi = 28
+android.minapi = 23
 
 # (int) Android SDK version to use
 android.sdk = 29
