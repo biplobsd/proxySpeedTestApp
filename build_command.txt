@@ -1,0 +1,39 @@
+    1  yes | buildozer android debug deploy run logcat
+    2  /root/.buildozer/android/platform/android-sdk/platform-tools/adb connect 0.tcp.ngrok.io:18312
+    3  yes | buildozer android debug deploy run logcat
+    4  yes | buildozer android release
+    5  buildozer appclean
+    6  buildozer -h
+    7  yes | buildozer android release
+    8  type keytool
+    9  keytool -genkey -keystore key.keystore -alias keykivy -keyalg RSA -keysize 2048 -validity 10000
+   10  ls -lh
+   11  jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore key.keystore bin/proxyspeedtest-1.0-arm64-v8a-release-unsigned.apk keykivy
+   12  zipalign -v 4 bin/proxyspeedtest-1.0-arm64-v8a-release-unsigned.apk bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
+   13  history
+   14  ls /root/.buildozer/android/
+   15  ls /root/.buildozer/android/platform/
+   16  ls /root/.buildozer/android/platform/apache-ant-1.9.4/
+   17  ls /root/.buildozer/android/platform/android
+   18  ls /root/.buildozer/android/platform/android/platform/
+   19  ls /root/.buildozer/android/platform/android
+   20  ls /root/.buildozer
+   21  ls /root/.buildozer/android/
+   22  ls /root/.buildozer/android/platform/
+   23  ls /root/.buildozer/android/platform/android-sk
+   24  ls /root/.buildozer/android/platform/android-sdk/
+   25  ls /root/.buildozer/android/platform/android-sdk/build-tools/
+   26  ls
+   27* /root/.buildozer/android/platform/android-sdk/build-tools/30.0.0-rc4/
+   28  /root/.buildozer/android/platform/android-sdk/build-tools/30.0.0-rc4/zipalign -v 4 bin/proxyspeedtest-1.0-arm64-v8a-release-unsigned.apk bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
+   29  adb install bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
+   30  hsityr
+   31  history
+   32  /root/.buildozer/android/platform/android-sdk/platform-tools/adb install bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
+   33  /root/.buildozer/android/platform/android-sdk/platform-tools/adb connect 0.tcp.ngrok.io:18447
+   34  /root/.buildozer/android/platform/android-sdk/platform-tools/adb install bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
+   35  /root/.buildozer/android/platform/android-sdk/platform-tools/adb devices
+   36  /root/.buildozer/android/platform/android-sdk/platform-tools/adb install bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
+   37  hisitry
+   38  history
+   39  history > build_command.txt
