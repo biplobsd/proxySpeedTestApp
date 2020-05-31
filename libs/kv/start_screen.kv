@@ -52,9 +52,10 @@ BoxLayout:
                             pos_hint: {"center_y": .35}
                             text: ""
                             bold: True
+                            theme_text_color: "Hint"
                             font_style: "Overline"
                             halign: "center"
-                            theme_text_color: "Primary"
+                            # theme_text_color: "Primary"
                         MDLabel:
                             id: top_text
                             pos_hint: {"center_y": .35}
@@ -73,7 +74,7 @@ BoxLayout:
                                 id: totaltx
                                 text: "Total"
                                 font_style: "Overline"
-                                size_hint_x: .2
+                                size_hint_x: .1
                                 halign: "center" 
                                 theme_text_color: "Primary"
                             MDProgressBar:
@@ -82,7 +83,7 @@ BoxLayout:
                                 value: 0
                             MDLabel:
                                 id: totalpbText
-                                size_hint_x: .2
+                                size_hint_x: .1
                                 text: f"{(totalpb.value/totalpb.max)*100}%"
                                 font_style: "Overline"
                                 size_hint_x: totaltx.size_hint_x
@@ -113,17 +114,17 @@ BoxLayout:
                                 id: Sprotocol
                                 font_style: "Overline"
                                 halign: "center"
-                                theme_text_color: "Primary"
+                                theme_text_color: "Hint"
                             MDLabel:
                                 id: Tproxys
                                 font_style: "Overline"
                                 halign: "center"
-                                theme_text_color: "Primary"
+                                theme_text_color: "Hint"
                             MDLabel:
                                 id: Smirror
                                 font_style: "Overline"
                                 halign: "center"
-                                theme_text_color: "Primary"
+                                theme_text_color: "Hint"
                         MDBoxLayout:
                             adaptive_height: True
                             padding: 10
@@ -138,7 +139,7 @@ BoxLayout:
                                     text: "SERVER"
                                     font_style: "Overline"
                                     halign: "center"
-                                    theme_text_color: "Primary"
+                                    theme_text_color: "Secondary"
                                 MDSeparator:
                             MDBoxLayout:
                                 size_hint_x: .35
@@ -147,7 +148,7 @@ BoxLayout:
                                     text: "SIZE"
                                     font_style: "Overline"
                                     halign: "center"
-                                    theme_text_color: "Primary"
+                                    theme_text_color: "Secondary"
                                 MDSeparator:
                             MDBoxLayout:
                                 size_hint_x: .27
@@ -156,7 +157,7 @@ BoxLayout:
                                     text: "TIME"
                                     font_style: "Overline"
                                     halign: "center"
-                                    theme_text_color: "Primary"
+                                    theme_text_color: "Secondary"
                                 MDSeparator:
                             MDBoxLayout:
                                 size_hint_x: .28
@@ -165,7 +166,7 @@ BoxLayout:
                                     text: "SPEED"
                                     font_style: "Overline"
                                     halign: "center"
-                                    theme_text_color: "Primary"
+                                    theme_text_color: "Secondary"
                                 MDSeparator:
                     KitchenSinkBackdropFrontLayer:
                         id: backdrop_front_layer
@@ -180,6 +181,8 @@ BoxLayout:
                             pos_hint: {"center_x": .5, "center_y": .5}
                             text: "Start"
                             increment_width: "164dp"
+                            theme_text_color: "Custom"
+                            text_color: 1, 1, 1, .8
                             # md_bg_color: get_color_from_hex("#f44336")
                             on_release: app.start_scan(self)
                         

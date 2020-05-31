@@ -15,6 +15,7 @@ from kivy.uix.floatlayout import FloatLayout
 import kivymd.material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
+from kivy.utils import get_color_from_hex
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
@@ -34,6 +35,7 @@ from kivy.metrics import dp
 from urllib import parse
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
+import time
 
 if platform == "android":
     from android.runnable import run_on_ui_thread
@@ -108,10 +110,10 @@ class ProxySpeedTestApp(MDApp):
         self.dialog_change_theme = None
         self.toolbar = None
         self.data_screens = {}
-        self.scaning = Queue(maxsize=1)
-        self.scaning.put_nowait(0)
-        self.running = Queue(maxsize=1)
-        self.running.put_nowait(0)
+        self.scaning = Queue()
+        # self.scaning.put_nowait(0)
+        self.running = Queue()
+        # self.running.put_nowait(0)
         self.currentSpeed = Queue()
         self.configs = {
             'protocol': 'http',
@@ -176,40 +178,42 @@ class ProxySpeedTestApp(MDApp):
 
     
     def start_scan(self, instance):
-        from kivy.utils import get_color_from_hex
         # print("Clicked!!")
         if instance.text == "Start":
+            try:
+                with open('proxys.txt', 'r') as r:
+                    data = r.read()
+                data = data.split('\n')
+                proxys = data[:-1]
+                self.root.ids.Tproxys.text = f"Total proxys: {len(proxys)}"
+            except FileNotFoundError:
+                pass
             if int(self.root.ids.Tproxys.text[-1:]) == 0:
                 toast("First input proxys ip:port list then start scan.")
                 return
             instance.text = "Stop"
             color = "#f44336"
             instance.md_bg_color = get_color_from_hex(color)
+            self.theme_cls.primary_palette = "Red"
             if platform == "android":self._statusBarColor(color)
-            p = self.scaning.get_nowait()
-            if not p == 1:
-                self.scaning.put_nowait(1)
-            else:
-                self.scaning.put_nowait(p)
-            Thread(target=self.proxySpeedTest, args=("start",)).start()
+            self.scaning.put_nowait(1)
+            self.running.put_nowait(1)
+            Thread(target=self.proxySpeedTest, args=(proxys,)).start()
         
             # self.proxySpeedTest('start')
         elif instance.text == "Stoping":
             toast(f"Waiting for finish {self.root.ids.currentIP.text[8:]}!")
         else:
-            p = self.scaning.get_nowait()
-            if not p == 0:
-                self.scaning.put_nowait(0)
-            else:
-                self.scaning.get_nowait(p)
+            while not self.scaning.empty():
+                self.scaning.get_nowait()
             
-            r = self.running.get_nowait()
-            self.running.put_nowait(r)
-            if bool(r):
+
+            if not self.running.empty():
                 instance.text = "Stoping"
                 # instance.text_color
                 color = "#757575"
                 instance.md_bg_color = get_color_from_hex(color)
+                self.theme_cls.primary_palette = "BlueGray"
                 if platform == "android":self._statusBarColor(color)
             
     
@@ -246,9 +250,20 @@ class ProxySpeedTestApp(MDApp):
                 timeout=5
             )
             with(open(f'{filename}{idx}', 'ab')) as f:
+                start = datetime.now()
+                chunkSize = 0
                 for chunk in req.iter_content(chunk_size=1024):
+                    end = datetime.now()
+                    if 0.1 <= (end-start).seconds:
+                        delta = round(float((end - start).seconds) +
+                                    float(str('0.' + str((end -
+                                                            start).microseconds))), 3)
+                        speed = round((chunkSize) / delta)
+                        start = datetime.now()
+                        self.currentSpeed.put_nowait(speed)
+                        chunkSize = 0
                     if chunk:
-                        self.currentSpeed.put_nowait(1024)
+                        chunkSize += sys.getsizeof(chunk)
                         self.showupdate(idx)
                         f.write(chunk)
         except requests.exceptions.ProxyError:
@@ -281,7 +296,7 @@ class ProxySpeedTestApp(MDApp):
         
         self.showupdate(idx, 'd')
     
-    def showupdate(self, idx, mode='u'):
+    def showupdate(self, idx, mode='u', error=True):
         if mode == 'u':
             if idx == 1:
                 self.root.ids.progressBar1.value += 1
@@ -290,21 +305,22 @@ class ProxySpeedTestApp(MDApp):
             elif idx == 3:
                 self.root.ids.progressBar3.value += 1
         elif mode == 'd':
+            color = "#f44336"
             if idx == 1:
                 self.root.ids.progressBar1.value = 0
+                # if error:
+                #     self.root.ids.progressBar1.color = get_color_from_hex(color)
             elif idx == 2:
                 self.root.ids.progressBar2.value = 0
+                # if error:
+                #     self.root.ids.progressBar1.color = get_color_from_hex(color)
             elif idx == 3:
                 self.root.ids.progressBar3.value = 0
+                # if error:
+                #     self.root.ids.progressBar1.color = get_color_from_hex(color)
             self.root.ids.top_text.text = "0 KB/s"
     
-    def proxySpeedTest(self, s):
-        print(s)
-        with open('proxys.txt', 'r') as r:
-            data = r.read()
-        data = data.split('\n')
-        proxys = data[:-1]
-        self.root.ids.Tproxys.text = f"Total proxys: {len(proxys)}"
+    def proxySpeedTest(self, proxys):
         filename = 'chunk'
         protocol = self.configs['protocol']
         mirror = self.configs['mirror']
@@ -313,14 +329,7 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.totalpb.max = len(proxys)
         self.root.ids.totalpb.value = 0
         for part in proxys:
-            r = self.running.get()
-            if not r == 1:
-                self.running.put(1)
-            else:
-                self.running.put(r)
-            s = self.scaning.get()
-            self.scaning.put(s)
-            if not bool(s):break        
+            if self.scaning.empty():break        
             proxy_ip = part.strip()
             self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
             # Removing before test chunk file
@@ -373,19 +382,13 @@ class ProxySpeedTestApp(MDApp):
             comP = (self.root.ids.totalpb.value/len(proxys))*100
             self.root.ids.totalpbText.text = f"{round(comP)}%"
             # return True
-        s = self.scaning.get()
-        if not s == 0:
-            self.scaning.put(0)
-        else:
-            self.scaning.put(s)
+        
         self.root.ids.start_stop.text = "Start"
+        self.theme_cls.primary_palette = "LightBlue"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
         if platform == "android":self._statusBarColor()
-        r = self.running.get()
-        if not r == 0:
-            self.running.put(0)
-        else:
-            self.running.put(r)
+        while not self.running.empty():
+            self.running.get_nowait()
         print("Finished!")
 
     def show_List(self, data):
@@ -407,29 +410,21 @@ class ProxySpeedTestApp(MDApp):
     
     def speedcal(self, msg):
         print(msg)
-        chunkSize = 0
+        speed = 0
         start = datetime.now()
-        r = self.running.get()
-        self.running.put(r)
-        while bool(r):
+        oldspeed = 0
+        while not self.running.empty():
             end = datetime.now()
-            if .5 <= (end-start).seconds:
-                delta = round(float((end - start).seconds) +
-                            float(str('0.' + str((end -
-                                                    start).microseconds))), 3)
-                speed = round((chunkSize) / delta)
+            if (0.1 <= (end-start).seconds) and speed != 0 and oldspeed != speed:
+                self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"
                 start = datetime.now()
-                chunkSize = 0
-                if not speed <= 0:
-                    self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"
+                oldspeed = speed
+                speed = 0
             try:
-                while True:
-                    chunkSize += self.currentSpeed.get_nowait()
+                while not self.currentSpeed.empty():
+                    speed += self.currentSpeed.get_nowait()
             except Empty:
                 pass
-            
-            r = self.running.get()
-            self.running.put(r)
 
 if __name__ == "__main__":
     ProxySpeedTestApp().run()
