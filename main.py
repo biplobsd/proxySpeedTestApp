@@ -40,9 +40,9 @@ import sqlite3
 from ago import human
 
 
-conn = sqlite3.connect('database.db')
-c = conn.cursor()
-
+# conn = sqlite3.connect('database.db')
+# c = conn.cursor()
+databaseFilename = 'database.db'
 
 if platform == "android":
     from android.runnable import run_on_ui_thread
@@ -131,6 +131,9 @@ class ProxySpeedTestApp(MDApp):
         self.scaning = Queue()
         self.running = Queue()
         self.currentSpeed = Queue()
+
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
         with conn:
             try:
                 c.execute("""create table proxys (
@@ -180,7 +183,9 @@ class ProxySpeedTestApp(MDApp):
                 getips = c.fetchall()
                 c.execute("SELECT protocol FROM 'proxys' WHERE time=?", [self.selLId])
                 protocol = c.fetchone()[0]
-        
+        conn.commit()
+        conn.close()
+
         self.scan_list = []
         if self.selLId:
             for l in scan_list:
@@ -204,8 +209,13 @@ class ProxySpeedTestApp(MDApp):
         
     def changeThemeMode(self, inst):
         self.theme_cls.theme_style = inst
+
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
         with conn:
             c.execute("UPDATE 'configs' SET themeMode=?", [inst])
+        conn.commit()
+        conn.close()
 
     def save_Update(self, l=[], filename='scan_data.json'):
         import json
@@ -232,6 +242,8 @@ class ProxySpeedTestApp(MDApp):
                                                 (p['SIZE'], p['TIME'], p['SPEED'], p['IP']))
             except sqlite3.OperationalError as e:
                 print(e)
+        conn.commit()
+        conn.close()
 
     def build(self):
         if platform == "android":
@@ -282,40 +294,53 @@ class ProxySpeedTestApp(MDApp):
         self.listPic()
 
     def listPic(self):
+
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
         with conn:
             c.execute("SELECT proxysInx FROM 'proxysInx'")
             proxysInx = c.fetchall()
+        conn.commit()
+        conn.close()
 
         self.proxysInx = proxysInx
         
-        self.root.ids.Slist.text = f"list : {agoConv(self.selLId)}".upper() if proxysInx else "list :"
-
         if proxysInx:
-            self.ListItems = []  
+            selLIdindxDict = {}
+            self.ListItems = []
             i = 0
             for Inx in proxysInx:
                 self.ListItems.append({"icon": "playlist-remove", "text": f'#{i} '+agoConv(Inx[0])})
+                selLIdindxDict[Inx[0]] = i
                 i += 1
         else:
             self.ListItems = [{"icon": "playlist-remove", "text": "None"}]
-         
+        
+        if proxysInx:
+            self.selLIdindx = selLIdindxDict[self.selLId]
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if proxysInx else "list :"
+
         self.listSel = MDDropdownMenu(
             caller=self.root.ids.Slist, items=self.ListItems, width_mult=4.2,
             opening_time=0.2,
+            use_icon_item=False,
             position='auto',
-            max_height=300,
-            callback=self.set_list
+            max_height=0,
+            callback=self.set_list,
         )
 
     def set_list(self, ins):
         import re
-        indx = int(re.search(r'#(\d)\s', ins.text).group(1))
+        self.selLIdindx = int(re.search(r'#(\d)\s', ins.text).group(1))
         withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
-        print(indx)
+        print(self.selLIdindx)
+
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
         with conn:
             c.execute("SELECT proxysInx FROM 'proxysInx'")
             proxysInx = c.fetchall()
-            self.selLId = proxysInx[indx][0]
+            self.selLId = proxysInx[self.selLIdindx][0]
             c.execute("SELECT ip FROM 'proxys' WHERE time=?", [self.selLId])
             getips = c.fetchall()
             c.execute("SELECT protocol FROM 'proxys' WHERE time=?", [self.selLId])
@@ -325,6 +350,8 @@ class ProxySpeedTestApp(MDApp):
             c.execute("SELECT ip, size, getfiletime, speed FROM 'proxys' WHERE time=?", [self.selLId])
             scan_list = c.fetchall()
             # print(protocol)
+        conn.commit()
+        conn.close()
 
         self.scan_list = []
         if self.selLId:
@@ -341,7 +368,7 @@ class ProxySpeedTestApp(MDApp):
         self.proxys = [ip[0] for ip in getips]
         self.configs['protocol'] = protocol
 
-        self.root.ids.Slist.text = f"list : {withoutHash}".upper()
+        self.root.ids.Slist.text = f"list : {ins.text}".upper()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         self.root.ids.Tproxys.text = f"Total proxys: {len(self.proxys)}"
         
@@ -356,8 +383,9 @@ class ProxySpeedTestApp(MDApp):
         self.protSel = MDDropdownMenu(
             caller=self.root.ids.Sprotocol, items=items, width_mult=3.5,
             opening_time=0.2,
+            use_icon_item=False,
             position='auto',
-            max_height=300,
+            max_height=0,
             callback=self.set_protocol
         )
 
@@ -371,16 +399,23 @@ class ProxySpeedTestApp(MDApp):
         self.protSel.dismiss()
 
     def mirrorPic(self):
+
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
         with conn:
             c.execute("SELECT * FROM 'mirrors'")
             mirrors = c.fetchall()
+        conn.commit()
+        conn.close()
+
         self.mirrors = mirrors
         items = [{"icon": "web", "text": parse.urlparse(mirror[0]).netloc} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
             caller=self.root.ids.Smirror, items=items, width_mult=5,
             opening_time=0.2,
+            use_icon_item=False,
             position='bottom',
-            max_height=300,
+            max_height=0,
             callback=self.set_mirror,
         )
 
@@ -394,11 +429,17 @@ class ProxySpeedTestApp(MDApp):
         self.configs['mirror'] = self.mirrors[miInx][0]
         self.root.ids.Smirror.text = f"Mirror: {ins.text}".upper()
         
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
         with conn:
             c.execute("UPDATE 'configs' SET proxysInx=?", [self.selLId])
             c.execute("UPDATE 'configs' SET miInx=? WHERE miInx=?", (miInx, self.miInx))
+        conn.commit()
+        conn.close()
+        
         toast(self.configs['mirror'])
         self.mirrSel.dismiss()
+        
 
     def start_scan(self, instance):
         # print("Clicked!!")
@@ -417,11 +458,17 @@ class ProxySpeedTestApp(MDApp):
             self.scaning.put_nowait(1)
             self.running.put_nowait(1)
             
+            conn = sqlite3.connect(databaseFilename)
+            c = conn.cursor()
             with conn:
                 IndexTime = datetime.now()
                 c.execute("UPDATE 'configs' SET proxysInx=?", [IndexTime])
                 c.execute("UPDATE 'proxysInx' SET proxysInx=? WHERE proxysInx=?", (IndexTime, self.selLId))
                 c.execute("UPDATE 'proxys' SET time=?, size=NULL, getfiletime=NULL, speed=NULL WHERE time=?", (IndexTime, self.selLId))
+            conn.commit()
+            conn.close()
+            
+            self.selLId = str(IndexTime)
 
             Thread(target=self.proxySpeedTest, args=(
                 self.proxys,
@@ -615,6 +662,7 @@ class ProxySpeedTestApp(MDApp):
             self.root.ids.totalpb.value += 1
             comP = (self.root.ids.totalpb.value/len(proxys))*100
             self.root.ids.totalpbText.text = f"{round(comP)}%"
+            self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()
             # return True
         
         self.root.ids.start_stop.text = "Start"
@@ -640,7 +688,6 @@ class ProxySpeedTestApp(MDApp):
                 )
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")
-        # print("Clicked!")
         Clipboard.copy(data)
     
     def speedcal(self, msg):
