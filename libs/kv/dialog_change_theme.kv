@@ -93,9 +93,10 @@
                 theme_text_color: "Primary"
             
             MDBoxLayout:
-                size_hint: None, None
-                adaptive_size: True
-                spacing: "20dp"
+                size_hint: .5, None
+                # adaptive_size: True
+                # spacing: "20dp"
+                adaptive_height: True
 
                 MDCheckbox:
                     id: pro_http
@@ -106,8 +107,9 @@
                         if self.active: root.piced_pro = 'http'
                         else: root.piced_pro = None
 
-                Label:
+                MDLabel:
                     text: "HTTP"
+                    font_style: "Overline"
                     color: app.theme_cls.text_color
 
                 MDCheckbox:
@@ -118,7 +120,8 @@
                     on_active:
                         if self.active: root.piced_pro = 'https'
                         else: root.piced_pro = None
-                Label:
+                MDLabel:
+                    font_style: "Overline"
                     text: "HTTPS"
                     # font_size: 12
                     color: app.theme_cls.text_color
@@ -132,9 +135,9 @@
                         if self.active: root.piced_pro = 'socks4'
                         else: root.piced_pro = None
 
-                Label:
+                MDLabel:
                     text: "SOCKS4"
-                    # font_size: 12
+                    font_style: "Overline"
                     color: app.theme_cls.text_color
                 
                 MDCheckbox:
@@ -145,9 +148,9 @@
                     on_active:
                         if self.active: root.piced_pro = 'socks5'
                         else: root.piced_pro = None
-                Label:
+                MDLabel:
                     text: "SOCKS5"
-                    # font_size: 12
+                    font_style: "Overline"
                     color: app.theme_cls.text_color
         MDRaisedButton:
             pos_hint: {"center_x": 0.5}

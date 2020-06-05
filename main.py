@@ -246,7 +246,7 @@ class ProxySpeedTestApp(MDApp):
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
 
-    @run_on_ui_thread
+    # @run_on_ui_thread
     def _statusBarColor(self, color="#03A9F4"):
         
         window = activity.getWindow()
