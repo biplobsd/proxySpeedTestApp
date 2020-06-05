@@ -36,7 +36,7 @@ version = 1.0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy==9aaca29d2f4e72aac71afba5c23c6cc8128b9e3c
-requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git,requests,pysocks,hurry.filesize
+requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -229,7 +229,7 @@ android.arch = arm64-v8a
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-#p4a.branch = master
+p4a.branch = develop
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
 #p4a.source_dir =
