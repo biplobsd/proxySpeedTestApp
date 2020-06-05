@@ -3,7 +3,6 @@ import os
 import sys
 
 from kivy.lang import Builder
-# from kivy.core.window import Window
 
 from kivy.utils import platform
 
@@ -16,6 +15,7 @@ import kivymd.material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
 from kivy.utils import get_color_from_hex
+from kivymd.uix.menu import MDDropdownMenu
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
@@ -36,6 +36,13 @@ from urllib import parse
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
 import time
+import sqlite3
+from ago import human
+
+
+conn = sqlite3.connect('database.db')
+c = conn.cursor()
+
 
 if platform == "android":
     from android.runnable import run_on_ui_thread
@@ -51,11 +58,12 @@ if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
 else:
     sys.path.append(os.path.abspath(__file__).split("demos")[0])
     os.environ["KITCHEN_SINK_ROOT"] = os.path.dirname(os.path.abspath(__file__))
-os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
+    os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
     os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
-)
+    )
+# from kivy.core.window import Window
 # Window.softinput_mode = "below_target"
-# _small = 3
+# _small = 2
 # Window.size = (1080/_small, 1920/_small)
 
 
@@ -102,27 +110,102 @@ def sec_to_mins(seconds):
     d = f"{a} m {b} s"
     return d
 
+def agoConv(datetimeStr):
+    if datetimeStr:
+        _ago = human(datetime.strptime(datetimeStr, '%Y-%m-%d %H:%M:%S.%f'),
+        abbreviate=True)
+        if 's' in _ago[:3]:
+            return 'now' 
+        else:
+            return _ago
+    else:
+        return 'Pic a list'
+
 class ProxySpeedTestApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.theme_cls.primary_palette = "LightBlue"
-        self.theme_cls.theme_style = "Dark"
         self.dialog_change_theme = None
         self.toolbar = None
         self.data_screens = {}
         self.scaning = Queue()
-        # self.scaning.put_nowait(0)
         self.running = Queue()
-        # self.running.put_nowait(0)
         self.currentSpeed = Queue()
+        with conn:
+            try:
+                c.execute("""create table proxys (
+                    time datetime,
+                    protocol text,
+                    ip text,
+                    size real,
+                    getfiletime text,
+                    speed integer
+                    )""")
+                
+            except sqlite3.OperationalError as e:
+                print(e)
+
+            try:
+                c.execute("create table proxysInx (proxysInx datetime)")
+                # c.execute("INSERT INTO proxysInx VALUES (?)", [defaultIndexTime])
+            except sqlite3.OperationalError as e:
+                print(e)
+            
+            try:
+                c.execute('''create table configs (
+                    themeMode text,
+                    miInx INTEGER,
+                    proxysInx datetime
+                    )''')
+                c.execute("INSERT INTO configs (themeMode, miInx) VALUES ('Dark',0)")
+            except sqlite3.OperationalError as e:
+                print(e)
+            
+            try:
+                c.execute("create table mirrors (mirror text)")
+                c.execute("INSERT INTO mirrors VALUES ('http://bd.archive.ubuntu.com/ubuntu/indices/override.oneiric.universe')")
+                c.execute("INSERT INTO mirrors VALUES ('http://provo.speed.googlefiber.net:3004/download?size=1048576')")
+            except sqlite3.OperationalError as e:
+                print(e)
+            
+            c.execute("SELECT * FROM 'configs'")
+            configs = c.fetchall()
+            c.execute("SELECT * FROM 'mirrors'")
+            mirrors = c.fetchall()
+            self.selLId = configs[0][2]
+            if self.selLId:
+                c.execute("SELECT ip, size, getfiletime, speed FROM 'proxys' WHERE time=?", [self.selLId])
+                scan_list = c.fetchall()
+                c.execute("SELECT ip FROM 'proxys' WHERE time=?", [self.selLId])
+                getips = c.fetchall()
+                c.execute("SELECT protocol FROM 'proxys' WHERE time=?", [self.selLId])
+                protocol = c.fetchone()[0]
+        
+        self.scan_list = []
+        if self.selLId:
+            for l in scan_list:
+                if not None in l:
+                    self.scan_list.append({"IP": l[0], "SIZE": l[1], "TIME": l[2], "SPEED": l[3]})
+        # print(mirrors)
+        # print(configs)
+        
+            
+        self.proxys = [ip[0] for ip in getips] if self.selLId else []
+        self.theme_cls.theme_style = configs[0][0]
+        self.mirrors = mirrors
+        # self.mirrorMenu = [{"icon": "web", "text": parse.urlparse(mirror[0]).netloc} for mirror[0] in mirrors]
+        self.miInx = configs[0][1]
         self.configs = {
-            'protocol': 'http',
-            'mirror': 'http://bd.archive.ubuntu.com/ubuntu/indices/override.oneiric.universe'}
+            'protocol': protocol if self.selLId else 'http',
+            'mirror': mirrors[self.miInx][0]}
+        self.proxysInx = []
+        # recentPlay = self.save_Update(filename='configs.json')
+
         
-        recentPlay = self.save_Update(filename='configs.json')
-        if recentPlay:
-            self.configs = recentPlay
-        
+    def changeThemeMode(self, inst):
+        self.theme_cls.theme_style = inst
+        with conn:
+            c.execute("UPDATE 'configs' SET themeMode=?", [inst])
 
     def save_Update(self, l=[], filename='scan_data.json'):
         import json
@@ -135,6 +218,20 @@ class ProxySpeedTestApp(MDApp):
                     return json.load(read)
             else:
                 return False
+    
+    def save_UpdateDB(self, l=[]):
+      
+        if not l:return False
+        # print(l)
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        with conn:
+            try:
+                for p in l:
+                    c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=? WHERE ip=?",
+                                                (p['SIZE'], p['TIME'], p['SPEED'], p['IP']))
+            except sqlite3.OperationalError as e:
+                print(e)
 
     def build(self):
         if platform == "android":
@@ -149,7 +246,7 @@ class ProxySpeedTestApp(MDApp):
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
 
-    @run_on_ui_thread
+    # @run_on_ui_thread
     def _statusBarColor(self, color="#03A9F4"):
         
         window = activity.getWindow()
@@ -157,6 +254,7 @@ class ProxySpeedTestApp(MDApp):
         window.addFlags(WindowManager.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.setStatusBarColor(Color.parseColor(color)) 
         window.setNavigationBarColor(Color.parseColor(color))
+
 
     def show_dialog_change_theme(self):
         if not self.dialog_change_theme:
@@ -167,30 +265,150 @@ class ProxySpeedTestApp(MDApp):
     def on_start(self):
         """Creates a list of items with examples on start screen."""
 
-        sort = self.save_Update()
-        if sort:
+        unsort = self.scan_list
+        # print(unsort)
+        if unsort:
+            sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
             self.show_List(sort)
             self.root.ids.Tproxys.text = f"Total proxys: {len(sort)}"
         else:
             self.root.ids.Tproxys.text = f"Total proxys: 0"
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
-        self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}"
+        self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
+        # self.root.ids.backdrop._front_layer_open=True
+        
+        self.mirrorPic()
+        self.protPic()
+        self.listPic()
 
-    
+    def listPic(self):
+        with conn:
+            c.execute("SELECT proxysInx FROM 'proxysInx'")
+            proxysInx = c.fetchall()
+
+        self.proxysInx = proxysInx
+        
+        self.root.ids.Slist.text = f"list : {agoConv(self.selLId)}".upper() if proxysInx else "list :"
+
+        if proxysInx:
+            self.ListItems = []  
+            i = 0
+            for Inx in proxysInx:
+                self.ListItems.append({"icon": "playlist-remove", "text": f'#{i} '+agoConv(Inx[0])})
+                i += 1
+        else:
+            self.ListItems = [{"icon": "playlist-remove", "text": "None"}]
+         
+        self.listSel = MDDropdownMenu(
+            caller=self.root.ids.Slist, items=self.ListItems, width_mult=4.2,
+            opening_time=0.2,
+            position='auto',
+            max_height=300,
+            callback=self.set_list
+        )
+
+    def set_list(self, ins):
+        import re
+        indx = int(re.search(r'#(\d)\s', ins.text).group(1))
+        withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
+        print(indx)
+        with conn:
+            c.execute("SELECT proxysInx FROM 'proxysInx'")
+            proxysInx = c.fetchall()
+            self.selLId = proxysInx[indx][0]
+            c.execute("SELECT ip FROM 'proxys' WHERE time=?", [self.selLId])
+            getips = c.fetchall()
+            c.execute("SELECT protocol FROM 'proxys' WHERE time=?", [self.selLId])
+            protocol = c.fetchone()[0]
+            c.execute("UPDATE 'configs' SET proxysInx=?", [self.selLId])
+            
+            c.execute("SELECT ip, size, getfiletime, speed FROM 'proxys' WHERE time=?", [self.selLId])
+            scan_list = c.fetchall()
+            # print(protocol)
+
+        self.scan_list = []
+        if self.selLId:
+            for l in scan_list:
+                if not None in l:
+                    self.scan_list.append({"IP": l[0], "SIZE": l[1], "TIME": l[2], "SPEED": l[3]})
+
+        unsort = self.scan_list
+        if unsort:
+            sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
+            # print(sort)
+            self.show_List(sort)
+
+        self.proxys = [ip[0] for ip in getips]
+        self.configs['protocol'] = protocol
+
+        self.root.ids.Slist.text = f"list : {withoutHash}".upper()
+        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
+        self.root.ids.Tproxys.text = f"Total proxys: {len(self.proxys)}"
+        
+        # print(getips)
+        toast(ins.text)
+        # print(indx)
+        self.listSel.dismiss()
+
+
+    def protPic(self):
+        items = [{"icon": "protocol", "text": protocol.upper()} for protocol in ['http', 'https', 'socks4', 'socks5']]
+        self.protSel = MDDropdownMenu(
+            caller=self.root.ids.Sprotocol, items=items, width_mult=3.5,
+            opening_time=0.2,
+            position='auto',
+            max_height=300,
+            callback=self.set_protocol
+        )
+
+    def set_protocol(self, ins):
+        # print(self.mirrors[0])
+        # print(miInx)
+        self.configs['protocol'] = ins.text.lower()
+        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
+        
+        toast(self.configs['protocol'])
+        self.protSel.dismiss()
+
+    def mirrorPic(self):
+        with conn:
+            c.execute("SELECT * FROM 'mirrors'")
+            mirrors = c.fetchall()
+        self.mirrors = mirrors
+        items = [{"icon": "web", "text": parse.urlparse(mirror[0]).netloc} for mirror in mirrors]
+        self.mirrSel = MDDropdownMenu(
+            caller=self.root.ids.Smirror, items=items, width_mult=5,
+            opening_time=0.2,
+            position='bottom',
+            max_height=300,
+            callback=self.set_mirror,
+        )
+
+    def set_mirror(self, ins):
+        miInx = 0
+        for l in self.mirrors:
+            if ins.text in l[0]:
+                break
+            miInx += 1
+        
+        self.configs['mirror'] = self.mirrors[miInx][0]
+        self.root.ids.Smirror.text = f"Mirror: {ins.text}".upper()
+        
+        with conn:
+            c.execute("UPDATE 'configs' SET proxysInx=?", [self.selLId])
+            c.execute("UPDATE 'configs' SET miInx=? WHERE miInx=?", (miInx, self.miInx))
+        toast(self.configs['mirror'])
+        self.mirrSel.dismiss()
+
     def start_scan(self, instance):
         # print("Clicked!!")
         if instance.text == "Start":
-            try:
-                with open('proxys.txt', 'r') as r:
-                    data = r.read()
-                data = data.split('\n')
-                proxys = data[:-1]
-                self.root.ids.Tproxys.text = f"Total proxys: {len(proxys)}"
-            except FileNotFoundError:
-                pass
-            if int(self.root.ids.Tproxys.text[-1:]) == 0:
+            
+            self.root.ids.Tproxys.text = f"Total proxys: {len(self.proxys)}"
+            if len(self.proxys) == 0:
                 toast("First input proxys ip:port list then start scan.")
                 return
+
             instance.text = "Stop"
             color = "#f44336"
             instance.md_bg_color = get_color_from_hex(color)
@@ -198,7 +416,18 @@ class ProxySpeedTestApp(MDApp):
             if platform == "android":self._statusBarColor(color)
             self.scaning.put_nowait(1)
             self.running.put_nowait(1)
-            Thread(target=self.proxySpeedTest, args=(proxys,)).start()
+            
+            with conn:
+                IndexTime = datetime.now()
+                c.execute("UPDATE 'configs' SET proxysInx=?", [IndexTime])
+                c.execute("UPDATE 'proxysInx' SET proxysInx=? WHERE proxysInx=?", (IndexTime, self.selLId))
+                c.execute("UPDATE 'proxys' SET time=?, size=NULL, getfiletime=NULL, speed=NULL WHERE time=?", (IndexTime, self.selLId))
+
+            Thread(target=self.proxySpeedTest, args=(
+                self.proxys,
+                self.configs['protocol'],
+                self.configs['mirror'],
+                )).start()
         
             # self.proxySpeedTest('start')
         elif instance.text == "Stoping":
@@ -252,13 +481,20 @@ class ProxySpeedTestApp(MDApp):
             with(open(f'{filename}{idx}', 'ab')) as f:
                 start = datetime.now()
                 chunkSize = 0
-                for chunk in req.iter_content(chunk_size=1024):
+                oldSpeed = 0
+                chunkSizeUp = 1024
+                for chunk in req.iter_content(chunk_size=chunkSizeUp):
                     end = datetime.now()
                     if 0.1 <= (end-start).seconds:
                         delta = round(float((end - start).seconds) +
                                     float(str('0.' + str((end -
                                                             start).microseconds))), 3)
                         speed = round((chunkSize) / delta)
+                        # if oldSpeed < speed:
+                            # chunkSizeUp *= 3
+                        # else:
+                        #     chunkSizeUp = speed
+                        oldSpeed = speed
                         start = datetime.now()
                         self.currentSpeed.put_nowait(speed)
                         chunkSize = 0
@@ -320,14 +556,13 @@ class ProxySpeedTestApp(MDApp):
                 #     self.root.ids.progressBar1.color = get_color_from_hex(color)
             self.root.ids.top_text.text = "0 KB/s"
     
-    def proxySpeedTest(self, proxys):
+    def proxySpeedTest(self, proxys, protocol, mirror):
         filename = 'chunk'
-        protocol = self.configs['protocol']
-        mirror = self.configs['mirror']
         unsort = list()
         sort = list ()
         self.root.ids.totalpb.max = len(proxys)
         self.root.ids.totalpb.value = 0
+        print(proxys)
         for part in proxys:
             if self.scaning.empty():break        
             proxy_ip = part.strip()
@@ -375,8 +610,7 @@ class ProxySpeedTestApp(MDApp):
                 'SPEED': int(speed)}
                 )
             sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
-            self.save_Update(sort)
-            self.root.ids.backdrop_front_layer.data = []
+            self.save_UpdateDB(sort)
             self.show_List(sort)
             self.root.ids.totalpb.value += 1
             comP = (self.root.ids.totalpb.value/len(proxys))*100
@@ -392,6 +626,7 @@ class ProxySpeedTestApp(MDApp):
         print("Finished!")
 
     def show_List(self, data):
+        self.root.ids.backdrop_front_layer.data = []
         for parServer in data:
             self.root.ids.backdrop_front_layer.data.append(
                 {

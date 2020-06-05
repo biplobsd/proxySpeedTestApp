@@ -4,6 +4,7 @@ libs/baseclass/__pycache__
 .buildozer/
 bin/
 # .vscode/
+database.db
 configs.json
 scan_data.json
 proxys.txt

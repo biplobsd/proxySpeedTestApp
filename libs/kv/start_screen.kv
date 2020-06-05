@@ -3,10 +3,12 @@
 #:import KitchenSinkDialogLicense libs.baseclass.dialog_change_theme.KitchenSinkDialogLicense
 #:import KitchenSinkDialogDev libs.baseclass.dialog_change_theme.KitchenSinkDialogDev
 #:import PSTDialogInput libs.baseclass.dialog_change_theme.PSTDialogInput
+#:import MirrorDialogInput libs.baseclass.dialog_change_theme.MirrorDialogInput
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import urlparse urllib.parse.urlparse
-
+#:import colors kivymd.color_definitions.colors
+#:import toast kivymd.toast.toast
 
 BoxLayout:
     orientation: "vertical"
@@ -26,10 +28,15 @@ BoxLayout:
 
             MDBackdrop:
                 id: backdrop
-                on_open: home.opening_animation_backdrop_components(backdrop, backlayer)
+                on_open:
+                    if start_stop.text in ['Stop', 'Stoping']:home.disableOpen(backdrop)
+                    else:home.opening_animation_backdrop_components(backdrop, backlayer)
+                    
                 on_close:
                     backlayer.ids.screen_manager.current = "settings"
                     home.closing_animation_backdrop_components(backdrop, backlayer)
+                    app.mirrorPic()
+                    app.listPic()
                 left_action_items: [['menu', lambda x: self.open()]]
                 title: "Proxy speed test"
                 header: False
@@ -66,7 +73,7 @@ BoxLayout:
                             theme_text_color: "Primary"
                     MDBoxLayout:
                         orientation: 'vertical'
-                        size_hint_y: .4
+                        size_hint_y: .55
 
                         MDBoxLayout:
                             padding: 10, 0, 10, 0 
@@ -106,25 +113,52 @@ BoxLayout:
                                 max: 1024
                                 value: 0
                         MDBoxLayout:
-                            padding: 10, 0, 30, 0
+                            padding: 50, 0, 50, 0
                             # orientation: "vertical"
+                            size_hint_y: .4
                             pos_hint: {"center_y": .5}
                             id: header_text
-                            MDLabel:
+                            MDTextButton:
                                 id: Sprotocol
-                                font_style: "Overline"
-                                halign: "center"
-                                theme_text_color: "Hint"
+                                # size_hint: 1, None
+                                font_size: sp(10)
+                                pos_hint: {"center_y": .5, "center_x": .5}
+                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                                on_release:
+                                    if len(app.proxys) != 0:app.protSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices protocol")
+                                    else: toast("First input proxys ip:port list then select protocol.")
                             MDLabel:
                                 id: Tproxys
+                                # size_hint: None, None
+                                # size_hint: 1, 1
+                                # pos_hint: {"center_y": .5}
                                 font_style: "Overline"
                                 halign: "center"
                                 theme_text_color: "Hint"
-                            MDLabel:
+                            MDTextButton:
+                                id: Slist
+                                # size_hint: 1, None
+                                # text: "List"
+                                font_size: sp(10)
+                                pos_hint: {"center_y": .5, "center_x": .5}
+                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                                on_release: 
+                                    if not start_stop.text in ['Stop', 'Stoping']:app.listSel.open() if app.proxysInx else toast("Input proxys ip first then scan")
+                                    else:toast("Please stop scan first then choices Lists")
+                        MDBoxLayout:
+                            size_hint_y: .4
+                            # padding: 10, 0, 30, 0
+                            # orientation: "vertical"
+                            pos_hint: {"center_y": .5, "center_x": .5}
+                            MDTextButton:
                                 id: Smirror
-                                font_style: "Overline"
-                                halign: "center"
-                                theme_text_color: "Hint"
+                                size_hint: 1,1
+                                font_size: sp(10)
+                                
+                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                                on_release: 
+                                    if len(app.proxysInx) != 0:app.mirrSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices mirror")
+                                    else: toast("First input proxys ip:port list then select mirrors.")
                         MDBoxLayout:
                             adaptive_height: True
                             padding: 10
@@ -333,7 +367,7 @@ BoxLayout:
                                 size: "48dp", '48dp'
                                 active: True if app.theme_cls.theme_style == "Light" else False
                                 on_active:
-                                    if self.active: app.theme_cls.theme_style = "Light"
+                                    if self.active: app.changeThemeMode("Light")
                                     root.backdrop.ids._front_layer.md_bg_color = [0, 0, 0, 0]
 
                             Label:
@@ -346,7 +380,7 @@ BoxLayout:
                                 size: "48dp", '48dp'
                                 active: True if app.theme_cls.theme_style == "Dark" else False
                                 on_active:
-                                    if self.active: app.theme_cls.theme_style = "Dark"
+                                    if self.active: app.changeThemeMode("Dark")
                                     root.backdrop.ids._front_layer.md_bg_color = [0, 0, 0, 0]
 
                             Label:
@@ -354,146 +388,18 @@ BoxLayout:
                                 color: app.theme_cls.text_color
 
                     MDSeparator:
-                    MDBoxLayout:
-                        orientation: "vertical"
-                        adaptive_height: True
-                        padding: "5dp"
-                        spacing: "10dp"
-
-                        MDLabel:
-                            text: "Select protocol"
-                            bold: True
-                            theme_text_color: "Primary"
                         
-                        MDBoxLayout:
-                            size_hint: None, None
-                            adaptive_size: True
-                            spacing: "20dp"
-
-                            MDCheckbox:
-                                group: "style_protocol"
-                                size_hint: None, None
-                                size: "48dp", '48dp'
-                                active: True if app.configs['protocol'] == "http" else False
-                                on_active:
-                                    if self.active: app.configs['protocol'] = "http"
-                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                    app.save_Update(app.configs, filename='configs.json')
-
-                            Label:
-                                text: "HTTP"
-                                color: app.theme_cls.text_color
-
-                            MDCheckbox:
-                                group: "style_protocol"
-                                size_hint: None, None
-                                size: "48dp", '48dp'
-                                active: True if app.configs['protocol'] == "https" else False
-                                on_active:
-                                    if self.active: app.configs['protocol'] = "https"
-                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                    app.save_Update(app.configs, filename='configs.json')
-                            Label:
-                                text: "HTTPS"
-                                # font_size: 12
-                                color: app.theme_cls.text_color
-                            
-                            MDCheckbox:
-                                group: "style_protocol"
-                                size_hint: None, None
-                                size: "48dp", '48dp'
-                                active: True if app.configs['protocol'] == "socks4" else False
-                                on_active:
-                                    if self.active: app.configs['protocol'] = "socks4"
-                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                    app.save_Update(app.configs, filename='configs.json')
-
-                            Label:
-                                text: "SOCKS4"
-                                # font_size: 12
-                                color: app.theme_cls.text_color
-                            
-                            MDCheckbox:
-                                group: "style_protocol"
-                                size_hint: None, None
-                                size: "48dp", '48dp'
-                                active: True if app.configs['protocol'] == "socks5" else False
-                                on_active:
-                                    if self.active: app.configs['protocol'] = "socks5"
-                                    app.root.ids.Sprotocol.text = f"Protocol: {app.configs['protocol'].upper()}"
-                                    app.save_Update(app.configs, filename='configs.json')
-                            Label:
-                                text: "SOCKS5"
-                                # font_size: 12
-                                color: app.theme_cls.text_color
-
-                    MDSeparator:
-
-                    MDBoxLayout:
-                        orientation: "vertical"
-                        adaptive_height: True
-                        padding: "5dp"
-                        spacing: "10dp"
-
-                        MDLabel:
-                            text: "Mirror"
-                            bold: True
-                            theme_text_color: "Primary"
-
-                        MDBoxLayout:
-                            # size_hint: 1, None
-                            # size: 1, 1
-                            adaptive_height: True
-                            # adaptive_size: True
-                            # spacing: "15dp"
-                            MDTextFieldRect:
-                                # size: 1, None
-                                # size_hint: .1, None
-                                id: mirrorSave
-                                required: True
-                                allow_copy: True
-                                multiline: False
-                                background_color: 0, 0, 0, .4
-                                height: "30dp"
-                                hint_text: "http://"
-                                text: app.configs['mirror']
-                                size_hint: 1, None
-                            MDFillRoundFlatButton:
-                                text: "Save"
-                                text_color: 1, 1, 1, .9
-                                on_release: 
-                                    if mirrorSave.text: app.configs['mirror'] = mirrorSave.text
-                                    app.root.ids.Smirror.text = f"Mirror: {urlparse(app.configs['mirror']).netloc}"
-                                    app.save_Update(app.configs, filename='configs.json')
-
-                    MDSeparator:
-
-                    MDLabel:
-                        id: label_theme
-                        text: "Current theme: {}".format(app.theme_cls.primary_palette)
-                        bold: True
-                        theme_text_color: "Primary"
-                        size_hint_y: None
-                        height: self.texture_size[1]
-
                     KitchenSinkOneLineIconListItem:
-                        text: "Change Theme"
-                        icon: "palette-outline"
+                        text: "Input mirror list"
+                        icon: "file-document-box-plus-outline"
                         divider: None
-                        on_release: app.show_dialog_change_theme()
+                        on_release: MirrorDialogInput(app).open()
 
                     MDSeparator:
 
-                    MDLabel:
-                        id: label_theme
-                        text: "Input proxy list"
-                        bold: True
-                        theme_text_color: "Primary"
-                        size_hint_y: None
-                        height: self.texture_size[1]
 
                     KitchenSinkOneLineIconListItem:
-                        text: "Input"
+                        text: "Input proxy list"
                         icon: "file-document-box-plus-outline"
                         divider: None
                         on_release: PSTDialogInput().open()

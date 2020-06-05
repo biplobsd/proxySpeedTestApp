@@ -2,7 +2,7 @@
 #:import Window kivy.core.window.Window
 #:import get_hex_from_color kivy.utils.get_hex_from_color
 #:import images_path kivymd.images_path
-
+#:import toast kivymd.toast.toast
 
 <KitchenSinkBaseDialog>:
     background: f"{images_path}/transparent.png"
@@ -51,15 +51,16 @@
 
 <PSTDialogInput>:
     size_hint: None, None
-    height: Window.height * 60 / 100
+    height: Window.height * 80 / 100
     width: Window.width * 90 / 100
 
     BoxLayout:
         orientation: "vertical"
-        spacing: "10dp"
+        spacing: "15dp"
+        padding: "10dp"
 
         MDLabel:
-            text: "Input proxys"
+            text: "Input proxys".upper()
             halign: "center"
             theme_text_color: "Custom"
             text_color: self.theme_cls.primary_color
@@ -77,11 +78,118 @@
             hint_text: "ip:proxy\n.."
             mode: "fill"
             size_hint: .9, 1
+        
+        MDSeparator:
+
+        MDBoxLayout:
+            orientation: "vertical"
+            adaptive_height: True
+            padding: "5dp"
+            spacing: "10dp"
+
+            MDLabel:
+                text: "Select protocol"
+                bold: True
+                theme_text_color: "Primary"
+            
+            MDBoxLayout:
+                size_hint: None, None
+                adaptive_size: True
+                spacing: "20dp"
+
+                MDCheckbox:
+                    id: pro_http
+                    group: "style_protocol"
+                    size_hint: None, None
+                    size: "48dp", '48dp'
+                    on_active:
+                        if self.active: root.piced_pro = 'http'
+                        else: root.piced_pro = None
+
+                Label:
+                    text: "HTTP"
+                    color: app.theme_cls.text_color
+
+                MDCheckbox:
+                    id: pro_https
+                    group: "style_protocol"
+                    size_hint: None, None
+                    size: "48dp", '48dp'
+                    on_active:
+                        if self.active: root.piced_pro = 'https'
+                        else: root.piced_pro = None
+                Label:
+                    text: "HTTPS"
+                    # font_size: 12
+                    color: app.theme_cls.text_color
+                
+                MDCheckbox:
+                    id: pro_socks4
+                    group: "style_protocol"
+                    size_hint: None, None
+                    size: "48dp", '48dp'
+                    on_active:
+                        if self.active: root.piced_pro = 'socks4'
+                        else: root.piced_pro = None
+
+                Label:
+                    text: "SOCKS4"
+                    # font_size: 12
+                    color: app.theme_cls.text_color
+                
+                MDCheckbox:
+                    id: pro_socks5
+                    group: "style_protocol"
+                    size_hint: None, None
+                    size: "48dp", '48dp'
+                    on_active:
+                        if self.active: root.piced_pro = 'socks5'
+                        else: root.piced_pro = None
+                Label:
+                    text: "SOCKS5"
+                    # font_size: 12
+                    color: app.theme_cls.text_color
+        MDRaisedButton:
+            pos_hint: {"center_x": 0.5}
+            text: "Save".upper()
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, .8
+            on_release:
+                root.inputedproxysSave() if root.piced_pro and query.text else toast("Error: Some things is wrong!.\nFill correctly!!")
+
+<MirrorDialogInput>:
+    size_hint: None, None
+    height: Window.height * 60 / 100
+    width: Window.width * 90 / 100
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: "10dp"
+
+        MDLabel:
+            text: "Input mirror"
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: self.theme_cls.primary_color
+            font_style: "H4"
+            bold: True
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        MDSeparator:
+
+        MDTextFieldRect:
+            id: queryMirror
+            hint_text: "Rectangle mode"
+            pos_hint: {"center_x": 0.5}
+            mode: "fill"
+            size_hint: .9, 1
+
         MDRaisedButton:
             pos_hint: {"center_x": 0.5}
             text: "Save"
             on_release:
-                root.inputedproxysSave()
+                root.inputedMirrorSave()
 
 
 
