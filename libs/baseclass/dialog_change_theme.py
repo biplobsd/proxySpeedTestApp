@@ -76,8 +76,8 @@ class PSTDialogInput(KitchenSinkBaseDialog):
             
         self.ids.query.text = currentSave
         
-        
         toast(f"Saved successful!\nInputed {len(proxys)}!")
+        self.dismiss()
 
 
 class MirrorDialogInput(KitchenSinkBaseDialog):

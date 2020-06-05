@@ -1,4 +1,3 @@
-import gc; gc.collect()
 import os
 import sys
 
@@ -233,7 +232,7 @@ class ProxySpeedTestApp(MDApp):
       
         if not l:return False
         # print(l)
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(databaseFilename)
         c = conn.cursor()
         with conn:
             try:
@@ -295,11 +294,14 @@ class ProxySpeedTestApp(MDApp):
 
     def listPic(self):
 
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(databaseFilename)
         c = conn.cursor()
         with conn:
             c.execute("SELECT proxysInx FROM 'proxysInx'")
             proxysInx = c.fetchall()
+
+            c.execute("SELECT  proxysInx FROM 'configs'")
+            self.selLId = c.fetchone()[0]
         conn.commit()
         conn.close()
 
@@ -414,7 +416,7 @@ class ProxySpeedTestApp(MDApp):
             caller=self.root.ids.Smirror, items=items, width_mult=5,
             opening_time=0.2,
             use_icon_item=False,
-            position='bottom',
+            position='center',
             max_height=0,
             callback=self.set_mirror,
         )
