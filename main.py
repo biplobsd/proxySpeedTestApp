@@ -323,7 +323,7 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if proxysInx else "list :"
 
         self.listSel = MDDropdownMenu(
-            caller=self.root.ids.Slist, items=self.ListItems, width_mult=4.2,
+            caller=self.root.ids.Slist, items=self.ListItems, width_mult=3,
             opening_time=0.2,
             use_icon_item=False,
             position='auto',
@@ -383,11 +383,10 @@ class ProxySpeedTestApp(MDApp):
     def protPic(self):
         items = [{"icon": "protocol", "text": protocol.upper()} for protocol in ['http', 'https', 'socks4', 'socks5']]
         self.protSel = MDDropdownMenu(
-            caller=self.root.ids.Sprotocol, items=items, width_mult=3.5,
+            caller=self.root.ids.Sprotocol, items=items, width_mult=2,
             opening_time=0.2,
             use_icon_item=False,
             position='auto',
-            max_height=0,
             callback=self.set_protocol
         )
 
@@ -416,7 +415,7 @@ class ProxySpeedTestApp(MDApp):
             caller=self.root.ids.Smirror, items=items, width_mult=5,
             opening_time=0.2,
             use_icon_item=False,
-            position='center',
+            position='bottom',
             max_height=0,
             callback=self.set_mirror,
         )

@@ -23,6 +23,7 @@
     BoxLayout:
         orientation: "vertical"
         spacing: "10dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
 
         MDLabel:
             text: "Developers"
@@ -93,65 +94,78 @@
                 theme_text_color: "Primary"
             
             MDBoxLayout:
-                size_hint: 1, None
-                # adaptive_size: True
-                # spacing: "20dp"
                 adaptive_height: True
-
-                MDCheckbox:
-                    id: pro_http
-                    group: "style_protocol"
+                MDBoxLayout:
                     size_hint: None, None
-                    size: "48dp", '48dp'
-                    on_active:
-                        if self.active: root.piced_pro = 'http'
-                        else: root.piced_pro = None
+                    size: 75, 1
+                    adaptive_height: True
+                    MDCheckbox:
+                        id: pro_http
+                        group: "style_protocol"
+                        size_hint: None, None
+                        size: "48dp", '48dp'
+                        on_active:
+                            if self.active: root.piced_pro = 'http'
+                            else: root.piced_pro = None
 
-                MDLabel:
-                    text: "HTTP"
-                    font_style: "Overline"
-                    color: app.theme_cls.text_color
+                    MDLabel:
+                        text: "HTTP"
+                        # halign: 'center'
+                        font_style: "Overline"
+                        color: app.theme_cls.text_color
 
-                MDCheckbox:
-                    id: pro_https
-                    group: "style_protocol"
+                MDBoxLayout:
                     size_hint: None, None
-                    size: "48dp", '48dp'
-                    on_active:
-                        if self.active: root.piced_pro = 'https'
-                        else: root.piced_pro = None
-                MDLabel:
-                    font_style: "Overline"
-                    text: "HTTPS"
-                    # font_size: 12
-                    color: app.theme_cls.text_color
+                    size: 80, 1
+                    adaptive_height: True
+                    MDCheckbox:
+                        id: pro_https
+                        group: "style_protocol"
+                        size_hint: None, None
+                        size: "48dp", '48dp'
+                        on_active:
+                            if self.active: root.piced_pro = 'https'
+                            else: root.piced_pro = None
+                    MDLabel:
+                        font_style: "Overline"
+                        text: "HTTPS"
+                        # font_size: 12
+                        color: app.theme_cls.text_color
                 
-                MDCheckbox:
-                    id: pro_socks4
-                    group: "style_protocol"
+                MDBoxLayout:
                     size_hint: None, None
-                    size: "48dp", '48dp'
-                    on_active:
-                        if self.active: root.piced_pro = 'socks4'
-                        else: root.piced_pro = None
+                    size: 90, 1
+                    adaptive_height: True
+                    MDCheckbox:
+                        id: pro_socks4
+                        group: "style_protocol"
+                        size_hint: None, None
+                        size: "48dp", '48dp'
+                        on_active:
+                            if self.active: root.piced_pro = 'socks4'
+                            else: root.piced_pro = None
 
-                MDLabel:
-                    text: "SOCKS4"
-                    font_style: "Overline"
-                    color: app.theme_cls.text_color
-                
-                MDCheckbox:
-                    id: pro_socks5
-                    group: "style_protocol"
+                    MDLabel:
+                        text: "SOCKS4"
+                        font_style: "Overline"
+                        color: app.theme_cls.text_color
+
+                MDBoxLayout:
                     size_hint: None, None
-                    size: "48dp", '48dp'
-                    on_active:
-                        if self.active: root.piced_pro = 'socks5'
-                        else: root.piced_pro = None
-                MDLabel:
-                    text: "SOCKS5"
-                    font_style: "Overline"
-                    color: app.theme_cls.text_color
+                    size: 90, 1
+                    adaptive_height: True
+                    MDCheckbox:
+                        id: pro_socks5
+                        group: "style_protocol"
+                        size_hint: None, None
+                        size: "48dp", '48dp'
+                        on_active:
+                            if self.active: root.piced_pro = 'socks5'
+                            else: root.piced_pro = None
+                    MDLabel:
+                        text: "SOCKS5"
+                        font_style: "Overline"
+                        color: app.theme_cls.text_color
         MDRaisedButton:
             pos_hint: {"center_x": 0.5}
             text: "Save".upper()
@@ -168,6 +182,7 @@
     BoxLayout:
         orientation: "vertical"
         spacing: "10dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
 
         MDLabel:
             text: "Input mirror"
@@ -204,7 +219,7 @@
     BoxLayout:
         orientation: "vertical"
         spacing: "10dp"
-        padding: 0, 0, 0, "10dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
 
         MDLabel:
             text: "ProxySpeedTest"

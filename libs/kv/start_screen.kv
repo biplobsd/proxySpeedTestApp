@@ -124,7 +124,7 @@ BoxLayout:
                                 # size_hint: 1, None
                                 font_size: sp(10)
                                 pos_hint: {"center_y": .5, "center_x": .5}
-                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["400"])
                                 on_release:
                                     if len(app.proxys) != 0:app.protSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices protocol")
                                     else: toast("First input proxys ip:port list then select protocol.")
@@ -142,33 +142,28 @@ BoxLayout:
                                 # text: "List"
                                 font_size: sp(10)
                                 pos_hint: {"center_y": .5, "center_x": .5}
-                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["400"])
                                 on_release: 
                                     if not start_stop.text in ['Stop', 'Stoping']:app.listSel.open() if app.proxysInx else toast("Input proxys ip first then scan")
                                     else:toast("Please stop scan first then choices Lists")
                         MDBoxLayout:
-                            size_hint_y: .6
-                            # padding: 10, 0, 30, 0
-                            # orientation: "vertical"
-                            pos_hint: {"center_y": .5, "center_x": .5}
+                            orientation: "vertical"
+                            adaptive_size: True
+                            pos_hint: {"center_x": .5}
                             MDTextButton:
                                 id: Smirror
-                                size_hint: 1,1
                                 font_size: sp(10)
-                                
-                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["400"])
                                 on_release: 
                                     if len(app.proxysInx) != 0:app.mirrSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices mirror")
                                     else: toast("First input proxys ip:port list then select mirrors.")
                         MDBoxLayout:
                             adaptive_height: True
                             padding: 10
-                            # orientation: "vertical"
                             id: header_text
                             MDBoxLayout:
                                 size_hint_x: .83
                                 size_hint_y: .1
-                                # size_hint_y: None
                                 MDSeparator:
                                 MDLabel:
                                     text: "SERVER"
