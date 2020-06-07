@@ -39,6 +39,7 @@ import sqlite3
 from ago import human
 
 
+
 # conn = sqlite3.connect('database.db')
 # c = conn.cursor()
 databaseFilename = 'database.db'
@@ -54,12 +55,17 @@ if platform == "android":
 
 if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
     os.environ["KITCHEN_SINK_ROOT"] = sys._MEIPASS
+    os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
+    os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
+    )
+    print("___one___")
 else:
-    sys.path.append(os.path.abspath(__file__).split("demos")[0])
+    sys.path.append(os.path.abspath(__file__).split("ProxySpeedTestV2")[0])
     os.environ["KITCHEN_SINK_ROOT"] = os.path.dirname(os.path.abspath(__file__))
     os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
     os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
     )
+    print("___two___")
 # from kivy.core.window import Window
 # Window.softinput_mode = "below_target"
 # _small = 2
@@ -121,6 +127,8 @@ def agoConv(datetimeStr):
         return 'Pic a list'
 
 class ProxySpeedTestApp(MDApp):
+    icon = f"{os.environ['KITCHEN_SINK_ASSETS']}icon.png"
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.theme_cls.primary_palette = "LightBlue"
