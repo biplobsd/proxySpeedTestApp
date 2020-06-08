@@ -38,7 +38,7 @@ import time
 import sqlite3
 from ago import human
 
-
+from kivy.clock import Clock
 
 # conn = sqlite3.connect('database.db')
 # c = conn.cursor()
