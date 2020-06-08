@@ -98,8 +98,8 @@ BoxLayout:
                                 theme_text_color: "Primary"
                         MDBoxLayout:
                             padding: 10
-                            spacing: 4
-                            size_hint_y: .8
+                            spacing: 3
+                            size_hint_y: .6
                             orientation: "vertical"
                             MDProgressBar:
                                 id: progressBar1
@@ -149,7 +149,9 @@ BoxLayout:
                         MDBoxLayout:
                             orientation: "vertical"
                             adaptive_size: True
+                            size_hint_y: .4
                             pos_hint: {"center_x": .5}
+                            padding: 0, 0, 0, 30
                             MDTextButton:
                                 id: Smirror
                                 font_size: sp(10)
