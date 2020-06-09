@@ -51,6 +51,10 @@ if platform == "android":
     Color = autoclass("android.graphics.Color")
     WindowManager = autoclass('android.view.WindowManager$LayoutParams')
     activity = autoclass('org.kivy.android.PythonActivity').mActivity
+else:
+    def run_on_ui_thread(d):
+        # print(f"nice! {d}")
+        pass
 
 
 if getattr(sys, "frozen", False):  # bundle mode with PyInstaller

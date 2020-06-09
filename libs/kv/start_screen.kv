@@ -164,41 +164,41 @@ BoxLayout:
                             padding: 10
                             id: header_text
                             MDBoxLayout:
-                                size_hint_x: .83
+                                # size_hint_x: .83
                                 size_hint_y: .1
                                 MDSeparator:
-                                MDLabel:
+                                MDTextButton:
+                                    pos_hint: {"center_y": .5, "center_x": .5}
+                                    font_size: sp(10)
+                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                     text: "SERVER"
-                                    font_style: "Overline"
-                                    halign: "center"
-                                    theme_text_color: "Secondary"
                                 MDSeparator:
                             MDBoxLayout:
-                                size_hint_x: .35
+                                size_hint_x: .37
                                 size_hint_y: .1
-                                MDLabel:
+                                MDTextButton:
+                                    pos_hint: {"center_y": .5, "center_x": .5}
+                                    font_size: sp(10)
+                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                     text: "SIZE"
-                                    font_style: "Overline"
-                                    halign: "center"
-                                    theme_text_color: "Secondary"
                                 MDSeparator:
                             MDBoxLayout:
-                                size_hint_x: .27
+                                size_hint_x: .31
                                 size_hint_y: .1
-                                MDLabel:
+                                MDTextButton:
+                                    pos_hint: {"center_y": .5, "center_x": .5}
+                                    font_size: sp(10)
+                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                     text: "TIME"
-                                    font_style: "Overline"
-                                    halign: "center"
-                                    theme_text_color: "Secondary"
                                 MDSeparator:
                             MDBoxLayout:
-                                size_hint_x: .28
+                                size_hint_x: .24
                                 size_hint_y: .1
-                                MDLabel:
+                                MDTextButton:
+                                    pos_hint: {"center_y": .5, "center_x": .5}
+                                    font_size: sp(10)
+                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                     text: "SPEED"
-                                    font_style: "Overline"
-                                    halign: "center"
-                                    theme_text_color: "Secondary"
                                 MDSeparator:
                     KitchenSinkBackdropFrontLayer:
                         id: backdrop_front_layer
