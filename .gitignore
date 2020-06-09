@@ -8,3 +8,6 @@ database.db
 configs.json
 scan_data.json
 proxys.txt
+chunk0
+chunk1
+chunk2

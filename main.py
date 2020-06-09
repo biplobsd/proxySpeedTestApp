@@ -38,7 +38,7 @@ import time
 import sqlite3
 from ago import human
 
-
+from kivy.clock import Clock
 
 # conn = sqlite3.connect('database.db')
 # c = conn.cursor()
@@ -138,6 +138,10 @@ class ProxySpeedTestApp(MDApp):
         self.scaning = Queue()
         self.running = Queue()
         self.currentSpeed = Queue()
+
+        self.pbar0 = Queue()
+        self.pbar1 = Queue()
+        self.pbar2 = Queue()
 
         conn = sqlite3.connect(databaseFilename)
         c = conn.cursor()
@@ -448,7 +452,37 @@ class ProxySpeedTestApp(MDApp):
         
         toast(self.configs['mirror'])
         self.mirrSel.dismiss()
+    
+    def update_screen(self, dt):
+        try:
+            while not self.pbar0.empty():
+                sp0 = self.pbar0.get_nowait()
+                if sp0 != 0:
+                    self.root.ids.progressBar1.value += sp0
+                else:
+                    self.root.ids.progressBar1.value = 0
+        except Empty:
+            pass
         
+        try:
+            while not self.pbar1.empty():
+                sp0 = self.pbar1.get_nowait()
+                if sp0 != 0:
+                    self.root.ids.progressBar2.value += sp0
+                else:
+                    self.root.ids.progressBar2.value = 0
+        except Empty:
+            pass
+            
+        try:
+            while not self.pbar2.empty():
+                sp0 = self.pbar2.get_nowait()
+                if sp0 != 0:
+                    self.root.ids.progressBar3.value += sp0
+                else:
+                    self.root.ids.progressBar3.value = 0
+        except Empty:
+            pass
 
     def start_scan(self, instance):
         # print("Clicked!!")
@@ -476,8 +510,10 @@ class ProxySpeedTestApp(MDApp):
                 c.execute("UPDATE 'proxys' SET time=?, size=NULL, getfiletime=NULL, speed=NULL WHERE time=?", (IndexTime, self.selLId))
             conn.commit()
             conn.close()
-            
+        
             self.selLId = str(IndexTime)
+
+            self.upScreen = Clock.schedule_interval(self.update_screen, 0.1)
 
             Thread(target=self.proxySpeedTest, args=(
                 self.proxys,
@@ -590,26 +626,21 @@ class ProxySpeedTestApp(MDApp):
     
     def showupdate(self, idx, mode='u', error=True):
         if mode == 'u':
-            if idx == 1:
-                self.root.ids.progressBar1.value += 1
+            if idx == 0:
+                self.pbar0.put_nowait(1)
+            elif idx == 1:
+                self.pbar1.put_nowait(1)
             elif idx == 2:
-                self.root.ids.progressBar2.value += 1
-            elif idx == 3:
-                self.root.ids.progressBar3.value += 1
+                self.pbar2.put_nowait(1)
         elif mode == 'd':
             color = "#f44336"
-            if idx == 1:
-                self.root.ids.progressBar1.value = 0
-                # if error:
-                #     self.root.ids.progressBar1.color = get_color_from_hex(color)
+            if idx == 0:
+                self.pbar0.put_nowait(0)
+            elif idx == 1:
+                self.pbar1.put_nowait(0)
             elif idx == 2:
-                self.root.ids.progressBar2.value = 0
-                # if error:
-                #     self.root.ids.progressBar1.color = get_color_from_hex(color)
-            elif idx == 3:
-                self.root.ids.progressBar3.value = 0
-                # if error:
-                #     self.root.ids.progressBar1.color = get_color_from_hex(color)
+                self.pbar2.put_nowait(0)
+            
             self.root.ids.top_text.text = "0 KB/s"
     
     def proxySpeedTest(self, proxys, protocol, mirror):
@@ -620,7 +651,9 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.totalpb.value = 0
         print(proxys)
         for part in proxys:
-            if self.scaning.empty():break        
+            if self.scaning.empty():
+                self.upScreen.cancel()
+                break        
             proxy_ip = part.strip()
             self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
             # Removing before test chunk file
