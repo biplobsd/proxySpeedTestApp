@@ -431,7 +431,7 @@ class ProxySpeedTestApp(MDApp):
             caller=self.root.ids.Smirror, items=items, width_mult=5,
             opening_time=0.2,
             use_icon_item=False,
-            position='bottom',
+            position='auto',
             max_height=0,
             callback=self.set_mirror,
         )
@@ -700,12 +700,11 @@ class ProxySpeedTestApp(MDApp):
             unsort.append(
                 {'IP': proxy_ip,
                 'SIZE': filesizeM, 
-                'TIME': sec_to_mins(delta),
+                'TIME': delta,
                 'SPEED': int(speed)}
                 )
-            sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
+            sort = self.sort_Type(unsort)
             self.save_UpdateDB(sort)
-            self.show_List(sort)
             self.root.ids.totalpb.value += 1
             comP = (self.root.ids.totalpb.value/len(proxys))*100
             self.root.ids.totalpbText.text = f"{round(comP)}%"
@@ -720,7 +719,23 @@ class ProxySpeedTestApp(MDApp):
             self.running.get_nowait()
         print("Finished!")
 
-    def show_List(self, data):
+    def sort_Change(self, inst, ckid):
+        if ckid and inst.active:
+            self.sort_Type(self.data_lists, mode=inst.text, reverse=False)
+            inst.active = False
+        elif ckid and inst.active == False:
+            self.sort_Type(self.data_lists, mode=inst.text, reverse=True)
+            inst.active = True
+
+
+    def sort_Type(self, unsort, mode='SPEED', reverse=True):
+        if mode == 'SERVER':mode = 'IP'
+
+        sort = sorted(unsort, key=lambda x: x[mode], reverse=reverse)
+        self.show_List(sort)
+        return sort
+
+    def show_List(self, data): 
         self.root.ids.backdrop_front_layer.data = []
         for parServer in data:
             self.root.ids.backdrop_front_layer.data.append(
@@ -728,11 +743,12 @@ class ProxySpeedTestApp(MDApp):
                     "viewclass": "ProxyShowList",
                     "text": parServer['IP'],
                     "text1": f"{parServer['SIZE']} MB",
-                    "text2": parServer['TIME'],
+                    "text2": sec_to_mins(float(parServer['TIME'])),
                     "text3": f"{size(parServer['SPEED'], system=alternative)}/s",
                     "on_release": lambda x=parServer['IP']: self.copy_proxyip(x),
                 }
                 )
+        self.data_lists = data
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")
         Clipboard.copy(data)
