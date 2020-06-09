@@ -456,9 +456,9 @@ class ProxySpeedTestApp(MDApp):
     def update_screen(self, dt):
         try:
             while not self.pbar0.empty():
-                sp0 = self.pbar0.get_nowait()
-                if sp0 != 0:
-                    self.root.ids.progressBar1.value += sp0
+                sp = self.pbar0.get_nowait()
+                if sp != 0:
+                    self.root.ids.progressBar1.value += sp
                 else:
                     self.root.ids.progressBar1.value = 0
         except Empty:
@@ -466,23 +466,27 @@ class ProxySpeedTestApp(MDApp):
         
         try:
             while not self.pbar1.empty():
-                sp0 = self.pbar1.get_nowait()
-                if sp0 != 0:
-                    self.root.ids.progressBar2.value += sp0
+                sp = self.pbar1.get_nowait()
+                if sp != 0:
+                    self.root.ids.progressBar2.value += sp
                 else:
                     self.root.ids.progressBar2.value = 0
         except Empty:
             pass
-            
+        
         try:
             while not self.pbar2.empty():
-                sp0 = self.pbar2.get_nowait()
-                if sp0 != 0:
-                    self.root.ids.progressBar3.value += sp0
+                sp = self.pbar2.get_nowait()
+                if sp != 0:
+                    self.root.ids.progressBar3.value += sp
                 else:
                     self.root.ids.progressBar3.value = 0
         except Empty:
             pass
+        
+        self.speedcal()
+
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()
 
     def start_scan(self, instance):
         # print("Clicked!!")
@@ -651,9 +655,7 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.totalpb.value = 0
         print(proxys)
         for part in proxys:
-            if self.scaning.empty():
-                self.upScreen.cancel()
-                break        
+            if self.scaning.empty():break        
             proxy_ip = part.strip()
             self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
             # Removing before test chunk file
@@ -664,7 +666,6 @@ class ProxySpeedTestApp(MDApp):
             # Starting chunk file downloading
             timeStart = datetime.now()
             print("Starting ....")
-            Thread(target=self.speedcal, args=('start',)).start()
             downloaders = [
             Thread(
                 target=self.downloadChunk,
@@ -686,7 +687,7 @@ class ProxySpeedTestApp(MDApp):
             delta = round(float((timeEnd - timeStart).seconds) +
                         float(str('0.' + str((timeEnd -
                                                 timeStart).microseconds))), 3)
-            speed = round(filesize / 1024) / delta
+            speed = round(filesize) / delta
 
             for i in range(3):
                 if os.path.exists(f'{filename}{i}'):
@@ -704,9 +705,9 @@ class ProxySpeedTestApp(MDApp):
             self.root.ids.totalpb.value += 1
             comP = (self.root.ids.totalpb.value/len(proxys))*100
             self.root.ids.totalpbText.text = f"{round(comP)}%"
-            self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()
             # return True
         
+        self.upScreen.cancel()
         self.root.ids.start_stop.text = "Start"
         self.theme_cls.primary_palette = "LightBlue"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
@@ -724,7 +725,7 @@ class ProxySpeedTestApp(MDApp):
                     "text": parServer['IP'],
                     "text1": f"{parServer['SIZE']} MB",
                     "text2": parServer['TIME'],
-                    "text3": f"{parServer['SPEED']} KB/s",
+                    "text3": f"{size(parServer['SPEED'], system=alternative)}/s",
                     "on_release": lambda x=parServer['IP']: self.copy_proxyip(x),
                 }
                 )
@@ -732,23 +733,17 @@ class ProxySpeedTestApp(MDApp):
         toast(f"Copied: {data}")
         Clipboard.copy(data)
     
-    def speedcal(self, msg):
-        print(msg)
+    def speedcal(self):
         speed = 0
-        start = datetime.now()
-        oldspeed = 0
-        while not self.running.empty():
-            end = datetime.now()
-            if (0.1 <= (end-start).seconds) and speed != 0 and oldspeed != speed:
-                self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"
-                start = datetime.now()
-                oldspeed = speed
-                speed = 0
-            try:
-                while not self.currentSpeed.empty():
-                    speed += self.currentSpeed.get_nowait()
-            except Empty:
-                pass
+        try:
+            while not self.currentSpeed.empty():
+                speed += self.currentSpeed.get_nowait()
+        except Empty:
+            pass
+        
+        if speed != 0:
+            self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"
+        
 
 if __name__ == "__main__":
     ProxySpeedTestApp().run()
