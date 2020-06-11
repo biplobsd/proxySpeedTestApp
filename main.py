@@ -39,6 +39,7 @@ import sqlite3
 from ago import human
 
 from kivy.clock import Clock
+from kivmob import KivMob, TestIds
 
 # conn = sqlite3.connect('database.db')
 # c = conn.cursor()
@@ -221,7 +222,9 @@ class ProxySpeedTestApp(MDApp):
         self.proxysInx = []
         # recentPlay = self.save_Update(filename='configs.json')
 
-        
+    # def on_resume(self):
+    #     self.ads.request_interstitial()
+
     def changeThemeMode(self, inst):
         self.theme_cls.theme_style = inst
 
@@ -269,6 +272,11 @@ class ProxySpeedTestApp(MDApp):
         Builder.load_file(
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/dialog_change_theme.kv"
         )
+        self.ads = KivMob(TestIds.APP)
+        self.ads.new_banner(TestIds.BANNER, top_pos=False)
+        self.ads.request_banner()
+        self.ads.show_banner()
+
         return Builder.load_file(
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
