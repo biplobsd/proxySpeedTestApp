@@ -28,7 +28,7 @@ source.include_patterns = assets/*
 source.exclude_patterns = LICENSE
 
 # (str) Application versioning (method 1)
-version = 1.2
+version = 1.3
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -36,7 +36,7 @@ version = 1.2
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy==9aaca29d2f4e72aac71afba5c23c6cc8128b9e3c
-requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna, kivmob
+requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna,kivmob
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

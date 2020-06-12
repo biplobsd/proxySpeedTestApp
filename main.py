@@ -77,6 +77,22 @@ else:
 # _small = 2
 # Window.size = (1080/_small, 1920/_small)
 
+class adMobIds:
+
+     """ Test AdMob App ID """
+    APP = "ca-app-pub-3940256099942544~3347511713"
+
+    """ Test Banner Ad ID """
+    BANNER = "ca-app-pub-3940256099942544/6300978111"
+    
+    # """ Test Interstitial Ad ID """
+    # INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
+
+    # """ Test Interstitial Video Ad ID """
+    # INTERSTITIAL_VIDEO = "ca-app-pub-3940256099942544/8691691433"
+
+    # """ Test Rewarded Video Ad ID """
+    # REWARDED_VIDEO = "ca-app-pub-3940256099942544/5224354917"
 
 class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
     """A one line list item."""
@@ -316,8 +332,8 @@ class ProxySpeedTestApp(MDApp):
         if platform == 'android':
             print(platform)
     
-            self.ads = KivMob(TestIds.APP)
-            self.ads.new_banner(TestIds.BANNER, top_pos=False)
+            self.ads = KivMob(adMobIds.APP)
+            self.ads.new_banner(adMobIds.BANNER, top_pos=False)
             self.ads.request_banner()
             self.ads.show_banner()
 
