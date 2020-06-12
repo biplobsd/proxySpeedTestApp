@@ -9,6 +9,7 @@
 #:import urlparse urllib.parse.urlparse
 #:import colors kivymd.color_definitions.colors
 #:import toast kivymd.toast.toast
+#:import Snackbar kivymd.uix.snackbar.Snackbar
 
 BoxLayout:
     orientation: "vertical"
@@ -127,7 +128,8 @@ BoxLayout:
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release:
                                     if len(app.proxys) != 0:app.protSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices protocol")
-                                    else: toast("First input proxys ip:port list then select protocol.")
+                                    else: Snackbar(text="First input proxys ip:port list then select protocol.").show()
+                                    # toast("First input proxys ip:port list then select protocol.")
                             MDLabel:
                                 id: Tproxys
                                 # size_hint: None, None
@@ -145,7 +147,8 @@ BoxLayout:
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release: 
                                     if not start_stop.text in ['Stop', 'Stoping']:app.listSel.open() if app.proxysInx else toast("Input proxys ip first then scan")
-                                    else:toast("Please stop scan first then choices Lists")
+                                    else:Snackbar(text="Please stop scan first then choices Lists").show()
+                                    # toast("Please stop scan first then choices Lists")
                         MDBoxLayout:
                             orientation: "vertical"
                             adaptive_size: True
@@ -158,7 +161,8 @@ BoxLayout:
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release: 
                                     if len(app.proxysInx) != 0:app.mirrSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices mirror")
-                                    else: toast("First input proxys ip:port list then select mirrors.")
+                                    else: Snackbar(text="First input proxys ip:port list then select mirrors.").show()
+                                    # toast("First input proxys ip:port list then select mirrors.")
                         MDBoxLayout:
                             adaptive_height: True
                             padding: 10
@@ -237,7 +241,8 @@ BoxLayout:
                     MDBoxLayout:
                         id: adsShow
                         size_hint: None, None
-                        size: self.width, 110
+                        size: 0, 0
+                        
                         
         Screen:
             name: "shrine demo"
@@ -355,7 +360,6 @@ BoxLayout:
 
         Screen:
             name: "settings"
-
             ScrollView:
 
                 MDGridLayout:
@@ -420,9 +424,6 @@ BoxLayout:
                         divider: None
                         on_release: MirrorDialogInput(app).open()
 
-                    MDSeparator:
-
-
                     KitchenSinkOneLineIconListItem:
                         text: "Input proxy list"
                         icon: "file-document-box-plus-outline"
@@ -450,7 +451,6 @@ BoxLayout:
                         icon: "license"
                         divider: None
                         on_release: KitchenSinkDialogLicense().open()
-
                     Widget:
                         size_hint_y: None
                         height: app.theme_cls.standard_increment

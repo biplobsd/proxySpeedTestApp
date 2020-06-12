@@ -40,6 +40,7 @@ from ago import human
 
 from kivy.clock import Clock
 from kivmob import KivMob, TestIds
+from libs.baseclass.dialog_change_theme import PSTDialogInput
 
 # conn = sqlite3.connect('database.db')
 # c = conn.cursor()
@@ -173,10 +174,12 @@ class ProxySpeedTestApp(MDApp):
             try:
                 c.execute('''create table configs (
                     themeMode text,
-                    miInx INTEGER,
-                    proxysInx datetime
+                    miInx integer,
+                    proxysInx datetime,
+                    timeoutD integer,
+                    fileSize integer
                     )''')
-                c.execute("INSERT INTO configs (themeMode, miInx) VALUES ('Dark',0)")
+                c.execute("INSERT INTO configs (themeMode, miInx, timeoutD, fileSize) VALUES ('Dark',0, 5, 1062124)")
             except sqlite3.OperationalError as e:
                 print(e)
             
@@ -218,7 +221,10 @@ class ProxySpeedTestApp(MDApp):
         self.miInx = configs[0][1]
         self.configs = {
             'protocol': protocol if self.selLId else 'http',
-            'mirror': mirrors[self.miInx][0]}
+            'mirror': mirrors[self.miInx][0],
+            'timeout': int(configs[0][3]),
+            'fileSize': int(configs[0][4]),
+            }
         self.proxysInx = []
         # recentPlay = self.save_Update(filename='configs.json')
 
@@ -272,11 +278,7 @@ class ProxySpeedTestApp(MDApp):
         Builder.load_file(
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/dialog_change_theme.kv"
         )
-        self.ads = KivMob(TestIds.APP)
-        self.ads.new_banner(TestIds.BANNER, top_pos=False)
-        self.ads.request_banner()
-        self.ads.show_banner()
-
+        
         return Builder.load_file(
             f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
@@ -311,6 +313,15 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
         # self.root.ids.backdrop._front_layer_open=True
+        if platform == 'android':
+            print(platform)
+    
+            self.ads = KivMob(TestIds.APP)
+            self.ads.new_banner(TestIds.BANNER, top_pos=False)
+            self.ads.request_banner()
+            self.ads.show_banner()
+
+            self.root.ids.adsShow.size = (self.root.ids.backdrop_front_layer.width, 110)
         
         self.mirrorPic()
         self.protPic()
@@ -503,9 +514,19 @@ class ProxySpeedTestApp(MDApp):
     def start_scan(self, instance):
         # print("Clicked!!")
         if instance.text == "Start":
-            
+            self.mirrorPic()
+            self.listPic()
+
             self.root.ids.Tproxys.text = f"Total proxys: {len(self.proxys)}"
             if len(self.proxys) == 0:
+                try:
+                    if self.proxysInx:
+                        self.listSel.open()
+                        toast("Pick that list!")        
+                        return
+                except:
+                    pass
+                PSTDialogInput().open()
                 toast("First input proxys ip:port list then start scan.")
                 return
 
@@ -555,7 +576,6 @@ class ProxySpeedTestApp(MDApp):
             
     
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
-        file_size = 1062124 
         print(f'{idx} Started')
         try:
             if protocol == 'http':
@@ -581,10 +601,10 @@ class ProxySpeedTestApp(MDApp):
 
             req = requests.get(
                 mirror,
-                headers={"Range": "bytes=%s-%s" % (0, file_size)},
+                headers={"Range": "bytes=%s-%s" % (0, self.configs['fileSize'])},
                 stream=True,
                 proxies=proxies,
-                timeout=5
+                timeout=self.configs['timeout']
             )
             with(open(f'{filename}{idx}', 'ab')) as f:
                 start = datetime.now()
