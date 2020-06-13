@@ -12,3 +12,6 @@ chunk0
 chunk1
 chunk2
 note.txt
+kivy_env
+build
+dist

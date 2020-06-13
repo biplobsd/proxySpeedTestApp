@@ -3,13 +3,15 @@
 #:import KitchenSinkDialogLicense libs.baseclass.dialog_change_theme.KitchenSinkDialogLicense
 #:import KitchenSinkDialogDev libs.baseclass.dialog_change_theme.KitchenSinkDialogDev
 #:import PSTDialogInput libs.baseclass.dialog_change_theme.PSTDialogInput
+#:import TimeoutSet libs.baseclass.dialog_change_theme.TimeoutSet
+#:import FilesizeSet libs.baseclass.dialog_change_theme.FilesizeSet
 #:import MirrorDialogInput libs.baseclass.dialog_change_theme.MirrorDialogInput
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import urlparse urllib.parse.urlparse
 #:import colors kivymd.color_definitions.colors
 #:import toast kivymd.toast.toast
-#:import Snackbar kivymd.uix.snackbar.Snackbar
+#:import size hurry.filesize.size
 
 BoxLayout:
     orientation: "vertical"
@@ -98,9 +100,9 @@ BoxLayout:
                                 halign: totaltx.halign
                                 theme_text_color: "Primary"
                         MDBoxLayout:
-                            padding: 10
-                            spacing: 3
-                            size_hint_y: .6
+                            padding: 10, 0, 10, 0
+                            # spacing: 4
+                            size_hint_y: .3
                             orientation: "vertical"
                             MDProgressBar:
                                 id: progressBar1
@@ -128,8 +130,7 @@ BoxLayout:
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release:
                                     if len(app.proxys) != 0:app.protSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices protocol")
-                                    else: Snackbar(text="First input proxys ip:port list then select protocol.").show()
-                                    # toast("First input proxys ip:port list then select protocol.")
+                                    else:toast("First input proxys ip:port list then select protocol.")
                             MDLabel:
                                 id: Tproxys
                                 # size_hint: None, None
@@ -147,22 +148,19 @@ BoxLayout:
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release: 
                                     if not start_stop.text in ['Stop', 'Stoping']:app.listSel.open() if app.proxysInx else toast("Input proxys ip first then scan")
-                                    else:Snackbar(text="Please stop scan first then choices Lists").show()
-                                    # toast("Please stop scan first then choices Lists")
+                                    else:toast("Please stop scan first then choices Lists")
                         MDBoxLayout:
                             orientation: "vertical"
                             adaptive_size: True
-                            size_hint_y: .4
-                            padding: 22
-                            pos_hint: {"center_x": .5}
+                            adaptive_height: True
+                            pos_hint: {"center_y": .5, "center_x": .5}
                             MDTextButton:
                                 id: Smirror
                                 font_size: sp(10)
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release: 
                                     if len(app.proxysInx) != 0:app.mirrSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices mirror")
-                                    else: Snackbar(text="First input proxys ip:port list then select mirrors.").show()
-                                    # toast("First input proxys ip:port list then select mirrors.")
+                                    else:toast("First input proxys ip:port list then select mirrors.")
                         MDBoxLayout:
                             adaptive_height: True
                             padding: 10
@@ -431,7 +429,23 @@ BoxLayout:
                         on_release: PSTDialogInput().open()
 
                     MDSeparator:
-
+                    MDLabel:
+                        text: "Proxys settings"
+                        bold: True
+                        theme_text_color: "Primary"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                    KitchenSinkOneLineIconListItem:
+                        text: f"Timeout : {app.configs['timeout']} seconds"
+                        icon: "timelapse"
+                        divider: None
+                        on_release: TimeoutSet(self).open()
+                    KitchenSinkOneLineIconListItem:
+                        text: f"Filesize : {size(app.configs['fileSize'])}"
+                        icon: "cloud-download-outline"
+                        divider: None
+                        on_release: FilesizeSet(self).open()
+                    MDSeparator:
                     MDLabel:
                         id: label_theme
                         text: "About Us"

@@ -10,11 +10,9 @@ import re
 from kivymd.toast import toast
 import sqlite3
 from datetime import datetime
+from hurry.filesize import size
 # from main import ProxySpeedTestApp
-
-conn = sqlite3.connect('database.db')
-c = conn.cursor()
-
+databaseFilename = 'database.db'
 
 class KitchenSinkBaseDialog(ThemableBehavior, ModalView):
     pass
@@ -63,6 +61,8 @@ class PSTDialogInput(KitchenSinkBaseDialog):
         
         IndexTime = datetime.now()
         # protocol = 'socks4'
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
         with conn:
             for l in proxys:
                 if not l:continue
@@ -72,8 +72,9 @@ class PSTDialogInput(KitchenSinkBaseDialog):
                     print(e)
             c.execute("UPDATE 'configs' SET proxysInx=?", [IndexTime])
             c.execute("INSERT INTO proxysInx VALUES (?)", [IndexTime])
+        conn.commit()
+        conn.close()
         
-            
         self.ids.query.text = currentSave
         
         toast(f"Saved successful!\nInputed {len(proxys)}!")
@@ -88,9 +89,15 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
         # if os.path.exists(self.filename):
         #     with open(self.filename, 'r', encoding="utf-8") as r:
         #         self.ids.query.text = r.read()
+
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
         with conn:
             c.execute("SELECT * FROM 'mirrors'")
             self.mirrors = c.fetchall()
+        conn.commit()
+        conn.close()
+
         self.showsInBox = ""
         for m in self.mirrors:
             self.showsInBox += m[0]+'\n'
@@ -101,6 +108,8 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
     def inputedMirrorSave(self):
         
         if self.showsInBox != self.ids.queryMirror.text:
+            conn = sqlite3.connect(databaseFilename)
+            c = conn.cursor()
             with conn:
                 c.execute("DROP TABLE 'mirrors'")
                 c.execute("create table mirrors (mirror text)")
@@ -110,7 +119,77 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
                         c.execute("INSERT INTO mirrors VALUES (?)", [line.strip()])
                 c.execute("UPDATE 'configs' SET miInx=0")
                 self.mainClass.mirrorPic()
+            conn.commit()
+            conn.close()
             toast(f"Saved!")
+        else:
+            toast('No new updated!')
+        
+
+class TimeoutSet(KitchenSinkBaseDialog):
+    def __init__(self,updateText, **kwargs):
+        super().__init__(**kwargs)
+
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
+        with conn:
+            c.execute("SELECT timeoutD FROM 'configs'")
+            self.timeoutD = c.fetchone()[0]
+        conn.commit()
+        conn.close()
+
+        self.updateText = updateText
+        self.ids.queryTimeout.text = str(self.timeoutD)
+
+
+    
+    def inputedTimeoutSave(self):
+        setTimeout = int(self.ids.queryTimeout.text)
+        if self.timeoutD != setTimeout:
+            
+            conn = sqlite3.connect(databaseFilename)
+            c = conn.cursor()
+            with conn:
+                c.execute("UPDATE 'configs' SET timeoutD=?", [setTimeout])
+            conn.commit()
+            conn.close()
+            self.updateText.text = f"Timeout : {setTimeout} seconds"
+            toast(f"Saved! {setTimeout} seconds")
+            self.dismiss()
+        else:
+            toast('No new updated!')
+
+class FilesizeSet(KitchenSinkBaseDialog):
+    def __init__(self,updateText, **kwargs):
+        super().__init__(**kwargs)
+
+        conn = sqlite3.connect(databaseFilename)
+        c = conn.cursor()
+        with conn:
+            c.execute("SELECT fileSize FROM 'configs'")
+            self.filesize = c.fetchone()[0]
+        conn.commit()
+        conn.close()
+
+        self.updateText = updateText
+        self.ids.queryFilesize.text = str(self.filesize)
+
+
+    
+    def inputedFilesizeSave(self):
+        setFilesize = int(self.ids.queryFilesize.text)
+        if self.filesize != setFilesize:
+
+            conn = sqlite3.connect(databaseFilename)
+            c = conn.cursor()
+            with conn:
+                c.execute("UPDATE 'configs' SET fileSize=?", [setFilesize])
+            conn.commit()
+            conn.close()
+            
+            self.updateText.text = f"Filesize : {size(setFilesize)}"
+            toast(f"Saved! {size(setFilesize)}")
+            self.dismiss()
         else:
             toast('No new updated!')
         

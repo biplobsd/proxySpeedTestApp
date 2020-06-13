@@ -39,7 +39,6 @@ import sqlite3
 from ago import human
 
 from kivy.clock import Clock
-from kivmob import KivMob, TestIds
 from libs.baseclass.dialog_change_theme import PSTDialogInput
 
 # conn = sqlite3.connect('database.db')
@@ -47,6 +46,7 @@ from libs.baseclass.dialog_change_theme import PSTDialogInput
 databaseFilename = 'database.db'
 
 if platform == "android":
+    from kivmob import KivMob, TestIds
     from android.runnable import run_on_ui_thread
     from jnius import autoclass
 
@@ -79,7 +79,7 @@ else:
 
 class adMobIds:
 
-     """ Test AdMob App ID """
+    """ Test AdMob App ID """
     APP = "ca-app-pub-3940256099942544~3347511713"
 
     """ Test Banner Ad ID """
@@ -527,6 +527,7 @@ class ProxySpeedTestApp(MDApp):
 
         self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()
 
+
     def start_scan(self, instance):
         # print("Clicked!!")
         if instance.text == "Start":
@@ -561,9 +562,12 @@ class ProxySpeedTestApp(MDApp):
                 c.execute("UPDATE 'configs' SET proxysInx=?", [IndexTime])
                 c.execute("UPDATE 'proxysInx' SET proxysInx=? WHERE proxysInx=?", (IndexTime, self.selLId))
                 c.execute("UPDATE 'proxys' SET time=?, size=NULL, getfiletime=NULL, speed=NULL WHERE time=?", (IndexTime, self.selLId))
+                c.execute("SELECT timeoutD,fileSize FROM 'configs'")
+                configs = c.fetchone()
             conn.commit()
             conn.close()
-        
+            self.configs['timeout'] = int(configs[0])
+            self.configs['fileSize'] = int(configs[1])
             self.selLId = str(IndexTime)
 
             self.upScreen = Clock.schedule_interval(self.update_screen, 0.1)

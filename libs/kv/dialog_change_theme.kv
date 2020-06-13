@@ -210,6 +210,80 @@
                 root.inputedMirrorSave()
 
 
+<TimeoutSet>:
+    size_hint: None, None
+    height: Window.height * 30 / 100
+    width: Window.width * 50 / 100
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: "10dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
+        MDLabel:
+            text: "Timeout"
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: self.theme_cls.primary_color
+            font_style: "H4"
+            bold: True
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        MDSeparator:
+
+        MDTextField:
+            id: queryTimeout
+            hint_text: "Seconds"
+            pos_hint: {"center_x": 0.5}
+            # size_hint: .5, 1
+            size_hint: .8, None
+            mode: "rectangle"
+            multiline: False
+            input_filter: 'int'
+            max_text_length: 5
+
+        MDRaisedButton:
+            pos_hint: {"center_x": 0.5}
+            text: "Save"
+            on_release:
+                root.inputedTimeoutSave()
+
+<FilesizeSet>:
+    size_hint: None, None
+    height: Window.height * 30 / 100
+    width: Window.width * 50 / 100
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: "10dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
+        MDLabel:
+            text: "Filesize"
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: self.theme_cls.primary_color
+            font_style: "H4"
+            bold: True
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        MDSeparator:
+
+        MDTextField:
+            id: queryFilesize
+            hint_text: "Bytes"
+            pos_hint: {"center_x": 0.5}
+            # size_hint: .5, 1
+            size_hint: .8, None
+            mode: "rectangle"
+            multiline: False
+            input_filter: 'int'
+
+        MDRaisedButton:
+            pos_hint: {"center_x": 0.5}
+            text: "Save"
+            on_release:
+                root.inputedFilesizeSave()
 
 <KitchenSinkDialogLicense>:
     size_hint: None, None
