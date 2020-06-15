@@ -40,9 +40,14 @@ from ago import human
 
 from kivy.clock import Clock
 from libs.baseclass.dialog_change_theme import PSTDialogInput
+from database import MyDb
 
 # conn = sqlite3.connect('database.db')
 # c = conn.cursor()
+
+dbRW = MyDb()
+dbRW.create()
+
 databaseFilename = 'database.db'
 
 if platform == "android":
@@ -156,7 +161,6 @@ class ProxySpeedTestApp(MDApp):
         self.theme_cls.primary_palette = "LightBlue"
         self.dialog_change_theme = None
         self.toolbar = None
-        self.data_screens = {}
         self.scaning = Queue()
         self.running = Queue()
         self.currentSpeed = Queue()
@@ -165,84 +169,34 @@ class ProxySpeedTestApp(MDApp):
         self.pbar1 = Queue()
         self.pbar2 = Queue()
 
-        conn = sqlite3.connect(databaseFilename)
-        c = conn.cursor()
-        with conn:
-            try:
-                c.execute("""create table proxys (
-                    time datetime,
-                    protocol text,
-                    ip text,
-                    size real,
-                    getfiletime text,
-                    speed integer
-                    )""")
-                
-            except sqlite3.OperationalError as e:
-                print(e)
+          
+        configs = dbRW.getAllConfigs()
+        mirrors = dbRW.getAllMirrors()
 
-            try:
-                c.execute("create table proxysInx (proxysInx datetime)")
-                # c.execute("INSERT INTO proxysInx VALUES (?)", [defaultIndexTime])
-            except sqlite3.OperationalError as e:
-                print(e)
-            
-            try:
-                c.execute('''create table configs (
-                    themeMode text,
-                    miInx integer,
-                    proxysInx datetime,
-                    timeoutD integer,
-                    fileSize integer
-                    )''')
-                c.execute("INSERT INTO configs (themeMode, miInx, timeoutD, fileSize) VALUES ('Dark',0, 5, 1062124)")
-            except sqlite3.OperationalError as e:
-                print(e)
-            
-            try:
-                c.execute("create table mirrors (mirror text)")
-                c.execute("INSERT INTO mirrors VALUES ('http://bd.archive.ubuntu.com/ubuntu/indices/override.oneiric.universe')")
-                c.execute("INSERT INTO mirrors VALUES ('http://provo.speed.googlefiber.net:3004/download?size=1048576')")
-            except sqlite3.OperationalError as e:
-                print(e)
-            
-            c.execute("SELECT * FROM 'configs'")
-            configs = c.fetchall()
-            c.execute("SELECT * FROM 'mirrors'")
-            mirrors = c.fetchall()
-            self.selLId = configs[0][2]
-            if self.selLId:
-                c.execute("SELECT ip, size, getfiletime, speed FROM 'proxys' WHERE time=?", [self.selLId])
-                scan_list = c.fetchall()
-                c.execute("SELECT ip FROM 'proxys' WHERE time=?", [self.selLId])
-                getips = c.fetchall()
-                c.execute("SELECT protocol FROM 'proxys' WHERE time=?", [self.selLId])
-                protocol = c.fetchone()[0]
-        conn.commit()
-        conn.close()
+        self.selLId = configs[0][2]
+        if self.selLId:
+            getips = dbRW.getAllCurrentProxys(self.selLId)
+            protocol = getips[0][4]
 
         self.scan_list = []
         if self.selLId:
-            for l in scan_list:
+            for l in getips:
                 if not None in l:
                     self.scan_list.append({"IP": l[0], "SIZE": l[1], "TIME": l[2], "SPEED": l[3]})
-        # print(mirrors)
-        # print(configs)
-        
-            
-        self.proxys = [ip[0] for ip in getips] if self.selLId else []
+
         self.theme_cls.theme_style = configs[0][0]
-        self.mirrors = mirrors
-        # self.mirrorMenu = [{"icon": "web", "text": parse.urlparse(mirror[0]).netloc} for mirror[0] in mirrors]
-        self.miInx = configs[0][1]
+        
+        miInx = configs[0][1]
         self.configs = {
             'protocol': protocol if self.selLId else 'http',
-            'mirror': mirrors[self.miInx][0],
+            'mirror': mirrors[miInx][0],
             'timeout': int(configs[0][3]),
             'fileSize': int(configs[0][4]),
+            'miInx': miInx,
+            'proxysInx': [],
+            'mirrors': mirrors,
+            'proxys': [ip[0] for ip in getips] if self.selLId else []
             }
-        self.proxysInx = []
-        # recentPlay = self.save_Update(filename='configs.json')
 
     # def on_resume(self):
     #     self.ads.request_interstitial()
@@ -250,12 +204,7 @@ class ProxySpeedTestApp(MDApp):
     def changeThemeMode(self, inst):
         self.theme_cls.theme_style = inst
 
-        conn = sqlite3.connect(databaseFilename)
-        c = conn.cursor()
-        with conn:
-            c.execute("UPDATE 'configs' SET themeMode=?", [inst])
-        conn.commit()
-        conn.close()
+        dbRW.updateThemeMode(inst)
 
     def save_Update(self, l=[], filename='scan_data.json'):
         import json
@@ -270,20 +219,8 @@ class ProxySpeedTestApp(MDApp):
                 return False
     
     def save_UpdateDB(self, l=[]):
-      
-        if not l:return False
-        # print(l)
-        conn = sqlite3.connect(databaseFilename)
-        c = conn.cursor()
-        with conn:
-            try:
-                for p in l:
-                    c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=? WHERE ip=?",
-                                                (p['SIZE'], p['TIME'], p['SPEED'], p['IP']))
-            except sqlite3.OperationalError as e:
-                print(e)
-        conn.commit()
-        conn.close()
+        dbRW = MyDb()
+        if l:dbRW.updateScanList(l)
 
     def build(self):
         if platform == "android":
@@ -345,18 +282,10 @@ class ProxySpeedTestApp(MDApp):
 
     def listPic(self):
 
-        conn = sqlite3.connect(databaseFilename)
-        c = conn.cursor()
-        with conn:
-            c.execute("SELECT proxysInx FROM 'proxysInx'")
-            proxysInx = c.fetchall()
-
-            c.execute("SELECT  proxysInx FROM 'configs'")
-            self.selLId = c.fetchone()[0]
-        conn.commit()
-        conn.close()
-
-        self.proxysInx = proxysInx
+        proxysInx = dbRW.getProxysInx()
+        self.selLId = dbRW.getConfig('proxysInx')[0]
+        print(self.selLId)
+        self.configs['proxysInx'] = proxysInx
         
         if proxysInx:
             selLIdindxDict = {}
@@ -388,23 +317,12 @@ class ProxySpeedTestApp(MDApp):
         withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
         print(self.selLIdindx)
 
-        conn = sqlite3.connect(databaseFilename)
-        c = conn.cursor()
-        with conn:
-            c.execute("SELECT proxysInx FROM 'proxysInx'")
-            proxysInx = c.fetchall()
-            self.selLId = proxysInx[self.selLIdindx][0]
-            c.execute("SELECT ip FROM 'proxys' WHERE time=?", [self.selLId])
-            getips = c.fetchall()
-            c.execute("SELECT protocol FROM 'proxys' WHERE time=?", [self.selLId])
-            protocol = c.fetchone()[0]
-            c.execute("UPDATE 'configs' SET proxysInx=?", [self.selLId])
-            
-            c.execute("SELECT ip, size, getfiletime, speed FROM 'proxys' WHERE time=?", [self.selLId])
-            scan_list = c.fetchall()
-            # print(protocol)
-        conn.commit()
-        conn.close()
+        proxysInx = dbRW.getProxysInx()
+        self.selLId = proxysInx[self.selLIdindx][0]
+        proxys = dbRW.getAllCurrentProxys(self.selLId)
+        protocol = proxys[0][4]
+        dbRW.updateConfig("proxysInx", self.selLId)
+        scan_list = proxys
 
         self.scan_list = []
         if self.selLId:
@@ -418,12 +336,12 @@ class ProxySpeedTestApp(MDApp):
             # print(sort)
             self.show_List(sort)
 
-        self.proxys = [ip[0] for ip in getips]
+        self.configs['proxys'] = [ip[0] for ip in proxys]
         self.configs['protocol'] = protocol
 
         self.root.ids.Slist.text = f"list : {ins.text}".upper()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
-        self.root.ids.Tproxys.text = f"Total proxys: {len(self.proxys)}"
+        self.root.ids.Tproxys.text = f"Total proxys: {len(self.configs['proxys'])}"
         
         # print(getips)
         toast(ins.text)
@@ -442,8 +360,6 @@ class ProxySpeedTestApp(MDApp):
         )
 
     def set_protocol(self, ins):
-        # print(self.mirrors[0])
-        # print(miInx)
         self.configs['protocol'] = ins.text.lower()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         
@@ -452,15 +368,9 @@ class ProxySpeedTestApp(MDApp):
 
     def mirrorPic(self):
 
-        conn = sqlite3.connect(databaseFilename)
-        c = conn.cursor()
-        with conn:
-            c.execute("SELECT * FROM 'mirrors'")
-            mirrors = c.fetchall()
-        conn.commit()
-        conn.close()
+        mirrors = dbRW.getAllMirrors()
 
-        self.mirrors = mirrors
+        self.configs['mirrors'] = mirrors
         items = [{"icon": "web", "text": parse.urlparse(mirror[0]).netloc} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
             caller=self.root.ids.Smirror, items=items, width_mult=5,
@@ -473,21 +383,17 @@ class ProxySpeedTestApp(MDApp):
 
     def set_mirror(self, ins):
         miInx = 0
-        for l in self.mirrors:
+        for l in self.configs['mirrors']:
             if ins.text in l[0]:
                 break
             miInx += 1
         
-        self.configs['mirror'] = self.mirrors[miInx][0]
+        self.configs['mirror'] = self.configs['mirrors'][miInx][0]
         self.root.ids.Smirror.text = f"Mirror: {ins.text}".upper()
         
-        conn = sqlite3.connect(databaseFilename)
-        c = conn.cursor()
-        with conn:
-            c.execute("UPDATE 'configs' SET proxysInx=?", [self.selLId])
-            c.execute("UPDATE 'configs' SET miInx=? WHERE miInx=?", (miInx, self.miInx))
-        conn.commit()
-        conn.close()
+  
+        dbRW.updateConfig("proxysInx", self.selLId)
+        dbRW.updateConfig("miInx", self.configs['miInx'])
         
         toast(self.configs['mirror'])
         self.mirrSel.dismiss()
@@ -534,10 +440,10 @@ class ProxySpeedTestApp(MDApp):
             self.mirrorPic()
             self.listPic()
 
-            self.root.ids.Tproxys.text = f"Total proxys: {len(self.proxys)}"
-            if len(self.proxys) == 0:
+            self.root.ids.Tproxys.text = f"Total proxys: {len(self.configs['proxys'])}"
+            if len(self.configs['proxys']) == 0:
                 try:
-                    if self.proxysInx:
+                    if self.configs['proxysInx']:
                         self.listSel.open()
                         toast("Pick that list!")        
                         return
@@ -555,25 +461,22 @@ class ProxySpeedTestApp(MDApp):
             self.scaning.put_nowait(1)
             self.running.put_nowait(1)
             
-            conn = sqlite3.connect(databaseFilename)
-            c = conn.cursor()
-            with conn:
-                IndexTime = datetime.now()
-                c.execute("UPDATE 'configs' SET proxysInx=?", [IndexTime])
-                c.execute("UPDATE 'proxysInx' SET proxysInx=? WHERE proxysInx=?", (IndexTime, self.selLId))
-                c.execute("UPDATE 'proxys' SET time=?, size=NULL, getfiletime=NULL, speed=NULL WHERE time=?", (IndexTime, self.selLId))
-                c.execute("SELECT timeoutD,fileSize FROM 'configs'")
-                configs = c.fetchone()
-            conn.commit()
-            conn.close()
-            self.configs['timeout'] = int(configs[0])
-            self.configs['fileSize'] = int(configs[1])
+
+            IndexTime = datetime.now()
+            dbRW.updateConfig('proxysInx', IndexTime)
+            dbRW.updateProxysInx(IndexTime, self.selLId)
+            dbRW.updateProxys(IndexTime, self.selLId)
+
+            configs = dbRW.getAllConfigs()
+
+            self.configs['timeout'] = int(configs[0][3])
+            self.configs['fileSize'] = int(configs[0][4])
             self.selLId = str(IndexTime)
 
             self.upScreen = Clock.schedule_interval(self.update_screen, 0.1)
 
             Thread(target=self.proxySpeedTest, args=(
-                self.proxys,
+                self.configs['proxys'],
                 self.configs['protocol'],
                 self.configs['mirror'],
                 )).start()
