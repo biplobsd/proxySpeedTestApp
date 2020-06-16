@@ -135,7 +135,7 @@ class MyDb:
             c.execute(f"DROP TABLE '{name}'")
     
     def inputeMirror(self, l):
-        self.drop('mirror')
+        self.drop('mirrors')
         self.createMirror()
         
         c = self.conn.cursor()
