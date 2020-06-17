@@ -5,6 +5,18 @@ import os
 from kivymd import hooks_path as kivymd_hooks_path
 path = os.path.abspath(".")
 
+
+import re
+VERSIONFILE="main.py"
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    verstr = mo.group(1)
+else:
+    verstr = ""
+    
+
 a = Analysis(['main.py'],
              pathex=[path],
              binaries=[],
@@ -25,7 +37,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='proxySpeedTest_v1.3',
+          name=f'proxySpeedTest_v{verstr}',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

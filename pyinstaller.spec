@@ -1,12 +1,21 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-import os
+import os, re
 path = os.path.abspath(".")
 os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
 
 from kivy_deps import sdl2, glew, angle
 from kivymd import hooks_path as kivymd_hooks_path
 from kivy.tools.packaging.pyinstaller_hooks import runtime_hooks
+
+VERSIONFILE="main.py"
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    verstr = mo.group(1)
+else:
+    verstr = ""
 
 a = Analysis(
     ["main.py"],
@@ -35,7 +44,7 @@ exe = EXE(
     debug=False,
     strip=False,
     upx=True,
-    name="proxy_speed_test",
+    name=f"proxy_speed_test_v{verstr}",
     console=True,
     icon="icon.ico",
 )
