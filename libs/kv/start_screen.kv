@@ -465,6 +465,16 @@ BoxLayout:
                         icon: "license"
                         divider: None
                         on_release: KitchenSinkDialogLicense().open()
+                    
+                    MDBoxLayout:
+                        adaptive_height: True
+                        orientation: "vertical"
+                        MDTextButton:
+                            pos_hint: {"center_y": .5, "center_x": .5}
+                            font_size: sp(10)
+                            custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                            text: f"VERSION : {app.version}"
+                            on_release:app.checkUpdates(True)
                     Widget:
                         size_hint_y: None
                         height: app.theme_cls.standard_increment

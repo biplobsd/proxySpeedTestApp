@@ -28,11 +28,11 @@ source.include_patterns = assets/*
 source.exclude_patterns = LICENSE
 
 # (str) Application versioning (method 1)
-version = 1.3
+#version = 1.3
 
 # (str) Application versioning (method 2)
-# version.regex = __version__ = ['"](.*)['"]
-# version.filename = %(source.dir)s/main.py
+version.regex = __version__ = ['"](.*)['"]
+version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy==9aaca29d2f4e72aac71afba5c23c6cc8128b9e3c

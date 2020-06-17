@@ -1,27 +1,13 @@
 import os
 import sys
+import webbrowser 
 
 from kivy.lang import Builder
-
 from kivy.utils import platform
-
-from kivymd.app import MDApp
-from kivymd.theming import ThemableBehavior
-from kivymd.uix.behaviors import RectangularRippleBehavior
+from kivy.logger import Logger
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.floatlayout import FloatLayout
-import kivymd.material_resources as m_res
-from kivymd.font_definitions import theme_font_styles
-from kivymd.toast import toast
 from kivy.utils import get_color_from_hex
-from kivymd.uix.menu import MDDropdownMenu
-
-from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
-from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
-
-from datetime import datetime
-from threading import Thread
-import requests
 from kivy.core.clipboard import Clipboard
 from kivy.properties import (
     StringProperty,
@@ -31,24 +17,39 @@ from kivy.properties import (
     BooleanProperty,
 )
 from kivy.metrics import dp
+from kivy.clock import Clock
+
+from kivymd.app import MDApp
+from kivymd.theming import ThemableBehavior
+from kivymd.uix.behaviors import RectangularRippleBehavior
+import kivymd.material_resources as m_res
+from kivymd.font_definitions import theme_font_styles
+from kivymd.toast import toast
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton, MDRaisedButton
+
+from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
+from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
+
+from datetime import datetime
+from threading import Thread
+import requests
 from urllib import parse
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
 import time
 import sqlite3
 from ago import human
-
-from kivy.clock import Clock
+from functools import partial
 from libs.baseclass.dialog_change_theme import PSTDialogInput
 from database import MyDb
-
-# conn = sqlite3.connect('database.db')
-# c = conn.cursor()
 
 dbRW = MyDb()
 dbRW.create()
 
-databaseFilename = 'database.db'
+__version__ = "1.3"
+Logger.info(f"App Version: v{__version__}")
 
 if platform == "android":
     from kivmob import KivMob, TestIds
@@ -69,14 +70,14 @@ if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
     os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
     os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
     )
-    print("___one___")
+    Logger.info("___one___")
 else:
     sys.path.append(os.path.abspath(__file__).split("ProxySpeedTestV2")[0])
     os.environ["KITCHEN_SINK_ROOT"] = os.path.dirname(os.path.abspath(__file__))
     os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
     os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
     )
-    print("___two___")
+    Logger.info("___two___")
 # from kivy.core.window import Window
 # Window.softinput_mode = "below_target"
 # _small = 2
@@ -98,6 +99,7 @@ class adMobIds:
 
     # """ Test Rewarded Video Ad ID """
     # REWARDED_VIDEO = "ca-app-pub-3940256099942544/5224354917"
+
 
 class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
     """A one line list item."""
@@ -153,11 +155,16 @@ def agoConv(datetimeStr):
     else:
         return 'Pic a list'
 
+def open_link(link):
+    webbrowser.open(link)
+    return True
+
 class ProxySpeedTestApp(MDApp):
     icon = f"{os.environ['KITCHEN_SINK_ASSETS']}icon.png"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.version = __version__
         self.theme_cls.primary_palette = "LightBlue"
         self.dialog_change_theme = None
         self.toolbar = None
@@ -198,13 +205,83 @@ class ProxySpeedTestApp(MDApp):
             'proxys': [ip[0] for ip in getips] if self.selLId else []
             }
 
-    # def on_resume(self):
-    #     self.ads.request_interstitial()
+    def on_resume(self):
+        self.ads.request_interstitial()
 
     def changeThemeMode(self, inst):
         self.theme_cls.theme_style = inst
 
         dbRW.updateThemeMode(inst)
+
+
+    def checkUpdates(self, ava=False, d=False):
+        # print(ava)
+        upCURL = 'https://raw.githubusercontent.com/biplobsd/proxySpeedTestApp/master/updates.json'
+        # from json import load
+        # with open('updates.json', 'r') as read:
+        #     updateinfo = load(read)
+        toast("Checking for any updates ...")
+        try:
+            updateinfo = requests.get(upCURL).json()
+        except:
+            updateinfo = {
+                "version": float(self.version),
+                "messages": "",
+                "changelogs": "",
+                "force": "false",
+                "release": {
+                    "windows": "",
+                    "linux": "",
+                    "android": ""
+                }
+            }
+            # toast("Faild app update check!")
+        if updateinfo:
+            appLink = updateinfo["release"][platform]
+            title = f"App update v{updateinfo['version']}" 
+            msg = "You are already in latest version!"
+            b1 = "CENCEL"
+            force = False
+
+            if updateinfo['version'] > float(self.version) and appLink != "":
+                if updateinfo['messages']:title = updateinfo['messages']
+                msg = ""
+                b2 = "DOWNLOAD"
+                force = bool(updateinfo['force'])
+                if force:
+                    b1 = "EXIT"
+                ava = True
+            else:
+                b2 = "CHECK"
+
+            self.updateDialog = MDDialog(
+                title=title,
+                text=msg+updateinfo['changelogs']+f"\n\n[size=8]Force update: {force}[/size]",
+                auto_dismiss=False,
+                buttons=[
+                    MDFlatButton(
+                        text=b1, 
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.updateDialog.dismiss() if b1 == "CENCEL" else self.stop()
+                    ),
+                    MDRaisedButton(
+                        text=b2,
+                        on_release=lambda x:open_link(appLink) if b2 == "DOWNLOAD" else self.FCU(self.updateDialog),
+                        text_color=self.theme_cls.primary_color
+                    ),
+                ],
+            )
+            self.updateDialog.ids.title.theme_text_color = "Custom"
+            self.updateDialog.ids.title.text_color = self.theme_cls.primary_light
+            if ava:self.updateDialog.open()
+
+    def FCU(self, inst):
+        inst.dismiss()
+        Clock.schedule_once(partial(self.checkUpdates, True))
+
+
+    def on_pause(self):
+        return True
 
     def save_Update(self, l=[], filename='scan_data.json'):
         import json
@@ -266,9 +343,8 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
         # self.root.ids.backdrop._front_layer_open=True
+        Logger.info(f"Platform: {platform}")
         if platform == 'android':
-            print(platform)
-    
             self.ads = KivMob(adMobIds.APP)
             self.ads.new_banner(adMobIds.BANNER, top_pos=False)
             self.ads.request_banner()
@@ -279,12 +355,13 @@ class ProxySpeedTestApp(MDApp):
         self.mirrorPic()
         self.protPic()
         self.listPic()
+        Clock.schedule_once(partial(self.checkUpdates, False))
 
     def listPic(self):
 
         proxysInx = dbRW.getProxysInx()
         self.selLId = dbRW.getConfig('proxysInx')[0]
-        print(self.selLId)
+        Logger.debug(self.selLId)
         self.configs['proxysInx'] = proxysInx
         
         if proxysInx:
@@ -315,7 +392,7 @@ class ProxySpeedTestApp(MDApp):
         import re
         self.selLIdindx = int(re.search(r'#(\d)\s', ins.text).group(1))
         withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
-        print(self.selLIdindx)
+        Logger.debug(self.selLIdindx)
 
         proxysInx = dbRW.getProxysInx()
         self.selLId = proxysInx[self.selLIdindx][0]
@@ -499,7 +576,7 @@ class ProxySpeedTestApp(MDApp):
             
     
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
-        print(f'{idx} Started')
+        Logger.info(f'Scaning {idx} : Started')
         try:
             if protocol == 'http':
                 proxies = {
@@ -555,31 +632,31 @@ class ProxySpeedTestApp(MDApp):
                         f.write(chunk)
         except requests.exceptions.ProxyError:
             self.showupdate(idx, 'd')
-            print(f"\nThread {idx}. Could not connect to {proxy_ip}")
+            Logger.info(f"Thread {idx} : Could not connect to {proxy_ip}")
             return False
         except requests.exceptions.ConnectionError:
             self.showupdate(idx, 'd')
-            print(f"\nThread {idx}. Could not connect to {proxy_ip}")
+            Logger.info(f"Thread {idx} : Could not connect to {proxy_ip}")
             return False
         except IndexError:
             self.showupdate(idx, 'd')
-            print(f'\nThread {idx}. You must provide a testing IP:PORT proxy')
+            Logger.info(f'Thread {idx} : You must provide a testing IP:PORT proxy')
             return False
         except requests.exceptions.ConnectTimeout:
             self.showupdate(idx, 'd')
-            print(f"\nThread {idx}. ConnectTimeou for {proxy_ip}")
+            Logger.info(f"Thread {idx} : ConnectTimeou for {proxy_ip}")
             return False
         except requests.exceptions.ReadTimeout:
             self.showupdate(idx, 'd')
-            print(f"\nThread {idx}. ReadTimeout for {proxy_ip}")
+            Logger.info(f"Thread {idx} : ReadTimeout for {proxy_ip}")
             return False
         except RuntimeError:
             self.showupdate(idx, 'd')
-            print(f"\nThread {idx}. Set changed size during iteration. {proxy_ip}")
+            Logger.info(f"Thread {idx} : Set changed size during iteration. {proxy_ip}")
             return False
         except KeyboardInterrupt:
             self.showupdate(idx, 'd')
-            print(f"\nThread no: {idx}. Exited by User.")
+            Logger.info(f"Thread no {idx} : Exited by User.")
         
         self.showupdate(idx, 'd')
     
@@ -608,7 +685,7 @@ class ProxySpeedTestApp(MDApp):
         sort = list ()
         self.root.ids.totalpb.max = len(proxys)
         self.root.ids.totalpb.value = 0
-        print(proxys)
+        Logger.debug(proxys)
         for part in proxys:
             if self.scaning.empty():break        
             proxy_ip = part.strip()
@@ -620,7 +697,7 @@ class ProxySpeedTestApp(MDApp):
 
             # Starting chunk file downloading
             timeStart = datetime.now()
-            print("Starting ....")
+            Logger.info("Scan : Starting ....")
             downloaders = [
             Thread(
                 target=self.downloadChunk,
@@ -668,7 +745,7 @@ class ProxySpeedTestApp(MDApp):
         if platform == "android":self._statusBarColor()
         while not self.running.empty():
             self.running.get_nowait()
-        print("Finished!")
+        Logger.info("Scan : Finished!")
 
     def sort_Change(self, inst, ckid):
         if ckid and inst.active:

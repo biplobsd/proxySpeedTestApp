@@ -1,4 +1,5 @@
 import sqlite3
+from kivy.logger import Logger
 
 class MyDb:
     
@@ -20,12 +21,12 @@ class MyDb:
                     speed integer
                     )""")
             except sqlite3.OperationalError as e:
-                print(e)
+                Logger.info(f"Sqlite3 : {e}")
 
             try:
                 c.execute("create table proxysInx (proxysInx datetime)")
             except sqlite3.OperationalError as e:
-                print(e)
+                Logger.info(f"Sqlite3 : {e}")
             
             try:
                 c.execute('''create table configs (
@@ -37,14 +38,14 @@ class MyDb:
                     )''')
                 c.execute("INSERT INTO configs (themeMode, miInx, timeoutD, fileSize) VALUES ('Dark',0, 5, 1062124)")
             except sqlite3.OperationalError as e:
-                print(e)
+                Logger.info(f"Sqlite3 : {e}")
             
             try:
                 self.createMirror()
                 c.execute("INSERT INTO mirrors VALUES ('http://bd.archive.ubuntu.com/ubuntu/indices/override.oneiric.universe')")
                 c.execute("INSERT INTO mirrors VALUES ('http://provo.speed.googlefiber.net:3004/download?size=1048576')")
             except sqlite3.OperationalError as e:
-                print(e)
+                Logger.info(f"Sqlite3 : {e}")
     
     def createMirror(self):
         c = self.conn.cursor()
@@ -99,7 +100,7 @@ class MyDb:
                     c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=? WHERE ip=?",
                                                 (p['SIZE'], p['TIME'], p['SPEED'], p['IP']))
             except sqlite3.OperationalError as e:
-                print(e)
+                Logger.info(f"Sqlite3 : {e}")
 
     def updateConfig(self, key, value):
         c = self.conn.cursor()
@@ -124,7 +125,7 @@ class MyDb:
                 try:
                     c.execute('INSERT INTO proxys (time, ip, protocol) VALUES (?, ?, ?)', (IndexTime, l, protocol))
                 except sqlite3.OperationalError as e:
-                    print(e)
+                    Logger.info(f"Sqlite3 : {e}")
 
             self.updateConfig('proxysInx', IndexTime)
             c.execute("INSERT INTO proxysInx VALUES (?)", [IndexTime])
