@@ -230,14 +230,20 @@ class ProxySpeedTestApp(MDApp):
                 "changelogs": "",
                 "force": "false",
                 "release": {
-                    "windows": "",
+                    "win": "",
                     "linux": "",
-                    "android": ""
+                    "android": "",
+                    "macosx": "",
+                    "unknown": "",
+                    "kivy_build": ""
                 }
             }
             # toast("Faild app update check!")
         if updateinfo:
-            appLink = updateinfo["release"][platform]
+            try:
+                appLink = updateinfo["release"][platform]
+            except KeyError:
+                return
             title = f"App update v{updateinfo['version']}" 
             msg = "You are already in latest version!"
             b1 = "CENCEL"

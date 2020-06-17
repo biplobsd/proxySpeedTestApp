@@ -4,8 +4,11 @@
     "changelogs": "\n\n ###Changelogs### : \nBugs fixed!",
     "force": false,
     "release": {
-        "windows": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.3/proxy_speed_test_v1.3.exe",
+        "win": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.3/proxy_speed_test_v1.3.exe",
         "linux": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.3/proxySpeedTestApp_linux.tar.gz",
-        "android": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.3/proxyspeedtest-1.3-arm64-v8a-release-signed.apk"
+        "android": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.3/proxyspeedtest-1.3-arm64-v8a-release-signed.apk",
+        "macosx": "",
+        "unknown": "",
+        "kivy_build": ""
     }
 }
