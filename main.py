@@ -262,7 +262,7 @@ class ProxySpeedTestApp(MDApp):
 
             self.updateDialog = MDDialog(
                 title=title,
-                text=msg+updateinfo['changelogs']+f"\n\n[size=8]Force update: {force}[/size]",
+                text=msg+updateinfo['changelogs']+f"\n\n[size=15]Force update: {force}[/size]",
                 auto_dismiss=False,
                 buttons=[
                     MDFlatButton(

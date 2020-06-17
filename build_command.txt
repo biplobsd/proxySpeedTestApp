@@ -1,11 +1,11 @@
 
 yes | buildozer android debug deploy run logcat
-/root/.buildozer/android/platform/android-sdk/platform-tools/adb connect 0.tcp.ngrok.io:18312
+/root/.buildozer/android/platform/android-sdk/platform-tools/adb connect 2.tcp.ngrok.io:18312
 yes | buildozer android debug deploy run logcat
 yes | buildozer android release
 buildozer appclean
 yes | buildozer android release
 keytool -genkey -keystore key.keystore -alias keykivy -keyalg RSA -keysize 2048 -validity 10000
 jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore key.keystore bin/proxyspeedtest-1.0-arm64-v8a-release-unsigned.apk keykivy
-/root/.buildozer/android/platform/android-sdk/build-tools/30.0.0-rc4/zipalign -v 4 bin/proxyspeedtest-1.0-arm64-v8a-release-unsigned.apk bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
+/root/.buildozer/android/platform/android-sdk/build-tools/30.0.0/zipalign -v 4 bin/proxyspeedtest-1.0-arm64-v8a-release-unsigned.apk bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
 /root/.buildozer/android/platform/android-sdk/platform-tools/adb install bin/proxyspeedtest-1.0-arm64-v8a-release-signed.apk 
