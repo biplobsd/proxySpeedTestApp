@@ -5,6 +5,7 @@ import os
 from kivymd import hooks_path as kivymd_hooks_path
 path = os.path.abspath(".")
 
+from kivy.utils import platform
 
 import re
 VERSIONFILE="main.py"
@@ -37,7 +38,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name=f'proxySpeedTest_v{verstr}',
+          name=f'proxySpeedTest_{platform}_v{verstr}',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
