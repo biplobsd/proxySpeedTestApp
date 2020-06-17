@@ -6,7 +6,6 @@ class MyDb:
     def __init__(self, dbName='database.db'):
 
         self.conn=sqlite3.connect(dbName)
-        c = self.conn.cursor()
 
     def create(self):
         c = self.conn.cursor()

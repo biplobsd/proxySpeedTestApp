@@ -34,7 +34,6 @@ BoxLayout:
                 on_open:
                     if start_stop.text in ['Stop', 'Stoping']:home.disableOpen(backdrop)
                     else:home.opening_animation_backdrop_components(backdrop, backlayer)
-                    
                 on_close:
                     backlayer.ids.screen_manager.current = "settings"
                     home.closing_animation_backdrop_components(backdrop, backlayer)

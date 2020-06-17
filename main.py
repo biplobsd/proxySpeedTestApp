@@ -391,7 +391,7 @@ class ProxySpeedTestApp(MDApp):
     def set_list(self, ins):
         import re
         self.selLIdindx = int(re.search(r'#(\d)\s', ins.text).group(1))
-        withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
+        # withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
         Logger.debug(self.selLIdindx)
 
         proxysInx = dbRW.getProxysInx()
@@ -669,7 +669,7 @@ class ProxySpeedTestApp(MDApp):
             elif idx == 2:
                 self.pbar2.put_nowait(1)
         elif mode == 'd':
-            color = "#f44336"
+            # color = "#f44336"
             if idx == 0:
                 self.pbar0.put_nowait(0)
             elif idx == 1:
