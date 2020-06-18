@@ -52,7 +52,7 @@ __version__ = "1.4"
 Logger.info(f"App Version: v{__version__}")
 
 if platform == "android":
-    from kivmob import KivMob, TestIds
+    # from kivmob import KivMob, TestIds
     from android.runnable import run_on_ui_thread
     from jnius import autoclass
 
@@ -83,13 +83,13 @@ else:
 # _small = 2
 # Window.size = (1080/_small, 1920/_small)
 
-class adMobIds:
+# class adMobIds:
 
-    """ Test AdMob App ID """
-    APP = "ca-app-pub-3940256099942544~3347511713"
+#     """ Test AdMob App ID """
+#     APP = "ca-app-pub-3940256099942544~3347511713"
 
-    """ Test Banner Ad ID """
-    BANNER = "ca-app-pub-3940256099942544/6300978111"
+#     """ Test Banner Ad ID """
+#     BANNER = "ca-app-pub-3940256099942544/6300978111"
     
     # """ Test Interstitial Ad ID """
     # INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
@@ -205,8 +205,8 @@ class ProxySpeedTestApp(MDApp):
             'proxys': [ip[0] for ip in getips] if self.selLId else []
             }
 
-    def on_resume(self):
-        self.ads.request_interstitial()
+    # def on_resume(self):
+    #     self.ads.request_interstitial()
 
     def changeThemeMode(self, inst):
         self.theme_cls.theme_style = inst
@@ -288,18 +288,6 @@ class ProxySpeedTestApp(MDApp):
 
     def on_pause(self):
         return True
-
-    def save_Update(self, l=[], filename='scan_data.json'):
-        import json
-        if l:
-            with open(filename, 'w') as write:
-                json.dump(l, write, indent=4)
-        else:
-            if os.path.exists(filename):
-                with open(filename, 'r') as read:
-                    return json.load(read)
-            else:
-                return False
     
     def save_UpdateDB(self, l=[]):
         dbRW = MyDb()
@@ -350,13 +338,13 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
         # self.root.ids.backdrop._front_layer_open=True
         Logger.info(f"Platform: {platform}")
-        if platform == 'android':
-            self.ads = KivMob(adMobIds.APP)
-            self.ads.new_banner(adMobIds.BANNER, top_pos=False)
-            self.ads.request_banner()
-            self.ads.show_banner()
+        # if platform == 'android':
+            # self.ads = KivMob(adMobIds.APP)
+            # self.ads.new_banner(adMobIds.BANNER, top_pos=False)
+            # self.ads.request_banner()
+            # self.ads.show_banner()
 
-            self.root.ids.adsShow.size = (self.root.ids.backdrop_front_layer.width, 110)
+            # self.root.ids.adsShow.size = (self.root.ids.backdrop_front_layer.width, 110)
         
         self.mirrorPic()
         self.protPic()
