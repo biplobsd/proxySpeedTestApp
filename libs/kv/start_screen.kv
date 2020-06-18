@@ -150,9 +150,10 @@ BoxLayout:
                                     else:toast("Please stop scan first then choices Lists")
                         MDBoxLayout:
                             orientation: "vertical"
-                            adaptive_size: True
                             adaptive_height: True
-                            pos_hint: {"center_y": .5, "center_x": .5}
+                            adaptive_size: True
+                            pos_hint: {"center_x": .5}
+                            MDBoxLayout:
                             MDTextButton:
                                 id: Smirror
                                 font_size: sp(10)
@@ -160,6 +161,7 @@ BoxLayout:
                                 on_release: 
                                     if len(app.configs['proxysInx']) != 0:app.mirrSel.open() if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices mirror")
                                     else:toast("First input proxys ip:port list then select mirrors.")
+                            MDBoxLayout:
                         MDBoxLayout:
                             adaptive_height: True
                             padding: 10

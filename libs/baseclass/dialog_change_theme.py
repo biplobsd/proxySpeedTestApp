@@ -11,7 +11,7 @@ from kivymd.toast import toast
 import sqlite3
 from datetime import datetime
 from hurry.filesize import size
-from database import MyDb
+from .database import MyDb
 from kivy.base import EventLoop
 
 dbRW = MyDb()

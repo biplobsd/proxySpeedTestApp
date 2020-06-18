@@ -220,7 +220,7 @@ class ProxySpeedTestApp(MDApp):
         # from json import load
         # with open('updates.json', 'r') as read:
         #     updateinfo = load(read)
-        toast("Checking for any updates ...")
+        # toast("Checking for any updates ...")
         try:
             updateinfo = requests.get(upCURL).json()
         except:
@@ -349,7 +349,7 @@ class ProxySpeedTestApp(MDApp):
         self.mirrorPic()
         self.protPic()
         self.listPic()
-        Clock.schedule_once(partial(self.checkUpdates, False))
+        Thread(target=self.checkUpdates).start()
 
     def listPic(self):
 
@@ -572,30 +572,16 @@ class ProxySpeedTestApp(MDApp):
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
         Logger.info(f'Scaning {idx} : Started')
         try:
-            if protocol == 'http':
-                proxies = {
-                    'http': f'http://{proxy_ip}',
-                    'https': f'http://{proxy_ip}'
-                }
-            elif protocol == 'https':
-                proxies = {
-                    'http': f'https://{proxy_ip}',
-                    'https': f'https://{proxy_ip}'
-                }
-            elif protocol == 'socks4':
-                proxies = {
-                    'http': f'socks4://{proxy_ip}',
-                    'https': f'socks4://{proxy_ip}'
-                }
-            elif protocol == 'socks5':
-                proxies = {
-                    'http': f'socks5://{proxy_ip}',
-                    'https': f'socks5://{proxy_ip}'
-                }
-
+            proxies = {
+                'http': f'{protocol}://{proxy_ip}',
+                'https': f'{protocol}://{proxy_ip}'
+            }
             req = requests.get(
                 mirror,
-                headers={"Range": "bytes=%s-%s" % (0, self.configs['fileSize'])},
+                headers={
+                    "Range": "bytes=%s-%s" % (0, self.configs['fileSize']),
+                    "user-agent": "Mozilla/5.0",
+                    },
                 stream=True,
                 proxies=proxies,
                 timeout=self.configs['timeout']
@@ -603,7 +589,7 @@ class ProxySpeedTestApp(MDApp):
             with(open(f'{filename}{idx}', 'ab')) as f:
                 start = datetime.now()
                 chunkSize = 0
-                oldSpeed = 0
+                # oldSpeed = 0
                 chunkSizeUp = 1024
                 for chunk in req.iter_content(chunk_size=chunkSizeUp):
                     end = datetime.now()
@@ -691,7 +677,6 @@ class ProxySpeedTestApp(MDApp):
 
             # Starting chunk file downloading
             timeStart = datetime.now()
-            Logger.info("Scan : Starting ....")
             downloaders = [
             Thread(
                 target=self.downloadChunk,
