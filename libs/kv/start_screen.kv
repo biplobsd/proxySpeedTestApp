@@ -232,7 +232,7 @@ BoxLayout:
                             text: "Start"
                             increment_width: "164dp"
                             theme_text_color: "Custom"
-                            text_color: 1, 1, 1, .8
+                            text_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["100"])
                             # md_bg_color: get_color_from_hex("#f44336")
                             on_release: app.start_scan(self)
                     # MDBoxLayout:

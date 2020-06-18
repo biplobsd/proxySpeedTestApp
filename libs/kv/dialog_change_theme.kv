@@ -72,7 +72,7 @@
 
         MDSeparator:
 
-        TextInput:
+        MDTextFieldRect:
             id: query
             hint_text: "Rectangle mode"
             pos_hint: {"center_x": 0.5}
@@ -166,14 +166,21 @@
                         text: "SOCKS5"
                         font_style: "Overline"
                         color: app.theme_cls.text_color
-        MDRaisedButton:
-            pos_hint: {"center_x": 0.5}
-            text: "Save".upper()
-            theme_text_color: "Custom"
-            text_color: 1, 1, 1, .8
-            on_release:
-                root.inputedproxysSave() if root.piced_pro and query.text else toast("Error: Some things is wrong!.\nFill correctly!!")
 
+            MDBoxLayout:
+                adaptive_height: True
+                spacing: 10
+                MDBoxLayout:
+                MDRectangleFlatButton:
+                    text: "close".upper()
+                    on_release:root.dismiss()
+                MDRaisedButton:
+                    text: "Save".upper()
+                    theme_text_color: "Custom"
+                    text_color: 1, 1, 1, .8
+                    on_release:
+                        root.inputedproxysSave() if root.piced_pro and query.text else toast("Error: Some things is wrong!.\nFill correctly!!")
+                MDBoxLayout:
 <MirrorDialogInput>:
     size_hint: None, None
     height: Window.height * 60 / 100
@@ -196,24 +203,33 @@
 
         MDSeparator:
 
-        TextInput:
+        MDTextFieldRect:
             id: queryMirror
             hint_text: "Rectangle mode"
             pos_hint: {"center_x": 0.5}
             mode: "fill"
             size_hint: .9, 1
 
-        MDRaisedButton:
-            pos_hint: {"center_x": 0.5}
-            text: "Save"
-            on_release:
-                root.inputedMirrorSave()
+        MDBoxLayout:
+            adaptive_height: True
+            spacing: 10
+            MDBoxLayout:
+            MDRectangleFlatButton:
+                text: "close".upper()
+                on_release:root.dismiss()
+            MDRaisedButton:
+                text: "Save".upper()
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, .8
+                on_release:
+                    root.inputedMirrorSave()
+            MDBoxLayout:
 
 
 <TimeoutSet>:
     size_hint: None, None
     height: Window.height * 30 / 100
-    width: Window.width * 50 / 100
+    width: Window.width * 60 / 100
 
     BoxLayout:
         orientation: "vertical"
@@ -235,18 +251,25 @@
             id: queryTimeout
             hint_text: "Seconds"
             pos_hint: {"center_x": 0.5}
-            # size_hint: .5, 1
             size_hint: .8, None
-            mode: "rectangle"
             multiline: False
             input_filter: 'int'
             max_text_length: 5
 
-        MDRaisedButton:
-            pos_hint: {"center_x": 0.5}
-            text: "Save"
-            on_release:
-                root.inputedTimeoutSave()
+        MDBoxLayout:
+            adaptive_height: True
+            spacing: 10
+            MDBoxLayout:
+            MDRectangleFlatButton:
+                text: "close".upper()
+                on_release:root.dismiss()
+            MDRaisedButton:
+                text: "Save".upper()
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, .8
+                on_release:
+                    root.inputedTimeoutSave()
+            MDBoxLayout:
 
 <FilesizeSet>:
     size_hint: None, None
@@ -273,17 +296,25 @@
             id: queryFilesize
             hint_text: "Bytes"
             pos_hint: {"center_x": 0.5}
-            # size_hint: .5, 1
             size_hint: .8, None
-            mode: "rectangle"
+            # mode: "rectangle"
             multiline: False
             input_filter: 'int'
 
-        MDRaisedButton:
-            pos_hint: {"center_x": 0.5}
-            text: "Save"
-            on_release:
-                root.inputedFilesizeSave()
+        MDBoxLayout:
+            adaptive_height: True
+            spacing: 10
+            MDBoxLayout:
+            MDRectangleFlatButton:
+                text: "close".upper()
+                on_release:root.dismiss()
+            MDRaisedButton:
+                text: "Save".upper()
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, .8
+                on_release:
+                    root.inputedFilesizeSave()
+            MDBoxLayout:
 
 <KitchenSinkDialogLicense>:
     size_hint: None, None

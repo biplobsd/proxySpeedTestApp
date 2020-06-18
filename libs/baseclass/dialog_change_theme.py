@@ -11,13 +11,22 @@ from kivymd.toast import toast
 import sqlite3
 from datetime import datetime
 from hurry.filesize import size
-# from main import ProxySpeedTestApp
 from database import MyDb
+from kivy.base import EventLoop
 
 dbRW = MyDb()
 
 class KitchenSinkBaseDialog(ThemableBehavior, ModalView):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        EventLoop.window.bind(on_keyboard=self.hook_keyboard)
+        # self.auto_dismiss = False
+
+    def hook_keyboard(self, window, key, *largs):
+        if key == 27:
+            # print("Back button clicked!")
+            self.dismiss()
+        return True 
 
 
 class KitchenSinkDialogDev(KitchenSinkBaseDialog):
