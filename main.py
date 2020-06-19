@@ -573,7 +573,7 @@ class ProxySpeedTestApp(MDApp):
             if not self.running.empty():
                 instance.text = "Stoping"
                 # instance.text_color
-                color = "#757575"
+                color = "#BDBDBD"
                 instance.md_bg_color = get_color_from_hex(color)
                 self.theme_cls.primary_palette = "Gray"
                 if platform == "android":self._statusBarColor(color)
