@@ -1,11 +1,11 @@
-import sqlite3
+from sqlite3 import connect, OperationalError
 from kivy.logger import Logger
 
 class MyDb:
     
     def __init__(self, dbName='database.db'):
 
-        self.conn=sqlite3.connect(dbName)
+        self.conn=connect(dbName)
 
     def create(self):
         c = self.conn.cursor()
@@ -19,12 +19,12 @@ class MyDb:
                     getfiletime text,
                     speed integer
                     )""")
-            except sqlite3.OperationalError as e:
+            except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
 
             try:
                 c.execute("create table proxysInx (proxysInx datetime)")
-            except sqlite3.OperationalError as e:
+            except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
             
             try:
@@ -36,14 +36,14 @@ class MyDb:
                     fileSize integer
                     )''')
                 c.execute("INSERT INTO configs (themeMode, miInx, timeoutD, fileSize) VALUES ('Dark',0, 5, 1062124)")
-            except sqlite3.OperationalError as e:
+            except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
             
             try:
                 self.createMirror()
                 c.execute("INSERT INTO mirrors VALUES ('http://bd.archive.ubuntu.com/ubuntu/indices/override.oneiric.universe')")
                 c.execute("INSERT INTO mirrors VALUES ('http://provo.speed.googlefiber.net:3004/download?size=1048576')")
-            except sqlite3.OperationalError as e:
+            except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
     
     def createMirror(self):
@@ -98,7 +98,7 @@ class MyDb:
                 for p in l:
                     c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=? WHERE ip=?",
                                                 (p['SIZE'], p['TIME'], p['SPEED'], p['IP']))
-            except sqlite3.OperationalError as e:
+            except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
 
     def updateConfig(self, key, value):
@@ -123,7 +123,7 @@ class MyDb:
                 if not l:continue
                 try:
                     c.execute('INSERT INTO proxys (time, ip, protocol) VALUES (?, ?, ?)', (IndexTime, l, protocol))
-                except sqlite3.OperationalError as e:
+                except OperationalError as e:
                     Logger.info(f"Sqlite3 : {e}")
 
             self.updateConfig('proxysInx', IndexTime)

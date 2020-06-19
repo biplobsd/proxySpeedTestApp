@@ -1,32 +1,30 @@
-import os
-
-from kivy.uix.modalview import ModalView
-
-from kivy.utils import get_color_from_hex, get_hex_from_color
-
-from kivymd.color_definitions import palette, colors
-from kivymd.theming import ThemableBehavior
-import re
-from kivymd.toast import toast
-import sqlite3
+from os import environ
+from os.path import join
+from re import findall, sub
 from datetime import datetime
 from hurry.filesize import size
-from .database import MyDb
+from libs.baseclass.database import MyDb
 from kivy.base import EventLoop
 
-dbRW = MyDb()
+from kivy.uix.modalview import ModalView
+from kivy.utils import get_color_from_hex, get_hex_from_color
+from kivymd.color_definitions import colors, palette
+from kivymd.theming import ThemableBehavior
+from kivymd.toast import toast
 
 class KitchenSinkBaseDialog(ThemableBehavior, ModalView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        EventLoop.window.bind(on_keyboard=self.hook_keyboard)
+        # EventLoop.window.bind(on_keyboard=self.hook_keyboard)
         # self.auto_dismiss = False
+        self.dbRW = MyDb()
 
-    def hook_keyboard(self, window, key, *largs):
-        if key == 27:
-            # print("Back button clicked!")
-            self.dismiss()
-        return True 
+    # def hook_keyboard(self, window, key, *largs):
+    #     if key == 27:
+    #         # print("Back button clicked!")
+    #         self.dismiss()
+    #         # EventLoop.window.stop()
+    #     return True 
 
 
 class KitchenSinkDialogDev(KitchenSinkBaseDialog):
@@ -58,10 +56,10 @@ class PSTDialogInput(KitchenSinkBaseDialog):
 
     def inputedproxysSave(self):
 
-        proxys = re.findall(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}[\s:\t][0-9]{1,5}",
+        proxys = findall(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}[\s:\t][0-9]{1,5}",
         self.ids.query.text)
         for line in range(len(proxys)):
-            proxys[line] = re.sub(r'[\s]', ':', proxys[line])
+            proxys[line] = sub(r'[\s]', ':', proxys[line])
         if not proxys:
             toast(f"Save error!\nNo ip:port found!")
             self.ids.query.text = ""
@@ -71,7 +69,7 @@ class PSTDialogInput(KitchenSinkBaseDialog):
             currentSave += line+'\n'
         
         IndexTime = datetime.now()
-        dbRW.createProxysList(proxys, self.piced_pro, IndexTime)
+        self.dbRW.createProxysList(proxys, self.piced_pro, IndexTime)
 
         self.ids.query.text = currentSave
         
@@ -89,7 +87,7 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
         #         self.ids.query.text = r.read()
 
         
-        self.mirrors = dbRW.getAllMirrors()
+        self.mirrors = self.dbRW.getAllMirrors()
 
         self.showsInBox = ""
         for m in self.mirrors:
@@ -102,7 +100,7 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
         
         if self.showsInBox != self.ids.queryMirror.text:
 
-            dbRW.inputeMirror(self.ids.queryMirror.text.split('\n'))
+            self.dbRW.inputeMirror(self.ids.queryMirror.text.split('\n'))
             self.mainClass.mirrorPic()
 
             toast(f"Saved!")
@@ -115,7 +113,7 @@ class TimeoutSet(KitchenSinkBaseDialog):
         super().__init__(**kwargs)
 
 
-        self.timeoutD = dbRW.getConfig('timeoutD')[0]
+        self.timeoutD = self.dbRW.getConfig('timeoutD')[0]
 
         self.updateText = updateText
         self.ids.queryTimeout.text = str(self.timeoutD)
@@ -125,7 +123,7 @@ class TimeoutSet(KitchenSinkBaseDialog):
     def inputedTimeoutSave(self):
         setTimeout = int(self.ids.queryTimeout.text)
         if self.timeoutD != setTimeout:
-            dbRW.updateConfig('timeoutD', setTimeout)
+            self.dbRW.updateConfig('timeoutD', setTimeout)
             self.updateText.text = f"Timeout : {setTimeout} seconds"
             toast(f"Saved! {setTimeout} seconds")
             self.dismiss()
@@ -136,7 +134,7 @@ class FilesizeSet(KitchenSinkBaseDialog):
     def __init__(self,updateText, **kwargs):
         super().__init__(**kwargs)
 
-        self.filesize = dbRW.getConfig('fileSize')[0]
+        self.filesize = self.dbRW.getConfig('fileSize')[0]
         self.updateText = updateText
         self.ids.queryFilesize.text = str(self.filesize)
 
@@ -145,7 +143,7 @@ class FilesizeSet(KitchenSinkBaseDialog):
     def inputedFilesizeSave(self):
         setFilesize = int(self.ids.queryFilesize.text)
         if self.filesize != setFilesize:
-            dbRW.updateConfig('fileSize', setFilesize)
+            self.dbRW.updateConfig('fileSize', setFilesize)
             self.updateText.text = f"Filesize : {size(setFilesize)}"
             toast(f"Saved! {size(setFilesize)}")
             self.dismiss()
@@ -157,7 +155,7 @@ class FilesizeSet(KitchenSinkBaseDialog):
 class KitchenSinkDialogLicense(KitchenSinkBaseDialog):
     def on_open(self):
         with open(
-            os.path.join(os.environ["KITCHEN_SINK_ROOT"], "LICENSE"),
+            join(environ["KITCHEN_SINK_ROOT"], "LICENSE"),
             encoding="utf-8",
         ) as license:
             self.ids.text_label.text = license.read().format(

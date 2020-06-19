@@ -1,6 +1,8 @@
-import os
+from os import environ, sep, remove
+from os.path import join, abspath, dirname, exists, getsize
+
 import sys
-import webbrowser 
+from webbrowser import open as webopen
 
 from kivy.lang import Builder
 from kivy.utils import platform
@@ -15,14 +17,16 @@ from kivy.properties import (
     ListProperty,
     OptionProperty,
     BooleanProperty,
+    ObjectProperty
 )
 from kivy.metrics import dp
 from kivy.clock import Clock
+from kivy.base import EventLoop
 
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.behaviors import RectangularRippleBehavior
-import kivymd.material_resources as m_res
+from kivymd import material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
 from kivymd.uix.menu import MDDropdownMenu
@@ -31,25 +35,20 @@ from kivymd.uix.button import MDFlatButton, MDRaisedButton
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
+from libs.baseclass.dialog_change_theme import PSTDialogInput
+from libs.baseclass.database import MyDb
 
 from datetime import datetime
 from threading import Thread
-import requests
+from requests import get
+from requests.exceptions import ProxyError, ConnectTimeout, ReadTimeout, ConnectionError as connError
 from urllib import parse
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
-import time
-import sqlite3
 from ago import human
 from functools import partial
-from libs.baseclass.dialog_change_theme import PSTDialogInput
-from database import MyDb
-
-dbRW = MyDb()
-dbRW.create()
 
 __version__ = "1.4"
-Logger.info(f"App Version: v{__version__}")
 
 if platform == "android":
     # from kivmob import KivMob, TestIds
@@ -60,24 +59,22 @@ if platform == "android":
     WindowManager = autoclass('android.view.WindowManager$LayoutParams')
     activity = autoclass('org.kivy.android.PythonActivity').mActivity
 else:
-    def run_on_ui_thread(d):
-        # print(f"nice! {d}")
-        pass
-
+    def run_on_ui_thread(d):pass
 
 if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
-    os.environ["KITCHEN_SINK_ROOT"] = sys._MEIPASS
-    os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
-    os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
+    environ["KITCHEN_SINK_ROOT"] = sys._MEIPASS
+    environ["KITCHEN_SINK_ASSETS"] = join(
+    environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
     )
     Logger.info("___one___")
 else:
-    sys.path.append(os.path.abspath(__file__).split("ProxySpeedTestV2")[0])
-    os.environ["KITCHEN_SINK_ROOT"] = os.path.dirname(os.path.abspath(__file__))
-    os.environ["KITCHEN_SINK_ASSETS"] = os.path.join(
-    os.environ["KITCHEN_SINK_ROOT"], f"assets{os.sep}"
+    sys.path.append(abspath(__file__).split("ProxySpeedTestV2")[0])
+    environ["KITCHEN_SINK_ROOT"] = dirname(abspath(__file__))
+    environ["KITCHEN_SINK_ASSETS"] = join(
+    environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
     )
     Logger.info("___two___")
+
 # from kivy.core.window import Window
 # Window.softinput_mode = "below_target"
 # _small = 2
@@ -99,7 +96,20 @@ else:
 
     # """ Test Rewarded Video Ad ID """
     # REWARDED_VIDEO = "ca-app-pub-3940256099942544/5224354917"
+class PSTBackdropBackLayer(FloatLayout):
+    backdrop = ObjectProperty(None)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        EventLoop.window.bind(on_keyboard=self.hk)
+
+    def hk(self, window, key, *largs):
+        if key == 27:
+            # print("Back button clicked!")
+            if self.backdrop._front_layer_open:
+                self.backdrop.left_action_items = [['menu', lambda x: self.backdrop.open()]]
+                self.backdrop.close()
+        return True 
 
 class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
     """A one line list item."""
@@ -156,14 +166,14 @@ def agoConv(datetimeStr):
         return 'Pic a list'
 
 def open_link(link):
-    webbrowser.open(link)
+    webopen(link)
     return True
 
 class ProxySpeedTestApp(MDApp):
-    icon = f"{os.environ['KITCHEN_SINK_ASSETS']}icon.png"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.icon = f"{environ['KITCHEN_SINK_ASSETS']}icon.png"
         self.version = __version__
         self.theme_cls.primary_palette = "LightBlue"
         self.dialog_change_theme = None
@@ -222,7 +232,7 @@ class ProxySpeedTestApp(MDApp):
         #     updateinfo = load(read)
         # toast("Checking for any updates ...")
         try:
-            updateinfo = requests.get(upCURL).json()
+            updateinfo = get(upCURL).json()
         except:
             updateinfo = {
                 "version": float(self.version),
@@ -297,14 +307,14 @@ class ProxySpeedTestApp(MDApp):
         if platform == "android":
             self._statusBarColor()
         Builder.load_file(
-            f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/list_items.kv"
+            f"{environ['KITCHEN_SINK_ROOT']}/libs/kv/list_items.kv"
         )
         Builder.load_file(
-            f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/dialog_change_theme.kv"
+            f"{environ['KITCHEN_SINK_ROOT']}/libs/kv/dialog_change_theme.kv"
         )
         
         return Builder.load_file(
-            f"{os.environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
+            f"{environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
 
     @run_on_ui_thread
@@ -576,7 +586,7 @@ class ProxySpeedTestApp(MDApp):
                 'http': f'{protocol}://{proxy_ip}',
                 'https': f'{protocol}://{proxy_ip}'
             }
-            req = requests.get(
+            req = get(
                 mirror,
                 headers={
                     "Range": "bytes=%s-%s" % (0, self.configs['fileSize']),
@@ -610,11 +620,11 @@ class ProxySpeedTestApp(MDApp):
                         chunkSize += sys.getsizeof(chunk)
                         self.showupdate(idx)
                         f.write(chunk)
-        except requests.exceptions.ProxyError:
+        except ProxyError:
             self.showupdate(idx, 'd')
             Logger.info(f"Thread {idx} : Could not connect to {proxy_ip}")
             return False
-        except requests.exceptions.ConnectionError:
+        except connError:
             self.showupdate(idx, 'd')
             Logger.info(f"Thread {idx} : Could not connect to {proxy_ip}")
             return False
@@ -622,11 +632,11 @@ class ProxySpeedTestApp(MDApp):
             self.showupdate(idx, 'd')
             Logger.info(f'Thread {idx} : You must provide a testing IP:PORT proxy')
             return False
-        except requests.exceptions.ConnectTimeout:
+        except ConnectTimeout:
             self.showupdate(idx, 'd')
             Logger.info(f"Thread {idx} : ConnectTimeou for {proxy_ip}")
             return False
-        except requests.exceptions.ReadTimeout:
+        except ReadTimeout:
             self.showupdate(idx, 'd')
             Logger.info(f"Thread {idx} : ReadTimeout for {proxy_ip}")
             return False
@@ -672,8 +682,8 @@ class ProxySpeedTestApp(MDApp):
             self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
             # Removing before test chunk file
             for i in range(3):
-                if os.path.exists(f'{filename}{i}'):
-                    os.remove(f'{filename}{i}')
+                if exists(f'{filename}{i}'):
+                    remove(f'{filename}{i}')
 
             # Starting chunk file downloading
             timeStart = datetime.now()
@@ -690,7 +700,7 @@ class ProxySpeedTestApp(MDApp):
             filesize = 0
             for i in range(3):
                 try:
-                    filesize = filesize + os.path.getsize(f'{filename}{i}')
+                    filesize = filesize + getsize(f'{filename}{i}')
                 except FileNotFoundError:
                     continue
 
@@ -701,8 +711,8 @@ class ProxySpeedTestApp(MDApp):
             speed = round(filesize) / delta
 
             for i in range(3):
-                if os.path.exists(f'{filename}{i}'):
-                    os.remove(f'{filename}{i}')
+                if exists(f'{filename}{i}'):
+                    remove(f'{filename}{i}')
 
             unsort.append(
                 {'IP': proxy_ip,
@@ -773,4 +783,7 @@ class ProxySpeedTestApp(MDApp):
         
 
 if __name__ == "__main__":
+    dbRW = MyDb()
+    dbRW.create()
+    Logger.info(f"App Version: v{__version__}")
     ProxySpeedTestApp().run()
