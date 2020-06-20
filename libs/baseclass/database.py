@@ -1,9 +1,12 @@
 from sqlite3 import connect, OperationalError
 from kivy.logger import Logger
+from kivy.utils import platform
 
 class MyDb:
     
-    def __init__(self, dbName='database.db'):
+    def __init__(self, dbName=''):
+        if not dbName:
+            dbName = '../database.db' if platform == 'android' else 'database.db'
 
         self.conn=connect(dbName)
 
