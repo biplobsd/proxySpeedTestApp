@@ -32,6 +32,7 @@ from kivymd.toast import toast
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
+from kivymd.color_definitions import colors
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
@@ -66,14 +67,14 @@ if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
     environ["KITCHEN_SINK_ASSETS"] = join(
     environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
     )
-    Logger.info("___one___")
+    # Logger.info("___one___")
 else:
     sys.path.append(abspath(__file__).split("ProxySpeedTestV2")[0])
     environ["KITCHEN_SINK_ROOT"] = dirname(abspath(__file__))
     environ["KITCHEN_SINK_ASSETS"] = join(
     environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
     )
-    Logger.info("___two___")
+    # Logger.info("___two___")
 
 # from kivy.core.window import Window
 # Window.softinput_mode = "below_target"
@@ -573,9 +574,9 @@ class ProxySpeedTestApp(MDApp):
             if not self.running.empty():
                 instance.text = "Stoping"
                 # instance.text_color
-                color = "#BDBDBD"
-                instance.md_bg_color = get_color_from_hex(color)
+                color = "#9E9E9E"
                 self.theme_cls.primary_palette = "Gray"
+                instance.md_bg_color = get_color_from_hex(color)
                 if platform == "android":self._statusBarColor(color)
             
     
@@ -764,7 +765,7 @@ class ProxySpeedTestApp(MDApp):
                     "text3": f"{size(parServer['SPEED'], system=alternative)}/s",
                     "on_release": lambda x=parServer['IP']: self.copy_proxyip(x),
                 }
-                )
+            )
         self.data_lists = data
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")
