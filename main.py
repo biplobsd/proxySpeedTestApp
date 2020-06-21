@@ -124,6 +124,7 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
     text1 = StringProperty()
     text2 = StringProperty()
     text3 = StringProperty()
+    text4 = StringProperty()
 
     text_color = ListProperty(None)
 
@@ -190,9 +191,10 @@ class ProxySpeedTestApp(MDApp):
           
         configs = dbRW.getAllConfigs()
         mirrors = dbRW.getAllMirrors()
-
         self.selLId = configs[0][2]
+
         if self.selLId:
+            totalScan = dbRW.getProxysInxTS(self.selLId)[0]
             getips = dbRW.getAllCurrentProxys(self.selLId)
             protocol = getips[0][4]
 
@@ -200,7 +202,12 @@ class ProxySpeedTestApp(MDApp):
         if self.selLId:
             for l in getips:
                 if not None in l:
-                    self.scan_list.append({"IP": l[0], "SIZE": l[1], "TIME": l[2], "SPEED": l[3]})
+                    self.scan_list.append({
+                        "IP": l[0],
+                        "SIZE": l[1],
+                        "TIME": l[2],
+                        "SPEED": l[3],
+                        "top3c": l[6]})
 
         self.theme_cls.theme_style = configs[0][0]
         
@@ -213,7 +220,8 @@ class ProxySpeedTestApp(MDApp):
             'miInx': miInx,
             'proxysInx': [],
             'mirrors': mirrors,
-            'proxys': [ip[0] for ip in getips] if self.selLId else []
+            'proxys': getips if self.selLId else[],
+            'totalScan': totalScan if self.selLId else 0
             }
 
     # def on_resume(self):
@@ -342,9 +350,11 @@ class ProxySpeedTestApp(MDApp):
         if unsort:
             sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
             self.show_List(sort)
-            self.root.ids.Tproxys.text = f"Total proxys: {len(sort)}"
+            self.root.ids.Tproxys.text = f"proxys: {len(sort)}"
+            self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
         else:
-            self.root.ids.Tproxys.text = f"Total proxys: 0"
+            self.root.ids.Tscan.text = "scan: 0"
+            self.root.ids.Tproxys.text = "proxys: 0"
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
         # self.root.ids.backdrop._front_layer_open=True
@@ -410,7 +420,13 @@ class ProxySpeedTestApp(MDApp):
         if self.selLId:
             for l in scan_list:
                 if not None in l:
-                    self.scan_list.append({"IP": l[0], "SIZE": l[1], "TIME": l[2], "SPEED": l[3]})
+                    self.scan_list.append({
+                            "IP": l[0],
+                            "SIZE": l[1],
+                            "TIME": l[2],
+                            "SPEED": l[3],
+                            "top3c": l[6]
+                            })
 
         unsort = self.scan_list
         if unsort:
@@ -418,7 +434,7 @@ class ProxySpeedTestApp(MDApp):
             # print(sort)
             self.show_List(sort)
 
-        self.configs['proxys'] = [ip[0] for ip in proxys]
+        self.configs['proxys'] = proxys
         self.configs['protocol'] = protocol
 
         self.root.ids.Slist.text = f"list : {ins.text}".upper()
@@ -550,6 +566,9 @@ class ProxySpeedTestApp(MDApp):
             dbRW.updateProxys(IndexTime, self.selLId)
 
             configs = dbRW.getAllConfigs()
+            self.configs['totalScan'] = dbRW.getProxysInxTS(IndexTime)[0]
+            self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
+            # print(totalScan)
 
             self.configs['timeout'] = int(configs[0][3])
             self.configs['fileSize'] = int(configs[0][4])
@@ -673,13 +692,14 @@ class ProxySpeedTestApp(MDApp):
     def proxySpeedTest(self, proxys, protocol, mirror):
         filename = 'chunk'
         unsort = list()
-        sort = list ()
+        sort = list()
+        astTop3 = list()
         self.root.ids.totalpb.max = len(proxys)
         self.root.ids.totalpb.value = 0
         Logger.debug(proxys)
         for part in proxys:
             if self.scaning.empty():break        
-            proxy_ip = part.strip()
+            proxy_ip = part[0].strip()
             self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
             # Removing before test chunk file
             for i in range(3):
@@ -719,15 +739,33 @@ class ProxySpeedTestApp(MDApp):
                 {'IP': proxy_ip,
                 'SIZE': filesizeM, 
                 'TIME': delta,
-                'SPEED': int(speed)}
+                'SPEED': int(speed),
+                'top3c': part[6]}
                 )
-            sort = self.sort_Type(unsort)
+            sort = self.sort_Type(unsort, showL=False)
+            sortLL = len(sort)
+            if sortLL >= 3:
+                for t in range(sortLL):
+                    if t < 3:
+                        if sort[t]['SPEED'] != 0:
+                            if not sort[t]['IP'] in astTop3: 
+                                sort[t]['top3c'] += 1
+                                astTop3.append(sort[t]['IP'])
+                    else:
+                        for i in range(len(astTop3)):
+                            if sort[t]['IP'] == astTop3[i]:
+                                print(i)
+                                astTop3.pop(i)
+                                sort[t]['top3c'] -= 1
+                                break
+            self.show_List(sort)
             self.save_UpdateDB(sort)
             self.root.ids.totalpb.value += 1
             comP = (self.root.ids.totalpb.value/len(proxys))*100
             self.root.ids.totalpbText.text = f"{round(comP)}%"
             # return True
-        
+
+        self.save_UpdateDB(sort)
         self.upScreen.cancel()
         self.root.ids.start_stop.text = "Start"
         self.theme_cls.primary_palette = "LightBlue"
@@ -746,11 +784,13 @@ class ProxySpeedTestApp(MDApp):
             inst.active = True
 
 
-    def sort_Type(self, unsort, mode='SPEED', reverse=True):
-        if mode == 'SERVER':mode = 'IP'
+    def sort_Type(self, unsort, mode='SPEED', reverse=True, showL=True):
+        if mode == 'SERVER': mode = 'IP'
+        if mode == 'TOP3-%':mode = 'top3c'
 
         sort = sorted(unsort, key=lambda x: x[mode], reverse=reverse)
-        self.show_List(sort)
+        if showL:
+            self.show_List(sort)
         return sort
 
     def show_List(self, data): 
@@ -760,12 +800,14 @@ class ProxySpeedTestApp(MDApp):
                 {
                     "viewclass": "ProxyShowList",
                     "text": parServer['IP'],
-                    "text1": f"{parServer['SIZE']} MB",
-                    "text2": sec_to_mins(float(parServer['TIME'])),
-                    "text3": f"{size(parServer['SPEED'], system=alternative)}/s",
+                    "text1": f"{round((parServer['top3c']/self.configs['totalScan'])*100)} %",
+                    "text2": f"{parServer['SIZE']} MB",
+                    "text3": sec_to_mins(float(parServer['TIME'])),
+                    "text4": f"{size(parServer['SPEED'], system=alternative)}/s",
                     "on_release": lambda x=parServer['IP']: self.copy_proxyip(x),
                 }
             )
+        self.root.ids.backdrop_front_layer.refresh_from_data()
         self.data_lists = data
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")

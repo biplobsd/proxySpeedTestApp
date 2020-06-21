@@ -20,13 +20,17 @@ class MyDb:
                     ip text,
                     size real,
                     getfiletime text,
-                    speed integer
+                    speed integer,
+                    top3c integer
                     )""")
             except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
 
             try:
-                c.execute("create table proxysInx (proxysInx datetime)")
+                c.execute("""create table proxysInx (
+                    proxysInx datetime,
+                    totalScan integer
+                    )""")
             except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
             
@@ -68,12 +72,19 @@ class MyDb:
             mirrors = c.fetchall()
         return mirrors
 
-    def getProxysInx(self):
+    def getProxysInx(self, name='proxysInx'):
         c = self.conn.cursor()
         with self.conn:
-            c.execute("SELECT proxysInx FROM 'proxysInx'")
+            c.execute(f"SELECT {name} FROM 'proxysInx'")
             proxysInx = c.fetchall()
         return proxysInx
+    
+    def getProxysInxTS(self, time):
+        c = self.conn.cursor()
+        with self.conn:
+            c.execute(f"SELECT totalScan FROM 'proxysInx' WHERE proxysInx=?", [time])
+            totalScan = c.fetchone()
+        return totalScan
     
     def getConfig(self, name):
         c = self.conn.cursor()
@@ -85,7 +96,7 @@ class MyDb:
     def getAllCurrentProxys(self, time):
         c = self.conn.cursor()
         with self.conn:
-            c.execute("SELECT ip, size, getfiletime, speed, protocol, time FROM 'proxys' WHERE time=?", [time])
+            c.execute("SELECT ip, size, getfiletime, speed, protocol, time, top3c FROM 'proxys' WHERE time=?", [time])
             scan_list = c.fetchall()
         return scan_list
 
@@ -99,8 +110,8 @@ class MyDb:
         with self.conn:
             try:
                 for p in l:
-                    c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=? WHERE ip=?",
-                                                (p['SIZE'], p['TIME'], p['SPEED'], p['IP']))
+                    c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=?, top3c=? WHERE ip=?",
+                                                (p['SIZE'], p['TIME'], p['SPEED'], p['top3c'], p['IP']))
             except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
 
@@ -112,7 +123,7 @@ class MyDb:
     def updateProxysInx(self, new, old):
         c = self.conn.cursor()
         with self.conn:
-            c.execute("UPDATE 'proxysInx' SET proxysInx=? WHERE proxysInx=?", (new, old))
+            c.execute("UPDATE 'proxysInx' SET proxysInx=?, totalScan=totalScan+1 WHERE proxysInx=?", (new, old))
 
     def updateProxys(self, new, old):
         c = self.conn.cursor()
@@ -125,12 +136,12 @@ class MyDb:
             for l in proxys:
                 if not l:continue
                 try:
-                    c.execute('INSERT INTO proxys (time, ip, protocol) VALUES (?, ?, ?)', (IndexTime, l, protocol))
+                    c.execute('INSERT INTO proxys (time, ip, protocol, top3c) VALUES (?, ?, ?, 0)', (IndexTime, l, protocol))
                 except OperationalError as e:
                     Logger.info(f"Sqlite3 : {e}")
 
             self.updateConfig('proxysInx', IndexTime)
-            c.execute("INSERT INTO proxysInx VALUES (?)", [IndexTime])
+            c.execute("INSERT INTO proxysInx (proxysInx, totalScan) VALUES (?, ?)", (IndexTime, 0))
     
     def drop(self, name):
         c = self.conn.cursor()
