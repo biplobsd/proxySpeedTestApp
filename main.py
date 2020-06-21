@@ -139,10 +139,10 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
 
     bg_color = ListProperty()
 
-    _txt_left_pad = NumericProperty("16dp")
+    _txt_left_pad = NumericProperty("10dp")
     _txt_top_pad = NumericProperty()
     _txt_bot_pad = NumericProperty()
-    _txt_right_pad = NumericProperty(m_res.HORIZ_MARGINS)
+    _txt_right_pad = NumericProperty("10dp")
     _num_lines = 3
     _no_ripple_effect = BooleanProperty(False)
 
@@ -153,7 +153,7 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
 def sec_to_mins(seconds):
     a = str(round((seconds % 3600)//60))
     b = str(round((seconds % 3600) % 60))
-    d = f"{a} m {b} s"
+    d = f"{a}m {b}s"
     return d
 
 def agoConv(datetimeStr):
@@ -439,7 +439,7 @@ class ProxySpeedTestApp(MDApp):
 
         self.root.ids.Slist.text = f"list : {ins.text}".upper()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
-        self.root.ids.Tproxys.text = f"Total proxys: {len(self.configs['proxys'])}"
+        self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"
         
         # print(getips)
         toast(ins.text)
@@ -538,7 +538,7 @@ class ProxySpeedTestApp(MDApp):
             self.mirrorPic()
             self.listPic()
 
-            self.root.ids.Tproxys.text = f"Total proxys: {len(self.configs['proxys'])}"
+            self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"
             if len(self.configs['proxys']) == 0:
                 try:
                     if self.configs['proxysInx']:

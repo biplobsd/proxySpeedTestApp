@@ -3,7 +3,7 @@ libs/__pycache__
 libs/baseclass/__pycache__
 .buildozer/
 bin/
-# .vscode/
+.vscode/
 database.db
 configs.json
 scan_data.json

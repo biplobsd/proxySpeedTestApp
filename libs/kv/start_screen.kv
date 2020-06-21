@@ -81,7 +81,7 @@ BoxLayout:
                             padding: 10, 0, 10, 0 
                             MDLabel:
                                 id: totaltx
-                                text: "Total"
+                                # text: "Total"
                                 font_style: "Overline"
                                 size_hint_x: .2
                                 halign: "center" 
@@ -116,7 +116,7 @@ BoxLayout:
                                 max: 1024
                                 value: 0
                         MDBoxLayout:
-                            padding: 50, 0, 50, 0
+                            padding: 20, 0, 20, 0
                             # orientation: "vertical"
                             size_hint_y: .5
                             pos_hint: {"center_y": .5}
@@ -175,7 +175,7 @@ BoxLayout:
                             padding: 10
                             id: header_text
                             MDBoxLayout:
-                                size_hint_x: .7
+                                size_hint_x: .5
                                 size_hint_y: .1
                                 MDSeparator:
                                 MDTextButton:
@@ -188,59 +188,61 @@ BoxLayout:
                                         app.sort_Change(self, backdrop_front_layer.data)
                                 MDSeparator:
                             MDBoxLayout:
-                                size_hint_x: .4
-                                size_hint_y: .1
-                                MDSeparator:
-                                MDTextButton:
-                                    pos_hint: {"center_y": .5, "center_x": .5}
-                                    font_size: sp(10)
-                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                    text: "TOP3-%"
-                                    active: False
-                                    on_release:
-                                        app.sort_Change(self, backdrop_front_layer.data)
-                                MDSeparator:
-                            MDBoxLayout:
-                                size_hint_x: .4
-                                size_hint_y: .1
-                                MDSeparator:
-                                MDTextButton:
-                                    pos_hint: {"center_y": .5, "center_x": .5}
-                                    font_size: sp(10)
-                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                    text: "SIZE"
-                                    active: False
-                                    on_release:
-                                        app.sort_Change(self, backdrop_front_layer.data)
-                                MDSeparator:
-                            MDBoxLayout:
-                                size_hint_x: .3
-                                size_hint_y: .1
-                                MDSeparator:
-                                MDTextButton:
-                                    pos_hint: {"center_y": .5, "center_x": .5}
-                                    font_size: sp(10)
-                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                    text: "TIME"
-                                    active: False
-                                    on_release:
-                                        app.sort_Change(self, backdrop_front_layer.data)
-                                        
+                                # size_hint_x: 1
+                                MDBoxLayout:
+                                    # size_hint_x: .3
+                                    size_hint_y: .1
+                                    MDSeparator:
+                                    MDTextButton:
+                                        pos_hint: {"center_y": .5, "center_x": .5}
+                                        font_size: sp(10)
+                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                        text: "TOP3-%"
+                                        active: False
+                                        on_release:
+                                            app.sort_Change(self, backdrop_front_layer.data)
+                                    MDSeparator:
+                                MDBoxLayout:
+                                    # size_hint_x: .3
+                                    size_hint_y: .1
+                                    MDSeparator:
+                                    MDTextButton:
+                                        pos_hint: {"center_y": .5, "center_x": .5}
+                                        font_size: sp(10)
+                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                        text: "SIZE"
+                                        active: False
+                                        on_release:
+                                            app.sort_Change(self, backdrop_front_layer.data)
+                                    MDSeparator:
+                                MDBoxLayout:
+                                    # size_hint_x: .3
+                                    size_hint_y: .1
+                                    MDSeparator:
+                                    MDTextButton:
+                                        pos_hint: {"center_y": .5, "center_x": .5}
+                                        font_size: sp(10)
+                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                        text: "TIME"
+                                        active: False
+                                        on_release:
+                                            app.sort_Change(self, backdrop_front_layer.data)
+                                            
 
-                                MDSeparator:
-                            MDBoxLayout:
-                                size_hint_x: .3
-                                size_hint_y: .1
-                                MDSeparator:
-                                MDTextButton:
-                                    pos_hint: {"center_y": .5, "center_x": .5}
-                                    font_size: sp(10)
-                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                    text: "SPEED"
-                                    active: False
-                                    on_release:
-                                        app.sort_Change(self, backdrop_front_layer.data)
-                                MDSeparator:
+                                    MDSeparator:
+                                MDBoxLayout:
+                                    # size_hint_x: .3
+                                    size_hint_y: .1
+                                    MDSeparator:
+                                    MDTextButton:
+                                        pos_hint: {"center_y": .5, "center_x": .5}
+                                        font_size: sp(10)
+                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                        text: "SPEED"
+                                        active: False
+                                        on_release:
+                                            app.sort_Change(self, backdrop_front_layer.data)
+                                    MDSeparator:
                     KitchenSinkBackdropFrontLayer:
                         id: backdrop_front_layer
                         backdrop: backdrop
@@ -286,68 +288,74 @@ BoxLayout:
         Rectangle:
             pos: self.pos
             size: self.size
-    BoxLayout:
+    MDBoxLayout:
         id: _text_container
         # orientation: 'vertical'
+        adaptive_height: True
+        # padding: 10
         pos: root.pos
         padding:
             root._txt_left_pad, root._txt_top_pad,\
             root._txt_right_pad, root._txt_bot_pad
-        MDLabel:
-            text: root.text
-            font_style: root.font_style
-            halign: "center"
-            theme_text_color: root.theme_text_color
-            text_color: root.text_color
-            size_hint_y: None
-            size_hint_x: .68
-            height: self.texture_size[1]
-            shorten_from: 'right'
-            shorten: True
-        MDLabel:
-            text: root.text1
-            font_style: root.font_style
-            halign: "center"
-            theme_text_color: root.theme_text_color
-            text_color: root.text_color
-            size_hint_y: None
-            size_hint_x: .4
-            height: self.texture_size[1]
-            shorten_from: 'right'
-            shorten: True
-        MDLabel:
-            text: root.text2
-            font_style: root.font_style
-            halign: "center"
-            theme_text_color: root.theme_text_color
-            text_color: root.text_color
-            size_hint_y: None
-            size_hint_x: .37
-            height: self.texture_size[1]
-            shorten_from: 'right'
-            shorten: True
-        MDLabel:
-            text: root.text3
-            font_style: root.font_style
-            halign: "center"
-            theme_text_color: root.theme_text_color
-            text_color: root.text_color
-            size_hint_y: None
-            size_hint_x: .28
-            height: self.texture_size[1]
-            shorten_from: 'right'
-            shorten: True
-        MDLabel:
-            text: root.text4
-            font_style: root.font_style
-            halign: "center"
-            theme_text_color: root.theme_text_color
-            text_color: root.text_color
-            size_hint_y: None
-            size_hint_x: .28
-            height: self.texture_size[1]
-            shorten_from: 'right'
-            shorten: True
+        MDBoxLayout:
+            size_hint_x: .5
+            # size_hint_y: .1
+            MDLabel:
+                text: root.text
+                font_style: root.font_style
+                halign: "center"
+                theme_text_color: root.theme_text_color
+                text_color: root.text_color
+                size_hint_y: None
+                # size_hint_x: .68
+                height: self.texture_size[1]
+                shorten_from: 'right'
+                shorten: True
+        MDBoxLayout:
+            MDLabel:
+                text: root.text1
+                font_style: root.font_style
+                halign: "center"
+                theme_text_color: root.theme_text_color
+                text_color: root.text_color
+                size_hint_y: None
+                # size_hint_x: .3
+                height: self.texture_size[1]
+                shorten_from: 'right'
+                shorten: True
+            MDLabel:
+                text: root.text2
+                font_style: root.font_style
+                halign: "center"
+                theme_text_color: root.theme_text_color
+                text_color: root.text_color
+                size_hint_y: None
+                # size_hint_x: .3
+                height: self.texture_size[1]
+                shorten_from: 'right'
+                shorten: True
+            MDLabel:
+                text: root.text3
+                font_style: root.font_style
+                halign: "center"
+                theme_text_color: root.theme_text_color
+                text_color: root.text_color
+                size_hint_y: None
+                # size_hint_x: .2
+                height: self.texture_size[1]
+                shorten_from: 'right'
+                shorten: True
+            MDLabel:
+                text: root.text4
+                font_style: root.font_style
+                halign: "center"
+                theme_text_color: root.theme_text_color
+                text_color: root.text_color
+                size_hint_y: None
+                # size_hint_x: .2
+                height: self.texture_size[1]
+                shorten_from: 'right'
+                shorten: True
 <KitchenSinkBackdropFrontLayer@RecycleView>
     backdrop: None
     backlayer: None
