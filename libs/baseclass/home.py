@@ -20,7 +20,7 @@ class Home(Screen):
         anim.start(instance_backdrop.ids.toolbar.ids.label_title)
     
     def disableOpen(self, inst):
-        toast("Please stop scan first then choices protocol")
+        toast("Please stop scan first then go menu")
         inst.open()
         inst.close()
     def set_instance_backdrop_title(
