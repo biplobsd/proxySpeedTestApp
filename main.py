@@ -380,7 +380,7 @@ class ProxySpeedTestApp(MDApp):
             title_text="Pic a lists",
             description_text="I will remember your list later!",
             widget_position="right_top",
-            outer_radius=dp(320),
+            # outer_radius=dp(320),
             cancelable=True,
             outer_circle_color=self.theme_cls.primary_color[:-1],
             outer_circle_alpha=0.9,
@@ -577,7 +577,7 @@ class ProxySpeedTestApp(MDApp):
                 try:
                     if self.configs['proxysInx']:
                         self.tap_target_list_view.start()
-                        # self.listSel.open()
+                        self.listSel.open()
                         # toast("Pick that list!")        
                         return
                 except:
