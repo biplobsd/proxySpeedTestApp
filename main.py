@@ -129,7 +129,7 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
 
     text_color = ListProperty(None)
 
-    theme_text_color = StringProperty("Primary", allownone=True)
+    theme_text_color = StringProperty("Secondary", allownone=True)
 
     font_style = OptionProperty("Caption", options=theme_font_styles)
 
@@ -150,6 +150,7 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.height = dp(48) if not self._height else self._height
+        
 
 def sec_to_mins(seconds):
     a = str(round((seconds % 3600)//60))
@@ -188,6 +189,7 @@ class ProxySpeedTestApp(MDApp):
         self.pbar0 = Queue()
         self.pbar1 = Queue()
         self.pbar2 = Queue()
+        self.totalpb = Queue()
 
           
         configs = dbRW.getAllConfigs()
@@ -544,6 +546,21 @@ class ProxySpeedTestApp(MDApp):
         except Empty:
             pass
         
+        try:
+            proxysL = len(self.configs['proxys'])
+            while not self.totalpb.empty():
+                sp = self.totalpb.get_nowait()
+                if sp != 0:
+                    self.root.ids.totalpb.value += sp
+                    comP = (self.root.ids.totalpb.value/proxysL)*100
+                    self.root.ids.totalpbText.text = f"{round(comP)}%"
+                else:
+                    self.root.ids.totalpb.max = proxysL
+                    self.root.ids.totalpb.value = 0
+        except Empty:
+            pass
+        
+
         self.speedcal()
 
         self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()
@@ -712,8 +729,7 @@ class ProxySpeedTestApp(MDApp):
         unsort = list()
         sort = list()
         astTop3 = list()
-        self.root.ids.totalpb.max = len(proxys)
-        self.root.ids.totalpb.value = 0
+        self.totalpb.put_nowait(0)
         Logger.debug(proxys)
         for part in proxys:
             if self.scaning.empty():break        
@@ -778,17 +794,15 @@ class ProxySpeedTestApp(MDApp):
                                 break
             self.show_List(sort)
             self.save_UpdateDB(sort)
-            self.root.ids.totalpb.value += 1
-            comP = (self.root.ids.totalpb.value/len(proxys))*100
-            self.root.ids.totalpbText.text = f"{round(comP)}%"
+            self.totalpb.put_nowait(1)
             # return True
 
         self.save_UpdateDB(sort)
-        self.upScreen.cancel()
         self.root.ids.start_stop.text = "Start"
         self.theme_cls.primary_palette = "LightBlue"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
-        if platform == "android":self._statusBarColor()
+        if platform == "android": self._statusBarColor()
+        self.upScreen.cancel()
         while not self.running.empty():
             self.running.get_nowait()
         Logger.info("Scan : Finished!")
