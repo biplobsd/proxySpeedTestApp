@@ -33,6 +33,7 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
 from kivymd.color_definitions import colors
+from kivymd.uix.taptargetview import MDTapTargetView
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
@@ -349,6 +350,8 @@ class ProxySpeedTestApp(MDApp):
         # print(unsort)
         if unsort:
             sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
+            # print(sort)
+            self.show_List()
             self.show_List(sort)
             self.root.ids.Tproxys.text = f"proxys: {len(sort)}"
             self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
@@ -370,7 +373,18 @@ class ProxySpeedTestApp(MDApp):
         self.mirrorPic()
         self.protPic()
         self.listPic()
+        self.tap_target_list_view = MDTapTargetView(
+            widget=self.root.ids.Slist,
+            title_text="Pic a lists",
+            description_text="I will remember your list later!",
+            widget_position="right_top",
+            outer_radius=dp(320),
+            cancelable=True,
+            outer_circle_color=self.theme_cls.primary_color[:-1],
+            outer_circle_alpha=0.9,
+        )
         Thread(target=self.checkUpdates).start()
+
 
     def listPic(self):
 
@@ -432,6 +446,7 @@ class ProxySpeedTestApp(MDApp):
         if unsort:
             sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
             # print(sort)
+            self.show_List()
             self.show_List(sort)
 
         self.configs['proxys'] = proxys
@@ -445,6 +460,8 @@ class ProxySpeedTestApp(MDApp):
         toast(ins.text)
         # print(indx)
         self.listSel.dismiss()
+        if self.tap_target_list_view.state == 'open':
+            self.tap_target_list_view.stop()
 
 
     def protPic(self):
@@ -542,8 +559,9 @@ class ProxySpeedTestApp(MDApp):
             if len(self.configs['proxys']) == 0:
                 try:
                     if self.configs['proxysInx']:
-                        self.listSel.open()
-                        toast("Pick that list!")        
+                        self.tap_target_list_view.start()
+                        # self.listSel.open()
+                        # toast("Pick that list!")        
                         return
                 except:
                     pass
@@ -573,7 +591,7 @@ class ProxySpeedTestApp(MDApp):
             self.configs['timeout'] = int(configs[0][3])
             self.configs['fileSize'] = int(configs[0][4])
             self.selLId = str(IndexTime)
-
+            self.show_List()
             self.upScreen = Clock.schedule_interval(self.update_screen, 0.1)
 
             Thread(target=self.proxySpeedTest, args=(
@@ -754,7 +772,7 @@ class ProxySpeedTestApp(MDApp):
                     else:
                         for i in range(len(astTop3)):
                             if sort[t]['IP'] == astTop3[i]:
-                                print(i)
+                                # print(i)
                                 astTop3.pop(i)
                                 sort[t]['top3c'] -= 1
                                 break
@@ -793,22 +811,41 @@ class ProxySpeedTestApp(MDApp):
             self.show_List(sort)
         return sort
 
-    def show_List(self, data): 
-        self.root.ids.backdrop_front_layer.data = []
-        for parServer in data:
-            self.root.ids.backdrop_front_layer.data.append(
-                {
-                    "viewclass": "ProxyShowList",
-                    "text": parServer['IP'],
-                    "text1": f"{round((parServer['top3c']/self.configs['totalScan'])*100)} %",
-                    "text2": f"{parServer['SIZE']} MB",
-                    "text3": sec_to_mins(float(parServer['TIME'])),
-                    "text4": f"{size(parServer['SPEED'], system=alternative)}/s",
-                    "on_release": lambda x=parServer['IP']: self.copy_proxyip(x),
-                }
-            )
-        self.root.ids.backdrop_front_layer.refresh_from_data()
-        self.data_lists = data
+    def show_List(self, data=[]): 
+        # if not self.root.ids.backdrop_front_layer.data:
+        # print(data)
+        # print(len(self.root.ids.backdrop_front_layer.data))
+        totalP = len(self.configs['proxys'])
+        ddict = {
+            "viewclass": "ProxyShowList",
+            "text": "",
+            "text1": "",
+            "text2": "",
+            "text3": "",
+            "text4": "",
+            "on_release": lambda: toast("empty!")
+        }
+        if not data:
+            self.root.ids.backdrop_front_layer.data = []
+            for i in range(totalP):
+                self.root.ids.backdrop_front_layer.data.append(ddict)
+        else:
+            for i in range(totalP):
+                try:
+                    _ = data[i]
+                    self.root.ids.backdrop_front_layer.data[i] = {
+                            "viewclass": "ProxyShowList",
+                            "text": data[i]['IP'],
+                            "text1": f"{round((data[i]['top3c']/self.configs['totalScan'])*100)} %",
+                            "text2": f"{data[i]['SIZE']} MB",
+                            "text3": sec_to_mins(float(data[i]['TIME'])),
+                            "text4": f"{size(data[i]['SPEED'], system=alternative)}/s",
+                            "on_release": lambda x=data[i]['IP']: self.copy_proxyip(x),
+                        }
+                except IndexError:
+                    self.root.ids.backdrop_front_layer.data[i] = ddict
+
+            self.data_lists = data
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")
         Clipboard.copy(data)
