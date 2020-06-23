@@ -94,7 +94,7 @@ android.permissions = INTERNET, ACCESS_NETWORK_STATE
 android.api = 29
 
 # (int) Minimum API your APK will support.
-android.minapi = 23
+android.minapi = 21
 
 # (int) Android SDK version to use
 android.sdk = 29
@@ -222,7 +222,7 @@ android.logcat_filters = *:S python:D
 #android.copy_libs = 1
 
 # (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
-android.arch = arm64-v8a
+android.arch = armeabi-v7a
 
 #
 # Python for android (p4a) specific
