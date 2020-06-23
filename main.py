@@ -729,10 +729,11 @@ class ProxySpeedTestApp(MDApp):
         unsort = list()
         sort = list()
         astTop3 = list()
-        self.totalpb.put_nowait(0)
+        roundC = 0
+        self.totalpb.put(0)
         Logger.debug(proxys)
-        for part in proxys:
-            if self.scaning.empty():break        
+        for c, part in enumerate(proxys):
+            if self.scaning.empty(): break
             proxy_ip = part[0].strip()
             self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
             # Removing before test chunk file
@@ -794,15 +795,22 @@ class ProxySpeedTestApp(MDApp):
                                 break
             self.show_List(sort)
             self.save_UpdateDB(sort)
-            self.totalpb.put_nowait(1)
+            self.totalpb.put(1)
+            roundC = c
             # return True
-
+        
         self.save_UpdateDB(sort)
+        # print(roundC)
+        # print(self.root.ids.totalpb.value)
+        roundC += 1
+        while True:
+            if self.root.ids.totalpb.value == roundC:
+                self.upScreen.cancel()
+                break
         self.root.ids.start_stop.text = "Start"
         self.theme_cls.primary_palette = "LightBlue"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
         if platform == "android": self._statusBarColor()
-        self.upScreen.cancel()
         while not self.running.empty():
             self.running.get_nowait()
         Logger.info("Scan : Finished!")
