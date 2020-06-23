@@ -19,7 +19,7 @@ jobs:
       uses: ArtemSBulgakov/buildozer-action@v1
       id: buildozer
       with:
-        workdir: demos/${{ matrix.demo-name }}
+        workdir: .
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
