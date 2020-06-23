@@ -50,7 +50,7 @@ from hurry.filesize import alternative, size
 from ago import human
 from functools import partial
 
-__version__ = "1.4"
+__version__ = "1.5"
 
 if platform == "android":
     # from kivmob import KivMob, TestIds
