@@ -1,12 +1,12 @@
 {
-    "version": 1.4,
+    "version": 1.5,
     "messages": "",
-    "changelogs": "\n\n [b]###Changelogs### :[/b]\n - Added timeout, filesize\n - Added app updates check!\n - Sqlite3 database optimized\n - Bugs fixed!",
+    "changelogs": "\n\n [b]### Changelogs ### :[/b]\n - lollipop (minimum API 21)\n - ads remove!\n - top3 %\n - recycleView crash fixed!",
     "force": false,
     "release": {
-        "win": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.4/proxySpeedTest_win_v1.4.exe",
-        "linux": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.4/proxySpeedTest_linux_v1.4",
-        "android": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.4/proxyspeedtest-1.4-arm64-v8a-release-signed.apk",
+        "win": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.5/proxySpeedTest_win_v1.5.exe",
+        "linux": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.5/proxySpeedTest_linux_v1.5",
+        "android": "https://github.com/biplobsd/proxySpeedTestApp/releases/download/1.5/proxyspeedtest-1.5-armeabi-v7a-release-signed.apk",
         "macosx": "",
         "unknown": "",
         "kivy_build": ""
