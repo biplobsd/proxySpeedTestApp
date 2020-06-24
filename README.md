@@ -1,3 +1,4 @@
 # proxySpeedTestApp <img width="35px" src="https://github.com/biplobsd/proxySpeedTestApp/blob/master/assets/icon.png">
+![Build debug apk](https://github.com/biplobsd/proxySpeedTestApp/workflows/Build%20debug%20apk/badge.svg?branch=master)
 ##### ___powerby Kivy, KivyMD___
 <img width="300" src="https://github.com/biplobsd/proxySpeedTestApp/blob/screenshort/img/1590946421911.png"><img width="300" src="https://github.com/biplobsd/proxySpeedTestApp/blob/screenshort/img/1590946451414.png"><img width="300" src="https://github.com/biplobsd/proxySpeedTestApp/blob/screenshort/img/1590946458627.png"><img width="300" src="https://github.com/biplobsd/proxySpeedTestApp/blob/screenshort/img/1590946469725.png"><img width="300" src="https://github.com/biplobsd/proxySpeedTestApp/blob/screenshort/img/1590946475909.png"><img width="300" src="https://github.com/biplobsd/proxySpeedTestApp/blob/screenshort/img/1590946482132.png">
