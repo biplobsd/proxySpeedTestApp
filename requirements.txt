@@ -1,6 +1,3 @@
-pip
-wheel
-setuptools
 pysocks
 hurry.filesize
 ago
