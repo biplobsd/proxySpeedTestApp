@@ -8,8 +8,8 @@ requests
 urllib3
 chardet
 idna
-git+https://github.com/kivy/kivy.git
-git+https://github.com/HeaTTheatR/KivyMD.git
+kivy @ https://github.com/kivy/kivy/archive/master.zip
+kivymd @ https://github.com/HeaTTheatR/KivyMD/archive/master.zip
 docutils
 pygments
 pypiwin32
@@ -17,4 +17,4 @@ kivy.deps.sdl2
 kivy.deps.glew
 kivy.deps.gstreamer
 kivy.deps.angle
-git+https://github.com/pyinstaller/pyinstaller.git
+pyinstaller @ https://github.com/pyinstaller/pyinstaller/archive/develop.zip
