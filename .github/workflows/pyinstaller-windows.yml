@@ -13,19 +13,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: PyInstaller Windows
-      uses: JackMcKew/pyinstaller-action-windows@main
+      uses: biplobsd/pyinstaller-action-windows@main
       with:
         path: .
-    
-    
-    
-    - name: Build with Buildozer
-      uses: ArtemSBulgakov/buildozer-action@v1
-      id: buildozer
-      with:
-        workdir: .
-        buildozer_version: master
-        command: buildozer android debug
+        spec: pyinstaller.spec
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
