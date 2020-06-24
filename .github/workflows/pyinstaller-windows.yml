@@ -1,0 +1,34 @@
+name: Package exe with PyInstaller - Windows
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build exe [${{ matrix.name }}]
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [proxySpeedTestApp]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: PyInstaller Windows
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: .
+    
+    
+    
+    - name: Build with Buildozer
+      uses: ArtemSBulgakov/buildozer-action@v1
+      id: buildozer
+      with:
+        workdir: .
+        buildozer_version: master
+        command: buildozer android debug
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: package ${{ matrix.name }}
+        path: src/dist/windows
