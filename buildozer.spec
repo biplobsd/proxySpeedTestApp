@@ -36,7 +36,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy==9aaca29d2f4e72aac71afba5c23c6cc8128b9e3c
-requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git@c67850fd9f505d20a9e86ab89a39918daf34cd43,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna
+requirements = python3,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna,sdl2_ttf==2.0.15
 
 # admob
 #requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git@c67850fd9f505d20a9e86ab89a39918daf34cd43,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna,kivmob
