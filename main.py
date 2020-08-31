@@ -413,13 +413,12 @@ class ProxySpeedTestApp(MDApp):
         self.listSel = MDDropdownMenu(
             caller=self.root.ids.Slist, items=self.ListItems, width_mult=3,
             opening_time=0.2,
-            use_icon_item=False,
             position='auto',
-            max_height=0,
-            callback=self.set_list,
+            max_height=0
         )
+        self.listSel.bind(on_release=self.set_list)
 
-    def set_list(self, ins):
+    def set_list(self, insMain, ins):
         import re
         self.selLIdindx = int(re.search(r'#(\d)\s', ins.text).group(1))
         # withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
@@ -471,12 +470,11 @@ class ProxySpeedTestApp(MDApp):
         self.protSel = MDDropdownMenu(
             caller=self.root.ids.Sprotocol, items=items, width_mult=2,
             opening_time=0.2,
-            use_icon_item=False,
-            position='auto',
-            callback=self.set_protocol
+            position='auto'
         )
+        self.protSel.bind(on_release=self.set_protocol)
 
-    def set_protocol(self, ins):
+    def set_protocol(self, insMain, ins):
         self.configs['protocol'] = ins.text.lower()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         
@@ -490,15 +488,16 @@ class ProxySpeedTestApp(MDApp):
         self.configs['mirrors'] = mirrors
         items = [{"icon": "web", "text": parse.urlparse(mirror[0]).netloc} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
-            caller=self.root.ids.Smirror, items=items, width_mult=5,
+            caller=self.root.ids.Smirror,
+            items=items,
             opening_time=0.2,
-            use_icon_item=False,
+            width_mult=5,
             position='auto',
-            max_height=0,
-            callback=self.set_mirror,
+            max_height=0
         )
+        self.mirrSel.bind(on_release=self.set_mirror)
 
-    def set_mirror(self, ins):
+    def set_mirror(self, insMain, ins):
         miInx = 0
         for l in self.configs['mirrors']:
             if ins.text in l[0]:

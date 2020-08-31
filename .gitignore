@@ -16,3 +16,4 @@ kivy_env
 build
 dist
 alpha_build
+.vscode
