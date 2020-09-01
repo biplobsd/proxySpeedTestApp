@@ -29,7 +29,7 @@ from kivymd.uix.behaviors import RectangularRippleBehavior
 from kivymd import material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
-from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.menu import MDDropdownMenu, RightContent
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
 from kivymd.color_definitions import colors
@@ -112,6 +112,9 @@ class PSTBackdropBackLayer(FloatLayout):
                 self.backdrop.left_action_items = [['menu', lambda x: self.backdrop.open()]]
                 self.backdrop.close()
         return True 
+
+class RightContentCls(RightContent):
+    pass
 
 class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
     """A one line list item."""
@@ -401,16 +404,23 @@ class ProxySpeedTestApp(MDApp):
             i = 0
             for Inx in proxysInx:
                 self.ListItems.append({
-                    "icon": "playlist-remove", 
+                    "right_content_cls": RightContentCls(
+                                icon="database-remove",
+                            ),
                     "text": f'#{i} '+agoConv(Inx[0]),
                     "font_style": "Caption",
                     "height": "36dp",
-                    "top_pad": "20dp",
+                    "top_pad": "35dp",
                     "bot_pad": "10dp"})
                 selLIdindxDict[Inx[0]] = i
                 i += 1
         else:
-            self.ListItems = [{"icon": "playlist-remove", "text": "None"}]
+            self.ListItems = [{
+                "text": "None",
+                "font_style": "Caption",
+                "height": "36dp",
+                "top_pad": "35dp",
+                "bot_pad": "10dp"}]
         
         if proxysInx:
             self.selLIdindx = selLIdindxDict[self.selLId]
@@ -475,14 +485,15 @@ class ProxySpeedTestApp(MDApp):
 
     def protPic(self):
         items = [{
-            "icon": "protocol", 
             "text": protocol.upper(),
             "font_style": "Caption",
             "height": "36dp",
-            "top_pad": "20dp",
+            "top_pad": "35dp",
             "bot_pad": "10dp"} for protocol in ['http', 'https', 'socks4', 'socks5']]
         self.protSel = MDDropdownMenu(
-            caller=self.root.ids.Sprotocol, items=items, width_mult=3.5,
+            caller=self.root.ids.Sprotocol,
+            items=items,
+            width_mult=2.5,
             opening_time=0.2,
             position='auto'
         )
@@ -501,11 +512,10 @@ class ProxySpeedTestApp(MDApp):
 
         self.configs['mirrors'] = mirrors
         items = [{
-            "icon": "web", 
             "text": parse.urlparse(mirror[0]).netloc,
             "font_style": "Caption",
             "height": "36dp",
-            "top_pad": "20dp",
+            "top_pad": "35dp",
             "bot_pad": "10dp"} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
             caller=self.root.ids.Smirror,
