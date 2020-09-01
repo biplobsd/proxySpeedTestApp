@@ -400,7 +400,13 @@ class ProxySpeedTestApp(MDApp):
             self.ListItems = []
             i = 0
             for Inx in proxysInx:
-                self.ListItems.append({"icon": "playlist-remove", "text": f'#{i} '+agoConv(Inx[0])})
+                self.ListItems.append({
+                    "icon": "playlist-remove", 
+                    "text": f'#{i} '+agoConv(Inx[0]),
+                    "font_style": "Caption",
+                    "height": "36dp",
+                    "top_pad": "20dp",
+                    "bot_pad": "10dp"})
                 selLIdindxDict[Inx[0]] = i
                 i += 1
         else:
@@ -411,7 +417,9 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if proxysInx else "list :"
 
         self.listSel = MDDropdownMenu(
-            caller=self.root.ids.Slist, items=self.ListItems, width_mult=3,
+            caller=self.root.ids.Slist, 
+            items=self.ListItems, 
+            width_mult=4,
             opening_time=0.2,
             position='auto',
             max_height=0
@@ -466,9 +474,15 @@ class ProxySpeedTestApp(MDApp):
 
 
     def protPic(self):
-        items = [{"icon": "protocol", "text": protocol.upper()} for protocol in ['http', 'https', 'socks4', 'socks5']]
+        items = [{
+            "icon": "protocol", 
+            "text": protocol.upper(),
+            "font_style": "Caption",
+            "height": "36dp",
+            "top_pad": "20dp",
+            "bot_pad": "10dp"} for protocol in ['http', 'https', 'socks4', 'socks5']]
         self.protSel = MDDropdownMenu(
-            caller=self.root.ids.Sprotocol, items=items, width_mult=2,
+            caller=self.root.ids.Sprotocol, items=items, width_mult=3.5,
             opening_time=0.2,
             position='auto'
         )
@@ -486,7 +500,13 @@ class ProxySpeedTestApp(MDApp):
         mirrors = dbRW.getAllMirrors()
 
         self.configs['mirrors'] = mirrors
-        items = [{"icon": "web", "text": parse.urlparse(mirror[0]).netloc} for mirror in mirrors]
+        items = [{
+            "icon": "web", 
+            "text": parse.urlparse(mirror[0]).netloc,
+            "font_style": "Caption",
+            "height": "36dp",
+            "top_pad": "20dp",
+            "bot_pad": "10dp"} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
             caller=self.root.ids.Smirror,
             items=items,
