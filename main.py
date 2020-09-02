@@ -432,9 +432,15 @@ class ProxySpeedTestApp(MDApp):
             width_mult=4,
             opening_time=0.2,
             position='auto',
-            max_height=0
+            max_height=0,
+            selected_color=self.theme_cls.primary_dark_hue
         )
-        self.listSel.bind(on_release=self.set_list)
+        self.listSel.bind(
+            on_release=self.set_list,
+            on_dismiss=self.manuDismiss)
+
+    def manuDismiss(self, ins):
+        ins.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
 
     def set_list(self, insMain, ins):
         import re
@@ -479,6 +485,7 @@ class ProxySpeedTestApp(MDApp):
         toast(ins.text)
         # print(indx)
         self.listSel.dismiss()
+        insMain.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
         if self.tap_target_list_view.state == 'open':
             self.tap_target_list_view.stop()
 
@@ -495,15 +502,19 @@ class ProxySpeedTestApp(MDApp):
             items=items,
             width_mult=2.5,
             opening_time=0.2,
-            position='auto'
+            position='auto',
+            selected_color=self.theme_cls.primary_dark_hue
         )
-        self.protSel.bind(on_release=self.set_protocol)
+        self.protSel.bind(
+            on_release=self.set_protocol,
+            on_dismiss=self.manuDismiss)
 
     def set_protocol(self, insMain, ins):
         self.configs['protocol'] = ins.text.lower()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         
         toast(self.configs['protocol'])
+        insMain.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
         self.protSel.dismiss()
 
     def mirrorPic(self):
@@ -523,9 +534,12 @@ class ProxySpeedTestApp(MDApp):
             opening_time=0.2,
             width_mult=5,
             position='auto',
-            max_height=0
+            max_height=0,
+            selected_color=self.theme_cls.primary_dark_hue
         )
-        self.mirrSel.bind(on_release=self.set_mirror)
+        self.mirrSel.bind(
+            on_release=self.set_mirror,
+            on_dismiss=self.manuDismiss)
 
     def set_mirror(self, insMain, ins):
         miInx = 0
@@ -542,6 +556,7 @@ class ProxySpeedTestApp(MDApp):
         dbRW.updateConfig("miInx", self.configs['miInx'])
         
         toast(self.configs['mirror'])
+        insMain.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
         self.mirrSel.dismiss()
     
     def update_screen(self, dt):
