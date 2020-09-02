@@ -128,10 +128,13 @@ BoxLayout:
                                 pos_hint: {"center_y": .5, "center_x": .5}
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release:
-                                    if len(app.configs['proxys']) != 0:app.protSel.open(); \
-                                    self.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["800"]) \
-                                    if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices protocol")
-                                    else:toast("First input proxys ip:port list then select protocol.")
+                                    if (len(app.configs['proxys']) == 0):\
+                                    toast("First input proxys ip:port list then select protocol.")
+                                    elif start_stop.text in ['Stop', 'Stoping']:\
+                                    toast("Please stop scan first then choices protocol")
+                                    else:\
+                                    app.protSel.open(); \
+                                    self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
                             MDLabel:
                                 id: Tproxys
                                 # size_hint: None, None
@@ -155,11 +158,14 @@ BoxLayout:
                                 font_size: sp(10)
                                 pos_hint: {"center_y": .5, "center_x": .5}
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
-                                on_release: 
-                                    if not start_stop.text in ['Stop', 'Stoping']:app.listSel.open(); \
-                                    self.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["800"]) \
-                                    if app.configs['proxysInx'] else toast("Input proxys ip first then scan")
-                                    else:toast("Please stop scan first then choices Lists")
+                                on_release:
+                                    if len(app.configs['proxysInx']) == 0:\
+                                    toast("Input proxys ip first then scan")
+                                    elif start_stop.text in ['Stop', 'Stoping']:\
+                                    toast("Please stop scan first then choices Lists")
+                                    else:\
+                                    app.listSel.open(); \
+                                    self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
                         MDBoxLayout:
                             orientation: "vertical"
                             adaptive_height: True
@@ -171,10 +177,13 @@ BoxLayout:
                                 font_size: sp(10)
                                 custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
                                 on_release: 
-                                    if len(app.configs['proxysInx']) != 0:app.mirrSel.open(); \
-                                    self.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["800"]) \
-                                    if not start_stop.text in ['Stop', 'Stoping'] else toast("Please stop scan first then choices mirror")
-                                    else:toast("First input proxys ip:port list then select mirrors.")
+                                    if (len(app.configs['proxysInx']) == 0):\
+                                    toast("First input proxys ip:port list then select mirrors.")
+                                    elif start_stop.text in ['Stop', 'Stoping']:\
+                                    toast("Please stop scan first then choices mirror")
+                                    else:\
+                                    app.mirrSel.open(); \
+                                    self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
                             MDBoxLayout:
                         MDBoxLayout:
                             adaptive_height: True
