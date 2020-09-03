@@ -10,8 +10,6 @@ jobs:
       matrix:
         name: [proxySpeedTestApp]
     runs-on: ubuntu-latest
-    env:
-      PYTHONUNBUFFERED: 1
 
     steps:
     - name: Checkout
