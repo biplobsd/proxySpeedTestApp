@@ -1,9 +1,0 @@
-__pycache__
-libs/__pycache__
-libs/baseclass/__pycache__
-.buildozer/
-bin/
-# .vscode/
-configs.json
-scan_data.json
-proxys.txt
