@@ -32,7 +32,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        path: screenshort
+        path: data
         ref: screenshort # Branch name
         persist-credentials: false
 
