@@ -10,10 +10,14 @@ jobs:
       matrix:
         name: [proxySpeedTestApp]
     runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        path: master
 
     - name: Build with Buildozer
       uses: ArtemSBulgakov/buildozer-action@v1
@@ -32,7 +36,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        path: apk
+        path: screenshort
         ref: screenshort # Branch name
 
     - name: Set up Python
