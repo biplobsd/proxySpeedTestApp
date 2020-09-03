@@ -34,6 +34,7 @@ jobs:
       with:
         path: screenshort
         ref: screenshort # Branch name
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@v2
