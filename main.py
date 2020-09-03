@@ -500,7 +500,7 @@ class ProxySpeedTestApp(MDApp):
         self.protSel = MDDropdownMenu(
             caller=self.root.ids.Sprotocol,
             items=items,
-            width_mult=2.5,
+            width_mult=3,
             opening_time=0.2,
             position='auto',
             selected_color=self.theme_cls.primary_dark_hue
