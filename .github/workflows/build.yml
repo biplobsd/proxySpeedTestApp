@@ -42,4 +42,11 @@ jobs:
         architecture: x64
 
     - name: Push binary to data branch
-      run: python master/.ci/move_binary.py "${{ steps.buildozer.outputs.filename }}" master screenshort
+      run: |
+        #Use personal token to push (when using GITHUB_TOKEN, it will not allow pushes from PR)
+        cd apk && \
+          git config user.name "biplobsd" && \
+          git config user.email biplobsd11@gmail.com && \
+          git remote set-url origin https://biplobsd:${{ secrets.GH_PAT }}@github.com/${{ github.repository }} && \
+          cd ..
+        python master/.ci/move_binary.py "${{ steps.buildozer.outputs.filename }}" master screenshort ${{ matrix.name }} 
