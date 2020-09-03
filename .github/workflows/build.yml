@@ -28,3 +28,18 @@ jobs:
       with:
         name: package ${{ matrix.name }}
         path: ${{ steps.buildozer.outputs.filename }}
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        path: apk
+        ref: screenshort # Branch name
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+        architecture: x64
+
+    - name: Push binary to data branch
+      run: python master/.ci/move_binary.py "${{ steps.buildozer.outputs.filename }}" master screenshort
