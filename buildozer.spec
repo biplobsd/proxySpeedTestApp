@@ -87,6 +87,12 @@ fullscreen = 0
 # olive, purple, silver, teal.
 android.presplash_color = black
 
+# (string) Presplash animation using Lottie format.
+# see https://lottiefiles.com/ for examples and https://airbnb.design/lottie/
+# for general documentation.
+# Lottie files can be created using various tools, like Adobe After Effect or Synfig.
+android.presplash_lottie = "assets/presplash.json"
+
 # (list) Permissions
 android.permissions = INTERNET, ACCESS_NETWORK_STATE
 
