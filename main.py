@@ -298,7 +298,7 @@ class ProxySpeedTestApp(MDApp):
                     MDRaisedButton(
                         text=b2,
                         on_release=lambda x:open_link(appLink) if b2 == "DOWNLOAD" else self.FCU(self.updateDialog),
-                        text_color=self.theme_cls.primary_color
+                        text_color=self.theme_cls.primary_light,
                     ),
                 ],
             )
