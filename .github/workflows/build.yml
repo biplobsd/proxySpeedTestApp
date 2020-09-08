@@ -48,7 +48,7 @@ jobs:
         python-version: 3.7
         architecture: x64
 
-    - name: Push binary to data branch
+    - name: Push binary to screenshort branch
       run: |
         #Use personal token to push (when using GITHUB_TOKEN, it will not allow pushes from PR)
         cd data && \
