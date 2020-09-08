@@ -29,7 +29,7 @@ from kivymd.uix.behaviors import RectangularRippleBehavior
 from kivymd import material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
-from kivymd.uix.menu import MDDropdownMenu, RightContent
+from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
 from kivymd.color_definitions import colors
@@ -113,8 +113,7 @@ class PSTBackdropBackLayer(FloatLayout):
                 self.backdrop.close()
         return True 
 
-class RightContentCls(RightContent):
-    pass
+
 
 class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
     """A one line list item."""
@@ -404,9 +403,6 @@ class ProxySpeedTestApp(MDApp):
             i = 0
             for Inx in proxysInx:
                 self.ListItems.append({
-                    "right_content_cls": RightContentCls(
-                                icon="database-remove",
-                            ),
                     "text": f'#{i} '+agoConv(Inx[0]),
                     "font_style": "Caption",
                     "height": "36dp",
