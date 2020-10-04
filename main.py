@@ -729,7 +729,7 @@ class ProxySpeedTestApp(MDApp):
             return False
         except ConnectTimeout:
             self.showupdate(idx, 'd')
-            Logger.info(f"Thread {idx} : ConnectTimeou for {proxy_ip}")
+            Logger.info(f"Thread {idx} : ConnectTimeout for {proxy_ip}")
             return False
         except ReadTimeout:
             self.showupdate(idx, 'd')
@@ -885,7 +885,7 @@ class ProxySpeedTestApp(MDApp):
             "text2": "",
             "text3": "",
             "text4": "",
-            "on_release": lambda: toast("empty!")
+            "on_release": lambda: toast("empty!!")
         }
         if not data:
             self.root.ids.backdrop_front_layer.data = []
