@@ -429,7 +429,7 @@ class ProxySpeedTestApp(MDApp):
             opening_time=0.2,
             position='auto',
             max_height=0,
-            selected_color=self.theme_cls.primary_dark_hue
+            selected_color=self.theme_cls.primary_light
         )
         self.listSel.bind(
             on_release=self.set_list,
@@ -499,7 +499,8 @@ class ProxySpeedTestApp(MDApp):
             width_mult=3,
             opening_time=0.2,
             position='auto',
-            selected_color=self.theme_cls.primary_dark_hue
+            selected_color=self.theme_cls.primary_light
+            
         )
         self.protSel.bind(
             on_release=self.set_protocol,
@@ -531,7 +532,7 @@ class ProxySpeedTestApp(MDApp):
             width_mult=5,
             position='auto',
             max_height=0,
-            selected_color=self.theme_cls.primary_dark_hue
+            selected_color=self.theme_cls.primary_light
         )
         self.mirrSel.bind(
             on_release=self.set_mirror,
