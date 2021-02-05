@@ -45,12 +45,15 @@ from threading import Thread
 from requests import get
 from requests.exceptions import ProxyError, ConnectTimeout, ReadTimeout, ConnectionError as connError
 from urllib import parse
+from urllib3 import disable_warnings, exceptions
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
 from ago import human
 from functools import partial
 
 __version__ = "1.5"
+
+disable_warnings(exceptions.InsecureRequestWarning)
 
 if platform == "android":
     # from kivmob import KivMob, TestIds
@@ -175,6 +178,21 @@ def open_link(link):
     webopen(link)
     return True
 
+def is_internet(host="8.8.8.8", port=53, timeout=0.1):
+    """
+    Host: 8.8.8.8 (google-public-dns-a.google.com)
+    OpenPort: 53/tcp
+    Service: domain (DNS/TCP)
+    """
+    import socket
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except socket.error as ex:
+        # print(ex)
+        return False
+
 class ProxySpeedTestApp(MDApp):
 
     def __init__(self, **kwargs):
@@ -246,7 +264,7 @@ class ProxySpeedTestApp(MDApp):
         #     updateinfo = load(read)
         # toast("Checking for any updates ...")
         try:
-            updateinfo = get(upCURL).json()
+            updateinfo = get(upCURL, verify=False, timeout=1).json() if is_internet() else False
         except:
             updateinfo = {
                 "version": float(self.version),
@@ -263,6 +281,7 @@ class ProxySpeedTestApp(MDApp):
                 }
             }
             # toast("Faild app update check!")
+            return
         if updateinfo:
             try:
                 appLink = updateinfo["release"][platform]
@@ -304,6 +323,8 @@ class ProxySpeedTestApp(MDApp):
             self.updateDialog.ids.title.theme_text_color = "Custom"
             self.updateDialog.ids.title.text_color = self.theme_cls.primary_light
             if ava:self.updateDialog.open()
+        else:
+            toast("Unable to get updates information")
 
     def FCU(self, inst):
         inst.dismiss()
@@ -387,7 +408,7 @@ class ProxySpeedTestApp(MDApp):
             outer_circle_color=self.theme_cls.primary_color[:-1],
             outer_circle_alpha=0.9,
         )
-        Thread(target=self.checkUpdates).start()
+        # Thread(target=self.checkUpdates).start()
 
 
     def listPic(self):
@@ -434,6 +455,7 @@ class ProxySpeedTestApp(MDApp):
         self.listSel.bind(
             on_release=self.set_list,
             on_dismiss=self.manuDismiss)
+        Clock.schedule_once(partial(self.checkUpdates, False))
 
     def manuDismiss(self, ins):
         ins.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])

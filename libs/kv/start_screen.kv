@@ -54,11 +54,12 @@ BoxLayout:
                     id: front_layer
                     orientation: "vertical"
                     MDBoxLayout:
+                        # adaptive_height: True
                         size_hint_y: .2
                         orientation: "vertical"
                         MDLabel:
                             id: currentIP
-                            pos_hint: {"center_y": .35}
+                            #pos_hint: {"center_y": .35}
                             text: ""
                             bold: True
                             theme_text_color: "Hint"
@@ -67,197 +68,204 @@ BoxLayout:
                             # theme_text_color: "Primary"
                         MDLabel:
                             id: top_text
-                            pos_hint: {"center_y": .35}
+                            #pos_hint: {"center_y": .35}
                             text: "0 KB/s"
                             bold: True
                             font_style: "H4"
                             halign: "center"
                             theme_text_color: "Primary"
                     MDBoxLayout:
-                        orientation: 'vertical'
-                        size_hint_y: .35
-
+                        padding: 10, 0, 10, 0
+                        size_hint_y: .1 
+                        MDLabel:
+                            id: totaltx
+                            text: "Total"
+                            font_style: "Overline"
+                            size_hint_x: .2
+                            halign: "center" 
+                            theme_text_color: "Primary"
+                        MDProgressBar:
+                            id: totalpb
+                            max: 100
+                            value: 0
+                        MDLabel:
+                            id: totalpbText
+                            size_hint_x: .2
+                            text: f"{(totalpb.value/totalpb.max)*100}%"
+                            font_style: "Overline"
+                            halign: "center"
+                            theme_text_color: "Primary"
+                    MDBoxLayout:
+                        # size_hint: None, None
+                        # size: root.width, 30
+                        size_hint_y: .1
+                        padding: 10, 0, 10, 0
+                        # spacing: 4
+                        orientation: "vertical"
+                        MDProgressBar:
+                            id: progressBar1
+                            max: 1024
+                            value: 0
+                        MDProgressBar:
+                            id: progressBar2
+                            max: 1024
+                            value: 0
+                        MDProgressBar:
+                            id: progressBar3
+                            max: 1024
+                            value: 0
+                    MDBoxLayout:
+                        # size_hint: None, None
+                        # size: root.width, '48dp'
+                        size_hint_y: .1
+                        padding: 20, 0, 20, 0
+                        orientation: "horizontal"
+                        #size_hint_y: .5
+                        #pos_hint: {"center_y": .5}
+                        id: header_text
+                        MDTextButton:
+                            id: Sprotocol
+                            # size_hint: 1, None
+                            font_style: "Overline"
+                            # size_hint_y: 1
+                            pos_hint: {"center_y": .5, "center_x": .5}
+                            custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                            on_release:
+                                if (len(app.configs['proxys']) == 0):\
+                                toast("First input proxys ip:port list then select protocol.")
+                                elif start_stop.text in ['Stop', 'Stoping']:\
+                                toast("Please stop scan first then choices protocol")
+                                else:\
+                                app.protSel.open(); \
+                                self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
+                        MDLabel:
+                            id: Tproxys
+                            # size_hint: None, None
+                            # size_hint: 1, 1
+                            # pos_hint: {"center_y": .5}
+                            font_style: "Overline"
+                            halign: "center"
+                            theme_text_color: "Hint"
+                        MDLabel:
+                            id: Tscan
+                            # size_hint: None, None
+                            # size_hint: 1, 1
+                            # pos_hint: {"center_y": .5}
+                            font_style: "Overline"
+                            halign: "center"
+                            theme_text_color: "Hint"
+                        MDTextButton:
+                            id: Slist
+                            # size_hint: 1, None
+                            # text: "List"
+                            font_style: "Overline"
+                            size_hint_y: 1
+                            custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                            on_release:
+                                if len(app.configs['proxysInx']) == 0:\
+                                toast("Input proxys ip first then scan")
+                                elif start_stop.text in ['Stop', 'Stoping']:\
+                                toast("Please stop scan first then choices Lists")
+                                else:\
+                                app.listSel.open(); \
+                                self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
+                    MDBoxLayout:
+                        size_hint: None, None
+                        size: root.width, '48dp'
+                        adaptive_height: True
+                        # size_hint_y: .1
+                        padding: 20, 0, 20, 0
+			            orientation: "horizontal"
                         MDBoxLayout:
-                            padding: 10, 0, 10, 0 
-                            MDLabel:
-                                id: totaltx
-                                text: "Total"
-                                font_style: "Overline"
-                                size_hint_x: .2
-                                halign: "center" 
-                                theme_text_color: "Primary"
-                            MDProgressBar:
-                                id: totalpb
-                                max: 100
-                                value: 0
-                            MDLabel:
-                                id: totalpbText
-                                size_hint_x: .2
-                                text: f"{(totalpb.value/totalpb.max)*100}%"
-                                font_style: "Overline"
-                                size_hint_x: totaltx.size_hint_x
-                                halign: totaltx.halign
-                                theme_text_color: "Primary"
                         MDBoxLayout:
-                            padding: 10, 0, 10, 0
-                            # spacing: 4
-                            size_hint_y: .3
-                            orientation: "vertical"
-                            MDProgressBar:
-                                id: progressBar1
-                                max: 1024
-                                value: 0
-                            MDProgressBar:
-                                id: progressBar2
-                                max: 1024
-                                value: 0
-                            MDProgressBar:
-                                id: progressBar3
-                                max: 1024
-                                value: 0
+                        MDTextButton:
+                            id: Smirror
+                            font_style: "Overline"
+                            size_hint_y: 1
+                            custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"]) 
+                            on_release: 
+                                if (len(app.configs['proxysInx']) == 0):\
+                                toast("First input proxys ip:port list then select mirrors.")
+                                elif start_stop.text in ['Stop', 'Stoping']:\
+                                toast("Please stop scan first then choices mirror")
+                                else:\
+                                app.mirrSel.open(); \
+                                self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
                         MDBoxLayout:
-                            padding: 20, 0, 20, 0
-                            # orientation: "vertical"
-                            size_hint_y: .5
-                            pos_hint: {"center_y": .5}
-                            id: header_text
+                        MDBoxLayout:
+                    MDBoxLayout:
+                        adaptive_height: True
+                        padding: 10, 15, 10, 10
+                        id: header_text
+                        MDBoxLayout:
+                            size_hint_x: .5
+                            size_hint_y: .1
+                            MDSeparator:
                             MDTextButton:
-                                id: Sprotocol
-                                # size_hint: 1, None
-                                font_size: sp(10)
                                 pos_hint: {"center_y": .5, "center_x": .5}
-                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
-                                on_release:
-                                    if (len(app.configs['proxys']) == 0):\
-                                    toast("First input proxys ip:port list then select protocol.")
-                                    elif start_stop.text in ['Stop', 'Stoping']:\
-                                    toast("Please stop scan first then choices protocol")
-                                    else:\
-                                    app.protSel.open(); \
-                                    self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
-                            MDLabel:
-                                id: Tproxys
-                                # size_hint: None, None
-                                # size_hint: 1, 1
-                                # pos_hint: {"center_y": .5}
-                                font_style: "Overline"
-                                halign: "center"
-                                theme_text_color: "Hint"
-                            MDLabel:
-                                id: Tscan
-                                # size_hint: None, None
-                                # size_hint: 1, 1
-                                # pos_hint: {"center_y": .5}
-                                font_style: "Overline"
-                                halign: "center"
-                                theme_text_color: "Hint"
-                            MDTextButton:
-                                id: Slist
-                                # size_hint: 1, None
-                                # text: "List"
                                 font_size: sp(10)
-                                pos_hint: {"center_y": .5, "center_x": .5}
-                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
+                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                text: "SERVER"
+                                active: False
                                 on_release:
-                                    if len(app.configs['proxysInx']) == 0:\
-                                    toast("Input proxys ip first then scan")
-                                    elif start_stop.text in ['Stop', 'Stoping']:\
-                                    toast("Please stop scan first then choices Lists")
-                                    else:\
-                                    app.listSel.open(); \
-                                    self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
+                                    app.sort_Change(self, backdrop_front_layer.data)
+                            MDSeparator:
                         MDBoxLayout:
-                            orientation: "vertical"
-                            adaptive_height: True
-                            adaptive_size: True
-                            pos_hint: {"center_x": .5}
+                            # size_hint_x: 1
                             MDBoxLayout:
-                            MDTextButton:
-                                id: Smirror
-                                font_size: sp(10)
-                                custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"])
-                                on_release: 
-                                    if (len(app.configs['proxysInx']) == 0):\
-                                    toast("First input proxys ip:port list then select mirrors.")
-                                    elif start_stop.text in ['Stop', 'Stoping']:\
-                                    toast("Please stop scan first then choices mirror")
-                                    else:\
-                                    app.mirrSel.open(); \
-                                    self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
-                            MDBoxLayout:
-                        MDBoxLayout:
-                            adaptive_height: True
-                            padding: 10
-                            id: header_text
-                            MDBoxLayout:
-                                size_hint_x: .5
+                                # size_hint_x: .3
                                 size_hint_y: .1
                                 MDSeparator:
                                 MDTextButton:
                                     pos_hint: {"center_y": .5, "center_x": .5}
                                     font_size: sp(10)
                                     custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                    text: "SERVER"
+                                    text: "TOP3-%"
                                     active: False
                                     on_release:
                                         app.sort_Change(self, backdrop_front_layer.data)
                                 MDSeparator:
                             MDBoxLayout:
-                                # size_hint_x: 1
-                                MDBoxLayout:
-                                    # size_hint_x: .3
-                                    size_hint_y: .1
-                                    MDSeparator:
-                                    MDTextButton:
-                                        pos_hint: {"center_y": .5, "center_x": .5}
-                                        font_size: sp(10)
-                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                        text: "TOP3-%"
-                                        active: False
-                                        on_release:
-                                            app.sort_Change(self, backdrop_front_layer.data)
-                                    MDSeparator:
-                                MDBoxLayout:
-                                    # size_hint_x: .3
-                                    size_hint_y: .1
-                                    MDSeparator:
-                                    MDTextButton:
-                                        pos_hint: {"center_y": .5, "center_x": .5}
-                                        font_size: sp(10)
-                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                        text: "SIZE"
-                                        active: False
-                                        on_release:
-                                            app.sort_Change(self, backdrop_front_layer.data)
-                                    MDSeparator:
-                                MDBoxLayout:
-                                    # size_hint_x: .3
-                                    size_hint_y: .1
-                                    MDSeparator:
-                                    MDTextButton:
-                                        pos_hint: {"center_y": .5, "center_x": .5}
-                                        font_size: sp(10)
-                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                        text: "TIME"
-                                        active: False
-                                        on_release:
-                                            app.sort_Change(self, backdrop_front_layer.data)
-                                            
+                                # size_hint_x: .3
+                                size_hint_y: .1
+                                MDSeparator:
+                                MDTextButton:
+                                    pos_hint: {"center_y": .5, "center_x": .5}
+                                    font_size: sp(10)
+                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                    text: "SIZE"
+                                    active: False
+                                    on_release:
+                                        app.sort_Change(self, backdrop_front_layer.data)
+                                MDSeparator:
+                            MDBoxLayout:
+                                # size_hint_x: .3
+                                size_hint_y: .1
+                                MDSeparator:
+                                MDTextButton:
+                                    pos_hint: {"center_y": .5, "center_x": .5}
+                                    font_size: sp(10)
+                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                    text: "TIME"
+                                    active: False
+                                    on_release:
+                                        app.sort_Change(self, backdrop_front_layer.data)
+                                        
 
-                                    MDSeparator:
-                                MDBoxLayout:
-                                    # size_hint_x: .3
-                                    size_hint_y: .1
-                                    MDSeparator:
-                                    MDTextButton:
-                                        pos_hint: {"center_y": .5, "center_x": .5}
-                                        font_size: sp(10)
-                                        custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
-                                        text: "SPEED"
-                                        active: False
-                                        on_release:
-                                            app.sort_Change(self, backdrop_front_layer.data)
-                                    MDSeparator:
+                                MDSeparator:
+                            MDBoxLayout:
+                                # size_hint_x: .3
+                                size_hint_y: .1
+                                MDSeparator:
+                                MDTextButton:
+                                    pos_hint: {"center_y": .5, "center_x": .5}
+                                    font_size: sp(10)
+                                    custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
+                                    text: "SPEED"
+                                    active: False
+                                    on_release:
+                                        app.sort_Change(self, backdrop_front_layer.data)
+                                MDSeparator:
                     KitchenSinkBackdropFrontLayer:
                         id: backdrop_front_layer
                         backdrop: backdrop
