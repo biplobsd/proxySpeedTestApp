@@ -243,6 +243,13 @@
             id: content
             text: root.text
             _no_ripple_effect: True
+            divider: None
+        IconRightWidget:
+            padding: "10dp"
+            icon: "trash-can"
+            pos_hint: {"center_x": 1, "center_y": .5}
+            on_release: root.remove_item(root)
+                    
 
 <proxysDialogRemove>:
     size_hint: None, None

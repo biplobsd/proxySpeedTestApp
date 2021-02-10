@@ -135,10 +135,12 @@ class proxysDialogRemove(KitchenSinkBaseDialog):
         #     self.showsInBox += m[0]+'\n'
         # self.ids.queryMirror.text = self.showsInBox
         
-        icons = list(md_icons.keys())
         for i,p in enumerate(proxysInx):
             self.ids.md_list.add_widget(
-                SwipeToDeleteItem(text=f"#{i} {agoConv(p)}", remove_item=self.remove_item, date_point=p)
+                SwipeToDeleteItem(
+                    text=f"#{i} {agoConv(p)}", 
+                    remove_item=self.remove_item, 
+                    date_point=p)
             )
 
     def remove_item(self, instance):
