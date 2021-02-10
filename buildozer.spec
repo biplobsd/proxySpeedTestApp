@@ -19,10 +19,10 @@ source.include_exts = py,png,kv
 source.include_patterns = assets/*
 
 # (list) Source files to exclude (let empty to not exclude anything)
-#source.exclude_exts = spec
+source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-#source.exclude_dirs = tests, bin
+source.exclude_dirs = tests, bin, .buildozer, .ci, .github
 
 # (list) List of exclusions using pattern matching
 source.exclude_patterns = LICENSE
@@ -36,7 +36,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy==9aaca29d2f4e72aac71afba5c23c6cc8128b9e3c
-requirements = python3,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna,sdl2_ttf==2.0.15
+requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna,sdl2_ttf==2.0.15,Pillow 
 
 # admob
 #requirements = hostpython3==3.7.5,python3==3.7.5,kivy==master,git+https://github.com/HeaTTheatR/KivyMD.git@c67850fd9f505d20a9e86ab89a39918daf34cd43,requests,pysocks,hurry.filesize,ago,urllib3,chardet,idna,kivmob
