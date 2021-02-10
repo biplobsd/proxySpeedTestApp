@@ -6,7 +6,7 @@ import sys
 
 from kivy.lang import Builder
 from kivy.utils import platform
-from kivy.logger import Logger
+from kivy.logger import Logger, LOG_LEVELS
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.floatlayout import FloatLayout
 from kivy.utils import get_color_from_hex
@@ -52,6 +52,7 @@ from hurry.filesize import alternative, size
 from functools import partial
 
 __version__ = "1.5"
+# Logger.setLevel(LOG_LEVELS["debug"])
 
 disable_warnings(exceptions.InsecureRequestWarning)
 
@@ -379,7 +380,7 @@ class ProxySpeedTestApp(MDApp):
 
     def listPic(self):
 
-        proxysInx = dbRW.getProxysInx()
+        proxysInx = dbRW.getProxysInx()[::-1]
         self.selLId = dbRW.getConfig('proxysInx')[0]
         Logger.debug(self.selLId)
         self.configs['proxysInx'] = proxysInx
