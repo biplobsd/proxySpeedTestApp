@@ -159,3 +159,14 @@ class MyDb:
                     c.execute("INSERT INTO mirrors VALUES (?)", [line.strip()])
 
         self.updateConfig('miInx', 0)
+
+    def deletePoint(self, table, column, point):
+        c = self.conn.cursor()
+        with self.conn:
+            try:
+                com = f"DELETE FROM {table} WHERE {column} = (?)"
+                c.execute(com, [point.strip()])
+                return True
+            except OperationalError as e:
+                Logger.info(f"Sqlite3 : {e}")
+        return False

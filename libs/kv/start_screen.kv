@@ -6,6 +6,7 @@
 #:import TimeoutSet libs.baseclass.dialog_change_theme.TimeoutSet
 #:import FilesizeSet libs.baseclass.dialog_change_theme.FilesizeSet
 #:import MirrorDialogInput libs.baseclass.dialog_change_theme.MirrorDialogInput
+#:import proxysDialogRemove libs.baseclass.dialog_change_theme.proxysDialogRemove
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import urlparse urllib.parse.urlparse
@@ -171,7 +172,7 @@ BoxLayout:
                                 self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
                     MDBoxLayout:
                         size_hint: None, None
-                        size: root.width, '48dp'
+                        size: root.width, '15dp'
                         adaptive_height: True
                         # size_hint_y: .1
                         padding: 20, 0, 20, 0
@@ -470,7 +471,7 @@ BoxLayout:
 
                     MDSeparator:
                     MDLabel:
-                        text: "Input data"
+                        text: "Input"
                         bold: True
                         theme_text_color: "Primary"
                         size_hint_y: None
@@ -487,6 +488,20 @@ BoxLayout:
                         icon: "database-plus"
                         divider: None
                         on_release: PSTDialogInput().open()
+                    
+                    MDSeparator:
+                    MDLabel:
+                        text: "Remove"
+                        bold: True
+                        theme_text_color: "Primary"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        
+                    KitchenSinkOneLineIconListItem:
+                        text: "Remove proxy list"
+                        icon: "vector-polyline-remove"
+                        divider: None
+                        on_release: proxysDialogRemove(app).open()
 
                     MDSeparator:
                     MDLabel:

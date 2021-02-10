@@ -4,6 +4,7 @@ from re import findall, sub
 from datetime import datetime
 from hurry.filesize import size
 from libs.baseclass.database import MyDb
+from libs.baseclass.utils import agoConv
 from kivy.base import EventLoop
 
 from kivy.uix.modalview import ModalView
@@ -11,6 +12,10 @@ from kivy.utils import get_color_from_hex, get_hex_from_color
 from kivymd.color_definitions import colors, palette
 from kivymd.theming import ThemableBehavior
 from kivymd.toast import toast
+
+from kivymd.icon_definitions import md_icons
+from kivymd.uix.card import MDCardSwipe
+from kivy.properties import StringProperty, ObjectProperty
 
 class KitchenSinkBaseDialog(ThemableBehavior, ModalView):
     def __init__(self, **kwargs):
@@ -106,7 +111,50 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
             toast(f"Saved!")
         else:
             toast('No new updated!')
+
+class SwipeToDeleteItem(MDCardSwipe):
+    text = StringProperty()
+    remove_item = ObjectProperty()
+    date_point = StringProperty()
+
+
+class proxysDialogRemove(KitchenSinkBaseDialog):
+    def __init__(self, mainClass, **kwargs):
+        super().__init__(**kwargs)
+        # self.filename = 'proxys.txt'
+        self.mainClass = mainClass
+        # if os.path.exists(self.filename):
+        #     with open(self.filename, 'r', encoding="utf-8") as r:
+        #         self.ids.query.text = r.read()
+
         
+        proxysInx = [p[0] for p in self.dbRW.getProxysInx()][::-1]
+
+        # self.showsInBox = ""
+        # for m in self.mirrors:
+        #     self.showsInBox += m[0]+'\n'
+        # self.ids.queryMirror.text = self.showsInBox
+        
+        icons = list(md_icons.keys())
+        for i,p in enumerate(proxysInx):
+            self.ids.md_list.add_widget(
+                SwipeToDeleteItem(text=f"#{i} {agoConv(p)}", remove_item=self.remove_item, date_point=p)
+            )
+
+    def remove_item(self, instance):
+        point = instance.date_point
+        currentPoint = self.dbRW.getConfig('proxysInx')[0]
+        if self.dbRW.deletePoint('proxysInx', 'proxysInx', point) and self.dbRW.deletePoint('proxys', 'time', point):
+            if point == currentPoint:
+                self.dbRW.updateConfig('proxysInx', None)
+                self.dbRW.updateConfig('miInx', 0)
+                self.mainClass.configs['proxys'] = []
+            # User feedback
+            self.ids.md_list.remove_widget(instance)
+            toast(f'"{instance.text}" has been successfully removed!')
+            return True
+        return False
+
 
 class TimeoutSet(KitchenSinkBaseDialog):
     def __init__(self,updateText, **kwargs):

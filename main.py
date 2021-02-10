@@ -1,8 +1,8 @@
 from os import environ, sep, remove
 from os.path import join, abspath, dirname, exists, getsize
+from datetime import datetime
 
 import sys
-from webbrowser import open as webopen
 
 from kivy.lang import Builder
 from kivy.utils import platform
@@ -26,7 +26,6 @@ from kivy.base import EventLoop
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.behaviors import RectangularRippleBehavior
-from kivymd import material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
 from kivymd.uix.menu import MDDropdownMenu
@@ -39,8 +38,10 @@ from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
 from libs.baseclass.dialog_change_theme import PSTDialogInput
 from libs.baseclass.database import MyDb
+from libs.baseclass.utils import open_link
+from libs.baseclass.utils import agoConv
+from libs.baseclass.utils import sec_to_mins
 
-from datetime import datetime
 from threading import Thread
 from requests import get
 from requests.exceptions import ProxyError, ConnectTimeout, ReadTimeout, ConnectionError as connError
@@ -48,7 +49,6 @@ from urllib import parse
 from urllib3 import disable_warnings, exceptions
 from queue import Empty, Queue
 from hurry.filesize import alternative, size
-from ago import human
 from functools import partial
 
 __version__ = "1.5"
@@ -116,8 +116,6 @@ class PSTBackdropBackLayer(FloatLayout):
                 self.backdrop.close()
         return True 
 
-
-
 class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
     """A one line list item."""
 
@@ -157,41 +155,6 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
         self.height = dp(48) if not self._height else self._height
         
 
-def sec_to_mins(seconds):
-    a = str(round((seconds % 3600)//60))
-    b = str(round((seconds % 3600) % 60))
-    d = f"{a}m {b}s"
-    return d
-
-def agoConv(datetimeStr):
-    if datetimeStr:
-        _ago = human(datetime.strptime(datetimeStr, '%Y-%m-%d %H:%M:%S.%f'),
-        abbreviate=True)
-        if 's' in _ago[:3]:
-            return 'now' 
-        else:
-            return _ago
-    else:
-        return 'Pic a list'
-
-def open_link(link):
-    webopen(link)
-    return True
-
-def is_internet(host="8.8.8.8", port=53, timeout=0.1):
-    """
-    Host: 8.8.8.8 (google-public-dns-a.google.com)
-    OpenPort: 53/tcp
-    Service: domain (DNS/TCP)
-    """
-    import socket
-    try:
-        socket.setdefaulttimeout(timeout)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        return True
-    except socket.error as ex:
-        # print(ex)
-        return False
 
 class ProxySpeedTestApp(MDApp):
 
@@ -215,6 +178,9 @@ class ProxySpeedTestApp(MDApp):
         configs = dbRW.getAllConfigs()
         mirrors = dbRW.getAllMirrors()
         self.selLId = configs[0][2]
+        getips = None
+        protocol = None
+        totalScan = None 
 
         if self.selLId:
             totalScan = dbRW.getProxysInxTS(self.selLId)[0]
@@ -264,7 +230,7 @@ class ProxySpeedTestApp(MDApp):
         #     updateinfo = load(read)
         # toast("Checking for any updates ...")
         try:
-            updateinfo = get(upCURL, verify=False, timeout=1).json() if is_internet() else False
+            updateinfo = get(upCURL, verify=False, timeout=1).json()
         except:
             updateinfo = {
                 "version": float(self.version),
@@ -328,7 +294,7 @@ class ProxySpeedTestApp(MDApp):
 
     def FCU(self, inst):
         inst.dismiss()
-        Clock.schedule_once(partial(self.checkUpdates, True))
+        Clock.schedule_once(partial(self.checkUpdates, True), -1)
 
 
     def on_pause(self):
@@ -408,7 +374,7 @@ class ProxySpeedTestApp(MDApp):
             outer_circle_color=self.theme_cls.primary_color[:-1],
             outer_circle_alpha=0.9,
         )
-        # Thread(target=self.checkUpdates).start()
+        Thread(target=self.checkUpdates).start()
 
 
     def listPic(self):
@@ -417,10 +383,10 @@ class ProxySpeedTestApp(MDApp):
         self.selLId = dbRW.getConfig('proxysInx')[0]
         Logger.debug(self.selLId)
         self.configs['proxysInx'] = proxysInx
-        
+        selLIdindxDict = {}
+        self.ListItems = []
+
         if proxysInx:
-            selLIdindxDict = {}
-            self.ListItems = []
             i = 0
             for Inx in proxysInx:
                 self.ListItems.append({
@@ -439,9 +405,9 @@ class ProxySpeedTestApp(MDApp):
                 "top_pad": "35dp",
                 "bot_pad": "10dp"}]
         
-        if proxysInx:
+        if self.selLId:
             self.selLIdindx = selLIdindxDict[self.selLId]
-        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if proxysInx else "list :"
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if self.selLId else "list :"
 
         self.listSel = MDDropdownMenu(
             caller=self.root.ids.Slist, 
@@ -455,7 +421,6 @@ class ProxySpeedTestApp(MDApp):
         self.listSel.bind(
             on_release=self.set_list,
             on_dismiss=self.manuDismiss)
-        Clock.schedule_once(partial(self.checkUpdates, False))
 
     def manuDismiss(self, ins):
         ins.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
