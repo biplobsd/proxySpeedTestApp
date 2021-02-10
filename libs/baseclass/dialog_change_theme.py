@@ -13,8 +13,6 @@ from kivymd.color_definitions import colors, palette
 from kivymd.theming import ThemableBehavior
 from kivymd.toast import toast
 
-from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
-from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.icon_definitions import md_icons
 from kivymd.uix.card import MDCardSwipe
 from kivy.properties import StringProperty, ObjectProperty

@@ -26,7 +26,6 @@ from kivy.base import EventLoop
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.behaviors import RectangularRippleBehavior
-from kivymd import material_resources as m_res
 from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
 from kivymd.uix.menu import MDDropdownMenu
