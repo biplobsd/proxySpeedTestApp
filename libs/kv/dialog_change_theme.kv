@@ -225,6 +225,61 @@
                     root.inputedMirrorSave()
             MDBoxLayout:
 
+<SwipeToDeleteItem>:
+    size_hint_y: None
+    height: content.height
+
+    MDCardSwipeLayerBox:
+        padding: "8dp"
+
+        MDIconButton:
+            icon: "trash-can"
+            pos_hint: {"center_y": .5}
+            on_release: root.remove_item(root)
+
+    MDCardSwipeFrontBox:
+
+        OneLineListItem:
+            id: content
+            text: root.text
+            _no_ripple_effect: True
+
+<proxysDialogRemove>:
+    size_hint: None, None
+    height: Window.height * 60 / 100
+    width: Window.width * 90 / 100
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: "10dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
+
+        MDLabel:
+            text: "Proxy lists"
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: self.theme_cls.primary_color
+            font_style: "H4"
+            bold: True
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        MDSeparator:
+
+        BoxLayout:
+            orientation: "vertical"
+            spacing: "10dp"
+
+            # MDToolbar:
+            #     elevation: 10
+            #     title: "MDCardSwipe"
+
+            ScrollView:
+
+                MDList:
+                    id: md_list
+                    padding: 0
+
 
 <TimeoutSet>:
     size_hint: None, None
