@@ -655,6 +655,7 @@ class ProxySpeedTestApp(MDApp):
             
 
             if not self.running.empty():
+                instance.lbl_txt.texture_size[0] = 50
                 instance.text = "Stoping"
                 # instance.text_color
                 color = "#9E9E9E"
@@ -764,7 +765,7 @@ class ProxySpeedTestApp(MDApp):
         for c, part in enumerate(proxys):
             if self.scaning.empty(): break
             proxy_ip = part[0].strip()
-            self.root.ids.currentIP.text = f"CURRENT: {proxy_ip}"
+            self.root.ids.currentIP.text = f"{proxy_ip}"
             # Removing before test chunk file
             for i in range(3):
                 if exists(f'{filename}{i}'):
