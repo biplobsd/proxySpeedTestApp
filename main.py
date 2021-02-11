@@ -22,6 +22,7 @@ from kivy.properties import (
 from kivy.metrics import dp
 from kivy.clock import Clock
 from kivy.base import EventLoop
+from kivy.config import Config
 
 from kivymd.app import MDApp
 from kivymd.theming import ThemableBehavior
@@ -52,8 +53,8 @@ from hurry.filesize import alternative, size
 from functools import partial
 
 __version__ = "1.5"
-# Logger.setLevel(LOG_LEVELS["debug"])
-
+Logger.setLevel(LOG_LEVELS["debug"])
+Config.set('graphics', 'verify_gl_main_thread', False)
 disable_warnings(exceptions.InsecureRequestWarning)
 
 if platform == "android":
@@ -351,7 +352,7 @@ class ProxySpeedTestApp(MDApp):
             self.root.ids.Tscan.text = "scan: 0"
             self.root.ids.Tproxys.text = "proxys: 0"
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
-        self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
+        # self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
         # self.root.ids.backdrop._front_layer_open=True
         Logger.info(f"Platform: {platform}")
         # if platform == 'android':
@@ -362,7 +363,7 @@ class ProxySpeedTestApp(MDApp):
 
             # self.root.ids.adsShow.size = (self.root.ids.backdrop_front_layer.width, 110)
         
-        self.mirrorPic()
+        # self.mirrorPic()
         self.protPic()
         self.listPic()
         self.tap_target_list_view = MDTapTargetView(
@@ -514,7 +515,7 @@ class ProxySpeedTestApp(MDApp):
             "top_pad": "35dp",
             "bot_pad": "10dp"} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
-            caller=self.root.ids.Smirror,
+            caller=self.root.ids.backlayer.ids.Smirror,
             items=items,
             opening_time=0.2,
             width_mult=5,
@@ -534,12 +535,11 @@ class ProxySpeedTestApp(MDApp):
             miInx += 1
         
         self.configs['mirror'] = self.configs['mirrors'][miInx][0]
-        self.root.ids.Smirror.text = f"Mirror: {ins.text}".upper()
+        self.root.ids.backlayer.ids.Smirror.text = f"Mirror: {ins.text}"
         dbRW.updateConfig("proxysInx", self.selLId)
         dbRW.updateConfig("miInx", miInx)
         
         toast(self.configs['mirror'])
-        insMain.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
         self.mirrSel.dismiss()
     
     def update_screen(self, dt):
@@ -596,7 +596,7 @@ class ProxySpeedTestApp(MDApp):
     def start_scan(self, instance):
         # print("Clicked!!")
         if instance.text == "Start":
-            self.mirrorPic()
+            # self.mirrorPic()
             self.listPic()
 
             self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"
@@ -767,7 +767,7 @@ class ProxySpeedTestApp(MDApp):
         for c, part in enumerate(proxys):
             if self.scaning.empty(): break
             proxy_ip = part[0].strip()
-            self.root.ids.currentIP.text = f"{proxy_ip}"
+            self.root.ids.currentIP.text = f"{proxy_ip} <-> {parse.urlparse(self.configs['mirror']).netloc}"
             # Removing before test chunk file
             for i in range(3):
                 if exists(f'{filename}{i}'):
