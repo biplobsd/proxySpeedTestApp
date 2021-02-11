@@ -225,7 +225,6 @@ class ProxySpeedTestApp(MDApp):
 
 
     def checkUpdates(self, ava=False, d=False):
-        # print(ava)
         upCURL = 'https://raw.githubusercontent.com/biplobsd/proxySpeedTestApp/master/updates.json'
         # from json import load
         # with open('updates.json', 'r') as read:
@@ -352,7 +351,6 @@ class ProxySpeedTestApp(MDApp):
             self.root.ids.Tscan.text = "scan: 0"
             self.root.ids.Tproxys.text = "proxys: 0"
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
-        # self.root.ids.Smirror.text = f"Mirror: {parse.urlparse(self.configs['mirror']).netloc}".upper()
         # self.root.ids.backdrop._front_layer_open=True
         Logger.info(f"Platform: {platform}")
         # if platform == 'android':
@@ -363,7 +361,6 @@ class ProxySpeedTestApp(MDApp):
 
             # self.root.ids.adsShow.size = (self.root.ids.backdrop_front_layer.width, 110)
         
-        # self.mirrorPic()
         self.protPic()
         self.listPic()
         self.tap_target_list_view = MDTapTargetView(

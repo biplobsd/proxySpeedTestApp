@@ -25,7 +25,7 @@ source.exclude_exts = spec
 source.exclude_dirs = tests, bin, .buildozer, .ci, .github
 
 # (list) List of exclusions using pattern matching
-source.exclude_patterns = LICENSE
+#source.exclude_patterns = LICENSE
 
 # (str) Application versioning (method 1)
 #version = 1.3

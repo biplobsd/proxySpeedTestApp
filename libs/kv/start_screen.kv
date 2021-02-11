@@ -174,31 +174,6 @@ BoxLayout:
                                 else:\
                                 app.listSel.open(); \
                                 self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
-                    # MDBoxLayout:
-                    #     size_hint: None, None
-                    #     size: root.width, '15dp'
-                    #     adaptive_height: True
-                    #     # size_hint_y: .1
-                    #     padding: 20, 0, 20, 0
-			        #     orientation: "horizontal"
-                    #     MDBoxLayout:
-                    #     MDBoxLayout:
-                    #     MDTextButton:
-                    #         id: Smirror
-                    #         font_style: "Overline"
-                    #         size_hint_y: 1
-                    #         width: dp(198+len(self.text))
-                    #         custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["300"]) 
-                    #         on_release: 
-                    #             if (len(app.configs['proxysInx']) == 0):\
-                    #             toast("First input proxys ip:port list then select mirrors.")
-                    #             elif start_stop.text in ['Stop', 'Stoping']:\
-                    #             toast("Please stop scan first then choices mirror")
-                    #             else:\
-                    #             app.mirrSel.open(); \
-                    #             self.custom_color = get_color_from_hex(colors[app.theme_cls.primary_palette]["800"])
-                    #     MDBoxLayout:
-                    #     MDBoxLayout:
                     MDBoxLayout:
                         adaptive_height: True
                         padding: 10, 15, 10, 10
