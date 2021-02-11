@@ -151,6 +151,7 @@ class proxysDialogRemove(KitchenSinkBaseDialog):
                 self.dbRW.updateConfig('proxysInx', None)
                 self.dbRW.updateConfig('miInx', 0)
                 self.mainClass.configs['proxys'] = []
+                self.mainClass.show_List()
             # User feedback
             self.ids.md_list.remove_widget(instance)
             toast(f'"{instance.text}" has been successfully removed!')

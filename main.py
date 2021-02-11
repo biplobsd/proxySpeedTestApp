@@ -340,10 +340,10 @@ class ProxySpeedTestApp(MDApp):
 
         unsort = self.scan_list
         # print(unsort)
+        self.show_List()
         if unsort:
             sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
             # print(sort)
-            self.show_List()
             self.show_List(sort)
             self.root.ids.Tproxys.text = f"proxys: {len(sort)}"
             self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
@@ -368,7 +368,7 @@ class ProxySpeedTestApp(MDApp):
         self.tap_target_list_view = MDTapTargetView(
             widget=self.root.ids.Slist,
             title_text="Pic a lists",
-            description_text="I will remember your list later!",
+            description_text="Your selected list choice will be saved in database!",
             widget_position="right_top",
             # outer_radius=dp(320),
             cancelable=True,
@@ -877,13 +877,19 @@ class ProxySpeedTestApp(MDApp):
             "text2": "",
             "text3": "",
             "text4": "",
-            "on_release": lambda: toast("empty!!")
+            "on_release": lambda: toast("Empty !!!")
         }
         if not data:
             self.root.ids.backdrop_front_layer.data = []
-            for i in range(totalP):
+            for i in range(25):
                 self.root.ids.backdrop_front_layer.data.append(ddict)
         else:
+            lenC = len(self.root.ids.backdrop_front_layer.data)
+            if lenC < totalP:
+                a =  totalP - lenC
+                for i in range(a):
+                    self.root.ids.backdrop_front_layer.data.append(ddict)
+
             for i in range(totalP):
                 try:
                     _ = data[i]
