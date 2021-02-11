@@ -529,16 +529,14 @@ class ProxySpeedTestApp(MDApp):
     def set_mirror(self, insMain, ins):
         miInx = 0
         for l in self.configs['mirrors']:
-            if ins.text in l[0]:
+            if ins.text == parse.urlparse(l[0]).netloc:
                 break
             miInx += 1
         
         self.configs['mirror'] = self.configs['mirrors'][miInx][0]
         self.root.ids.Smirror.text = f"Mirror: {ins.text}".upper()
-        
-  
         dbRW.updateConfig("proxysInx", self.selLId)
-        dbRW.updateConfig("miInx", self.configs['miInx'])
+        dbRW.updateConfig("miInx", miInx)
         
         toast(self.configs['mirror'])
         insMain.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
@@ -639,6 +637,10 @@ class ProxySpeedTestApp(MDApp):
             self.selLId = str(IndexTime)
             self.show_List()
             self.upScreen = Clock.schedule_interval(self.update_screen, 0.1)
+            
+            Logger.debug(f"Proxys : {self.configs['proxys']}")
+            Logger.debug(f"Protocol : {self.configs['protocol']}")
+            Logger.debug(f"Mirror : {self.configs['mirror']}")
 
             Thread(target=self.proxySpeedTest, args=(
                 self.configs['proxys'],
