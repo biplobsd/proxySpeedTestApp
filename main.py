@@ -3,6 +3,7 @@ from os.path import join, abspath, dirname, exists, getsize
 from datetime import datetime
 
 import sys
+from kivy import logger
 
 from kivy.lang import Builder
 from kivy.utils import platform
@@ -31,9 +32,10 @@ from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDRaisedButton
+from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFloatingActionButton
 from kivymd.color_definitions import colors
 from kivymd.uix.taptargetview import MDTapTargetView
+from kivymd.uix.behaviors import MagicBehavior
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
@@ -156,7 +158,8 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
         super().__init__(**kwargs)
         self.height = dp(48) if not self._height else self._height
         
-
+class MagicButton(MagicBehavior, MDFloatingActionButton):
+    text = StringProperty()
 
 class ProxySpeedTestApp(MDApp):
 
@@ -591,8 +594,9 @@ class ProxySpeedTestApp(MDApp):
 
 
     def start_scan(self, instance):
-        # print("Clicked!!")
-        if instance.text == "Start":
+        Logger.debug(instance.icon)
+        
+        if instance.icon == "play":
             # self.mirrorPic()
             self.listPic()
 
@@ -610,7 +614,7 @@ class ProxySpeedTestApp(MDApp):
                 toast("First input proxys ip:port list then start scan.")
                 return
 
-            instance.text = "Stop"
+            instance.icon = "stop"
             color = "#f44336"
             instance.md_bg_color = get_color_from_hex(color)
             self.theme_cls.primary_palette = "Red"
@@ -646,7 +650,7 @@ class ProxySpeedTestApp(MDApp):
                 )).start()
         
             # self.proxySpeedTest('start')
-        elif instance.text == "Stoping":
+        elif instance.icon == "blur":
             toast(f"Waiting for finish {self.root.ids.currentIP.text[8:]}!")
         else:
             while not self.scaning.empty():
@@ -654,8 +658,7 @@ class ProxySpeedTestApp(MDApp):
             
 
             if not self.running.empty():
-                instance.lbl_txt.texture_size[0] = 50
-                instance.text = "Stoping"
+                instance.icon = "blur"
                 # instance.text_color
                 color = "#9E9E9E"
                 self.theme_cls.primary_palette = "Gray"
@@ -836,7 +839,7 @@ class ProxySpeedTestApp(MDApp):
             if self.root.ids.totalpb.value == roundC:
                 self.upScreen.cancel()
                 break
-        self.root.ids.start_stop.text = "Start"
+        self.root.ids.start_stop.icon = "play"
         self.theme_cls.primary_palette = "LightBlue"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
         if platform == "android": self._statusBarColor()

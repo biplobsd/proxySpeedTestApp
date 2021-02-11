@@ -14,6 +14,7 @@
 #:import colors kivymd.color_definitions.colors
 #:import toast kivymd.toast.toast
 #:import size hurry.filesize.size
+#:import MagicBehavior kivymd.uix.behaviors.MagicBehavior
 
 BoxLayout:
     orientation: "vertical"
@@ -34,7 +35,7 @@ BoxLayout:
             MDBackdrop:
                 id: backdrop
                 on_open:
-                    if start_stop.text in ['Stop', 'Stoping']:home.disableOpen(backdrop)
+                    if start_stop.icon in ['stop', 'blur']:home.disableOpen(backdrop)
                     else:home.opening_animation_backdrop_components(backdrop, backlayer)
                     app.mirrorPic()
                 on_close:
@@ -137,7 +138,7 @@ BoxLayout:
                             on_release:
                                 if (len(app.configs['proxys']) == 0):\
                                 toast("First input proxys ip:port list then select protocol.")
-                                elif start_stop.text in ['Stop', 'Stoping']:\
+                                elif start_stop.icon in ['stop', 'blur']:\
                                 toast("Please stop scan first then choices protocol")
                                 else:\
                                 app.protSel.open(); \
@@ -169,7 +170,7 @@ BoxLayout:
                             on_release:
                                 if len(app.configs['proxysInx']) == 0:\
                                 toast("Input proxys ip first then scan")
-                                elif start_stop.text in ['Stop', 'Stoping']:\
+                                elif start_stop.icon in ['Stop', 'blur']:\
                                 toast("Please stop scan first then choices Lists")
                                 else:\
                                 app.listSel.open(); \
@@ -255,16 +256,22 @@ BoxLayout:
                         size_hint_y: .15
                         padding: 10
                         orientation: "vertical"
-                        MDFillRoundFlatButton:
+                        MagicButton:
                             id: start_stop
-                            pos_hint: {"center_x": .5, "center_y": .5}
-                            size_hint_x: .4
+                            pos_hint: {"center_x": .5}
+                            # size_hint_x: .4
                             text: "Start"
-                            increment_width: "164dp"
-                            theme_text_color: "Custom"
+                            # increment_width: "164dp"
+                            # theme_text_color: "Custom"
                             text_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["100"])
                             # md_bg_color: get_color_from_hex("#f44336")
-                            on_release: app.start_scan(self)
+                            icon: "play"
+                            elevation_normal: 12
+                            on_release:
+                                app.start_scan(self)
+                                self.wobble() 
+                                
+                                
                     # MDBoxLayout:
                     #     id: adsShow
                     #     size_hint: None, None
@@ -277,6 +284,8 @@ BoxLayout:
             on_leave:
                 backlayer.ids.screen_manager.current = "settings"
                 self.clear_widgets()
+
+<MagicButton@MagicBehavior+MDFloatingActionButton>
 
 <ProxyShowList>
     size_hint_y: None
