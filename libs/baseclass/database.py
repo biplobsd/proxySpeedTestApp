@@ -96,7 +96,7 @@ class MyDb:
     def getAllCurrentProxys(self, time):
         c = self.conn.cursor()
         with self.conn:
-            c.execute("SELECT ip, size, getfiletime, speed, protocol, time, top3c FROM 'proxys' WHERE time=?", [time])
+            c.execute("SELECT ip, size, getfiletime, speed, protocol, time, top3c FROM 'proxys' WHERE time=? ORDER BY speed DESC", [time])
             scan_list = c.fetchall()
         return scan_list
 

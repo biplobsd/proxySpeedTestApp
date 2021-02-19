@@ -399,8 +399,7 @@ class ProxySpeedTestApp(MDApp):
         self.ListItems = []
 
         if proxysInx:
-            i = 0
-            for Inx in proxysInx:
+            for i, Inx in enumerate(proxysInx):
                 self.ListItems.append({
                     "text": f'#{i} '+agoConv(Inx[0]),
                     "font_style": "Caption",
@@ -408,7 +407,6 @@ class ProxySpeedTestApp(MDApp):
                     "top_pad": "35dp",
                     "bot_pad": "10dp"})
                 selLIdindxDict[Inx[0]] = i
-                i += 1
         else:
             self.ListItems = [{
                 "text": "None",
@@ -439,7 +437,7 @@ class ProxySpeedTestApp(MDApp):
 
     def set_list(self, insMain, ins):
         import re
-        self.selLIdindx = int(re.search(r'#(\d)\s', ins.text).group(1))
+        self.selLIdindx = int(re.search(r'#(\d+)\s', ins.text).group(1))
         # withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
         Logger.debug(self.selLIdindx)
 
