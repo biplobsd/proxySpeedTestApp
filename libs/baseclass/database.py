@@ -105,13 +105,13 @@ class MyDb:
         with self.conn:
             c.execute("UPDATE 'configs' SET themeMode=?", [name])
 
-    def updateScanList(self, l):
+    def updateScanList(self, l, afterTime):
         c = self.conn.cursor()
         with self.conn:
             try:
                 for p in l:
-                    c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=?, top3c=? WHERE ip=?",
-                                                (p['SIZE'], p['TIME'], p['SPEED'], p['top3c'], p['IP']))
+                    c.execute("UPDATE proxys SET size=?, getfiletime=?, speed=?, top3c=? WHERE ip=? AND time=?",
+                                                (p['SIZE'], p['TIME'], p['SPEED'], p['top3c'], p['IP'], afterTime))
             except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
 

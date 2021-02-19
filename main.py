@@ -316,7 +316,7 @@ class ProxySpeedTestApp(MDApp):
     
     def save_UpdateDB(self, l=[]):
         dbRW = MyDb()
-        if l:dbRW.updateScanList(l)
+        if l:dbRW.updateScanList(l, self.selLId)
 
     def build(self):
         if platform == "android":
@@ -444,6 +444,7 @@ class ProxySpeedTestApp(MDApp):
         proxysInx = dbRW.getProxysInx()
         self.selLId = proxysInx[self.selLIdindx][0]
         proxys = dbRW.getAllCurrentProxys(self.selLId)
+        self.configs['totalScan'] = dbRW.getProxysInxTS(self.selLId)[0]
         protocol = proxys[0][4]
         dbRW.updateConfig("proxysInx", self.selLId)
         scan_list = proxys
@@ -461,11 +462,11 @@ class ProxySpeedTestApp(MDApp):
                             })
 
         unsort = self.scan_list
-        if unsort:
-            sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
-            # print(sort)
-            self.show_List()
-            self.show_List(sort)
+        # if unsort:
+        sort = sorted(unsort, key=lambda x: x['SPEED'], reverse=True)
+        # print(sort)
+        # self.show_List()
+        self.show_List(sort)
 
         self.configs['proxys'] = proxys
         self.configs['protocol'] = protocol
@@ -473,6 +474,7 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.Slist.text = f"list : {ins.text}".upper()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
         self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"
+        self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
         
         # print(getips)
         toast(ins.text)
