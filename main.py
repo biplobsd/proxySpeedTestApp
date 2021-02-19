@@ -35,7 +35,7 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFloatingActionButton
 from kivymd.color_definitions import colors
 from kivymd.uix.taptargetview import MDTapTargetView
-from kivymd.uix.behaviors import MagicBehavior
+from kivymd.uix.behaviors import MagicBehavior, HoverBehavior
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
@@ -120,11 +120,11 @@ class PSTBackdropBackLayer(FloatLayout):
                 self.backdrop.close()
         return True 
 
-class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, FloatLayout):
+class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, HoverBehavior, FloatLayout):
     """A one line list item."""
 
-    _txt_top_pad = NumericProperty("16dp")
-    _txt_bot_pad = NumericProperty("15dp")  # dp(20) - dp(5)
+    _txt_top_pad = NumericProperty()
+    _txt_bot_pad = NumericProperty()  # dp(20) - dp(5)
     _height = NumericProperty()
     _num_lines = 1
     
@@ -147,16 +147,26 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
 
     bg_color = ListProperty()
 
-    _txt_left_pad = NumericProperty("10dp")
-    _txt_top_pad = NumericProperty()
-    _txt_bot_pad = NumericProperty()
-    _txt_right_pad = NumericProperty("10dp")
+    _txt_left_pad = NumericProperty()
+    _txt_right_pad = NumericProperty()
     _num_lines = 3
     _no_ripple_effect = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.height = dp(48) if not self._height else self._height
+
+    def _enter(self, ins):
+        '''The method will be called when the mouse cursor
+        is within the borders of the current widget.'''
+
+        bg_color = self.theme_cls.divider_color
+        bg_color[3] = 0.05
+        ins.bg_color = bg_color
+    def _leave(self, ins):
+        '''The method will be called when the mouse cursor goes beyond
+        the borders of the current widget.'''
+        ins.bg_color = []
         
 class MagicButton(MagicBehavior, MDFloatingActionButton):
     text = StringProperty()

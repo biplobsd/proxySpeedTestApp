@@ -15,7 +15,7 @@
 #:import toast kivymd.toast.toast
 #:import size hurry.filesize.size
 #:import MagicBehavior kivymd.uix.behaviors.MagicBehavior
-
+#:import Window kivy.core.window.Window
 BoxLayout:
     orientation: "vertical"
 
@@ -163,6 +163,7 @@ BoxLayout:
                             id: Slist
                             # size_hint: 1, None
                             # text: "List"
+                            halign: "right"
                             font_style: "Overline"
                             size_hint_y: 1
                             width: dp(85+len(self.text))
@@ -253,19 +254,19 @@ BoxLayout:
                         backdrop: backdrop
                         backlayer: backlayer
                     MDBoxLayout:
-                        size_hint_y: .15
-                        padding: 10
+                        size_hint_y: .01
+                        padding: 0, 0, 10, 30
                         orientation: "vertical"
                         MagicButton:
                             id: start_stop
-                            pos_hint: {"center_x": .5}
+                            pos_hint: {"x": (Window.width-self.width*1.5)/Window.width}
                             text_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["100"])
                             icon: "play"
                             elevation_normal: 12
                             on_release:
                                 self.wobble()
                                 app.start_scan(self)
-                                
+                            
                                 
                     # MDBoxLayout:
                     #     id: adsShow
@@ -285,6 +286,8 @@ BoxLayout:
 <ProxyShowList>
     size_hint_y: None
     divider: "Full"
+    on_enter: self._enter(root)
+    on_leave: self._leave(root)
     canvas:
         Color:
             rgba:
@@ -371,6 +374,7 @@ BoxLayout:
     key_viewclass: 'viewclass'
     key_size: 'height'
     RecycleBoxLayout:
+        padding: 10, 0, 10, 0
         default_size: None, dp(20)
         default_size_hint: 1, None
         size_hint_y: None
