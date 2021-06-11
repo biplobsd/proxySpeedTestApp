@@ -403,17 +403,17 @@ class ProxySpeedTestApp(MDApp):
                 self.ListItems.append({
                     "text": f'#{i} '+agoConv(Inx[0]),
                     "font_style": "Caption",
-                    "height": "36dp",
-                    "top_pad": "35dp",
-                    "bot_pad": "10dp"})
+                    "height": 36,
+                    "top_pad": 35,
+                    "bot_pad": 10})
                 selLIdindxDict[Inx[0]] = i
         else:
             self.ListItems = [{
                 "text": "None",
                 "font_style": "Caption",
-                "height": "36dp",
-                "top_pad": "35dp",
-                "bot_pad": "10dp"}]
+                "height": 36,
+                "top_pad": 35,
+                "bot_pad": 10}]
         
         if self.selLId:
             self.selLIdindx = selLIdindxDict[self.selLId]
@@ -421,12 +421,11 @@ class ProxySpeedTestApp(MDApp):
 
         self.listSel = MDDropdownMenu(
             caller=self.root.ids.Slist, 
-            items=self.ListItems, 
+            items=self.ListItems,
             width_mult=4,
             opening_time=0.2,
             position='auto',
-            max_height=0,
-            selected_color=self.theme_cls.primary_light
+            max_height=0
         )
         self.listSel.bind(
             on_release=self.set_list,
@@ -489,17 +488,15 @@ class ProxySpeedTestApp(MDApp):
         items = [{
             "text": protocol.upper(),
             "font_style": "Caption",
-            "height": "36dp",
-            "top_pad": "35dp",
-            "bot_pad": "10dp"} for protocol in ['http', 'https', 'socks4', 'socks5']]
+            "height": 36,
+            "top_pad": 35,
+            "bot_pad": 10} for protocol in ['http', 'https', 'socks4', 'socks5']]
         self.protSel = MDDropdownMenu(
             caller=self.root.ids.Sprotocol,
             items=items,
             width_mult=3,
             opening_time=0.2,
-            position='auto',
-            selected_color=self.theme_cls.primary_light
-            
+            position='auto'
         )
         self.protSel.bind(
             on_release=self.set_protocol,
@@ -521,17 +518,16 @@ class ProxySpeedTestApp(MDApp):
         items = [{
             "text": parse.urlparse(mirror[0]).netloc,
             "font_style": "Caption",
-            "height": "36dp",
-            "top_pad": "35dp",
-            "bot_pad": "10dp"} for mirror in mirrors]
+            "height": 36,
+            "top_pad": 35,
+            "bot_pad": 10} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
             caller=self.root.ids.backlayer.ids.Smirror,
             items=items,
             opening_time=0.2,
             width_mult=5,
             position='auto',
-            max_height=0,
-            selected_color=self.theme_cls.primary_light
+            max_height=0
         )
         self.mirrSel.bind(
             on_release=self.set_mirror,
