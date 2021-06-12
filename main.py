@@ -3,7 +3,6 @@ from os.path import join, abspath, dirname, exists, getsize
 from datetime import datetime
 
 import sys
-from kivy import logger
 
 from kivy.lang import Builder
 from kivy.utils import platform
@@ -68,7 +67,8 @@ if platform == "android":
     WindowManager = autoclass('android.view.WindowManager$LayoutParams')
     activity = autoclass('org.kivy.android.PythonActivity').mActivity
 else:
-    def run_on_ui_thread(d):pass
+    def run_on_ui_thread(_):
+        pass
 
 if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
     environ["KITCHEN_SINK_ROOT"] = sys._MEIPASS
@@ -96,7 +96,7 @@ else:
 
 #     """ Test Banner Ad ID """
 #     BANNER = "ca-app-pub-3940256099942544/6300978111"
-    
+
     # """ Test Interstitial Ad ID """
     # INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
 
@@ -915,7 +915,7 @@ class ProxySpeedTestApp(MDApp):
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")
         Clipboard.copy(data)
-    
+
     def speedcal(self):
         speed = 0
         try:
@@ -923,10 +923,10 @@ class ProxySpeedTestApp(MDApp):
                 speed += self.currentSpeed.get_nowait()
         except Empty:
             pass
-        
+
         if speed != 0:
             self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"
-        
+
 
 if __name__ == "__main__":
     dbRW = MyDb()
