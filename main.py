@@ -1,8 +1,7 @@
+import sys
 from os import environ, sep, remove
 from os.path import join, abspath, dirname, exists, getsize
 from datetime import datetime
-
-import sys
 
 from kivy.lang import Builder
 from kivy.utils import platform
@@ -31,13 +30,14 @@ from kivymd.font_definitions import theme_font_styles
 from kivymd.toast import toast
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFloatingActionButton
+from kivymd.uix.button import (
+    MDFlatButton, MDRaisedButton, MDFloatingActionButton
+)
 from kivymd.color_definitions import colors
 from kivymd.uix.taptargetview import MDTapTargetView
 from kivymd.uix.behaviors import MagicBehavior, HoverBehavior
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
-from libs.baseclass.list_items import KitchenSinkOneLineLeftIconItem
 from libs.baseclass.dialog_change_theme import PSTDialogInput
 from libs.baseclass.database import MyDb
 from libs.baseclass.utils import open_link
@@ -46,7 +46,9 @@ from libs.baseclass.utils import sec_to_mins
 
 from threading import Thread
 from requests import get
-from requests.exceptions import ProxyError, ConnectTimeout, ReadTimeout, ConnectionError as connError
+from requests.exceptions import (
+    ProxyError, ConnectTimeout, ReadTimeout, ConnectionError as connError
+)
 from urllib import parse
 from urllib3 import disable_warnings, exceptions
 from queue import Empty, Queue
@@ -60,8 +62,8 @@ disable_warnings(exceptions.InsecureRequestWarning)
 
 if platform == "android":
     # from kivmob import KivMob, TestIds
-    from android.runnable import run_on_ui_thread
-    from jnius import autoclass
+    from android.runnable import run_on_ui_thread  # type: ignore
+    from jnius import autoclass  # type: ignore
 
     Color = autoclass("android.graphics.Color")
     WindowManager = autoclass('android.view.WindowManager$LayoutParams')
@@ -73,14 +75,14 @@ else:
 if getattr(sys, "frozen", False):  # bundle mode with PyInstaller
     environ["KITCHEN_SINK_ROOT"] = sys._MEIPASS
     environ["KITCHEN_SINK_ASSETS"] = join(
-    environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
+        environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
     )
     # Logger.info("___one___")
 else:
     sys.path.append(abspath(__file__).split("ProxySpeedTestV2")[0])
     environ["KITCHEN_SINK_ROOT"] = dirname(abspath(__file__))
     environ["KITCHEN_SINK_ASSETS"] = join(
-    environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
+        environ["KITCHEN_SINK_ROOT"], f"assets{sep}"
     )
     # Logger.info("___two___")
 
@@ -105,6 +107,8 @@ else:
 
     # """ Test Rewarded Video Ad ID """
     # REWARDED_VIDEO = "ca-app-pub-3940256099942544/5224354917"
+
+
 class PSTBackdropBackLayer(FloatLayout):
     backdrop = ObjectProperty(None)
 
@@ -116,18 +120,23 @@ class PSTBackdropBackLayer(FloatLayout):
         if key == 27:
             # print("Back button clicked!")
             if self.backdrop._front_layer_open:
-                self.backdrop.left_action_items = [['menu', lambda x: self.backdrop.open()]]
+                self.backdrop.left_action_items = [
+                    ['menu', lambda x: self.backdrop.open()]
+                ]
                 self.backdrop.close()
-        return True 
+        return True
 
-class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior, HoverBehavior, FloatLayout):
+
+class ProxyShowList(
+        ThemableBehavior, RectangularRippleBehavior,
+        ButtonBehavior, HoverBehavior, FloatLayout):
     """A one line list item."""
 
     _txt_top_pad = NumericProperty()
     _txt_bot_pad = NumericProperty()  # dp(20) - dp(5)
     _height = NumericProperty()
     _num_lines = 1
-    
+
     text = StringProperty()
     text1 = StringProperty()
     text2 = StringProperty()
@@ -139,7 +148,6 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
     theme_text_color = StringProperty("Secondary", allownone=True)
 
     font_style = OptionProperty("Caption", options=theme_font_styles)
-
 
     divider = OptionProperty(
         "Full", options=["Full", "Inset", None], allownone=True
@@ -163,13 +171,16 @@ class ProxyShowList(ThemableBehavior, RectangularRippleBehavior, ButtonBehavior,
         bg_color = self.theme_cls.divider_color
         bg_color[3] = 0.05
         ins.bg_color = bg_color
+
     def _leave(self, ins):
         '''The method will be called when the mouse cursor goes beyond
         the borders of the current widget.'''
         ins.bg_color = []
-        
+
+
 class MagicButton(MagicBehavior, MDFloatingActionButton):
     text = StringProperty()
+
 
 class ProxySpeedTestApp(MDApp):
 
@@ -189,13 +200,12 @@ class ProxySpeedTestApp(MDApp):
         self.pbar2 = Queue()
         self.totalpb = Queue()
 
-          
         configs = dbRW.getAllConfigs()
         mirrors = dbRW.getAllMirrors()
         self.selLId = configs[0][2]
         getips = None
         protocol = None
-        totalScan = None 
+        totalScan = None
 
         if self.selLId:
             totalScan = dbRW.getProxysInxTS(self.selLId)[0]
@@ -204,17 +214,17 @@ class ProxySpeedTestApp(MDApp):
 
         self.scan_list = []
         if self.selLId:
-            for l in getips:
-                if not None in l:
+            for slist in getips:
+                if not (None in slist):
                     self.scan_list.append({
-                        "IP": l[0],
-                        "SIZE": l[1],
-                        "TIME": l[2],
-                        "SPEED": l[3],
-                        "top3c": l[6]})
+                        "IP": slist[0],
+                        "SIZE": slist[1],
+                        "TIME": slist[2],
+                        "SPEED": slist[3],
+                        "top3c": slist[6]})
 
         self.theme_cls.theme_style = configs[0][0]
-        
+
         miInx = configs[0][1]
         self.configs = {
             'protocol': protocol if self.selLId else 'http',
@@ -236,9 +246,8 @@ class ProxySpeedTestApp(MDApp):
 
         dbRW.updateThemeMode(inst)
 
-
     def checkUpdates(self, ava=False, d=False):
-        upCURL = 'https://raw.githubusercontent.com/biplobsd/proxySpeedTestApp/master/updates.json'
+        upCURL = 'https://raw.githubusercontent.com/biplobsd/proxySpeedTestApp/master/updates.json'  # noqa update-check-link
         # from json import load
         # with open('updates.json', 'r') as read:
         #     updateinfo = load(read)
@@ -267,13 +276,14 @@ class ProxySpeedTestApp(MDApp):
                 appLink = updateinfo["release"][platform]
             except KeyError:
                 return
-            title = f"App update v{updateinfo['version']}" 
+            title = f"App update v{updateinfo['version']}"
             msg = "You are already in latest version!"
             b1 = "CENCEL"
             force = False
 
             if updateinfo['version'] > float(self.version) and appLink != "":
-                if updateinfo['messages']:title = updateinfo['messages']
+                if updateinfo['messages']:
+                    title = updateinfo['messages']
                 msg = ""
                 b2 = "DOWNLOAD"
                 force = bool(updateinfo['force'])
@@ -285,24 +295,26 @@ class ProxySpeedTestApp(MDApp):
 
             self.updateDialog = MDDialog(
                 title=title,
-                text=msg+updateinfo['changelogs']+f"\n\n[size=15]Force update: {force}[/size]",
+                text=msg+updateinfo[
+                    'changelogs']+f"\n\n[size=15]Force update: {force}[/size]",
                 auto_dismiss=False,
                 buttons=[
                     MDFlatButton(
-                        text=b1, 
+                        text=b1,
                         text_color=self.theme_cls.primary_color,
-                        on_release=lambda x: self.updateDialog.dismiss() if b1 == "CENCEL" else self.stop()
+                        on_release=lambda x:self.updateDialog.dismiss() if b1 == "CENCEL" else self.stop()  # noqa
                     ),
                     MDRaisedButton(
                         text=b2,
-                        on_release=lambda x:open_link(appLink) if b2 == "DOWNLOAD" else self.FCU(self.updateDialog),
+                        on_release=lambda x:open_link(appLink) if b2 == "DOWNLOAD" else self.FCU(self.updateDialog),  # noqa
                         text_color=self.theme_cls.primary_light,
                     ),
                 ],
             )
             self.updateDialog.ids.title.theme_text_color = "Custom"
-            self.updateDialog.ids.title.text_color = self.theme_cls.primary_light
-            if ava:self.updateDialog.open()
+            self.updateDialog.ids.title.text_color = self.theme_cls.primary_light  # noqa
+            if ava:
+                self.updateDialog.open()
         else:
             toast("Unable to get updates information")
 
@@ -310,13 +322,13 @@ class ProxySpeedTestApp(MDApp):
         inst.dismiss()
         Clock.schedule_once(partial(self.checkUpdates, True), -1)
 
-
     def on_pause(self):
         return True
-    
-    def save_UpdateDB(self, l=[]):
+
+    def save_UpdateDB(self, lists=[]):
         dbRW = MyDb()
-        if l:dbRW.updateScanList(l, self.selLId)
+        if lists:
+            dbRW.updateScanList(lists, self.selLId)
 
     def build(self):
         if platform == "android":
@@ -327,20 +339,19 @@ class ProxySpeedTestApp(MDApp):
         Builder.load_file(
             f"{environ['KITCHEN_SINK_ROOT']}/libs/kv/dialog_change_theme.kv"
         )
-        
+
         return Builder.load_file(
             f"{environ['KITCHEN_SINK_ROOT']}/libs/kv/start_screen.kv"
         )
 
     @run_on_ui_thread
     def _statusBarColor(self, color="#03A9F4"):
-        
+
         window = activity.getWindow()
         window.clearFlags(WindowManager.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.setStatusBarColor(Color.parseColor(color)) 
+        window.setStatusBarColor(Color.parseColor(color))
         window.setNavigationBarColor(Color.parseColor(color))
-
 
     def show_dialog_change_theme(self):
         if not self.dialog_change_theme:
@@ -363,23 +374,23 @@ class ProxySpeedTestApp(MDApp):
         else:
             self.root.ids.Tscan.text = "scan: 0"
             self.root.ids.Tproxys.text = "proxys: 0"
-        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
+        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"  # noqa
         # self.root.ids.backdrop._front_layer_open=True
         Logger.info(f"Platform: {platform}")
         # if platform == 'android':
-            # self.ads = KivMob(adMobIds.APP)
-            # self.ads.new_banner(adMobIds.BANNER, top_pos=False)
-            # self.ads.request_banner()
-            # self.ads.show_banner()
+        # self.ads = KivMob(adMobIds.APP)
+        # self.ads.new_banner(adMobIds.BANNER, top_pos=False)
+        # self.ads.request_banner()
+        # self.ads.show_banner()
 
-            # self.root.ids.adsShow.size = (self.root.ids.backdrop_front_layer.width, 110)
-        
+        # self.root.ids.adsShow.size = (self.root.ids.backdrop_front_layer.width, 110) # noqa
+
         self.protPic()
         self.listPic()
         self.tap_target_list_view = MDTapTargetView(
             widget=self.root.ids.Slist,
             title_text="Pic a lists",
-            description_text="Your selected list choice will be saved in database!",
+            description_text="Your selected list choice will be saved in database!",  # noqa
             widget_position="right_top",
             # outer_radius=dp(320),
             cancelable=True,
@@ -388,9 +399,7 @@ class ProxySpeedTestApp(MDApp):
         )
         Thread(target=self.checkUpdates).start()
 
-
     def listPic(self):
-
         proxysInx = dbRW.getProxysInx()[::-1]
         self.selLId = dbRW.getConfig('proxysInx')[0]
         Logger.debug(self.selLId)
@@ -414,13 +423,13 @@ class ProxySpeedTestApp(MDApp):
                 "height": 36,
                 "top_pad": 35,
                 "bot_pad": 10}]
-        
+
         if self.selLId:
             self.selLIdindx = selLIdindxDict[self.selLId]
-        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if self.selLId else "list :"
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if self.selLId else "list :"  # noqa
 
         self.listSel = MDDropdownMenu(
-            caller=self.root.ids.Slist, 
+            caller=self.root.ids.Slist,
             items=self.ListItems,
             width_mult=4,
             opening_time=0.2,
@@ -432,7 +441,8 @@ class ProxySpeedTestApp(MDApp):
             on_dismiss=self.manuDismiss)
 
     def manuDismiss(self, ins):
-        ins.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
+        ins.caller.custom_color = get_color_from_hex(
+            colors[self.theme_cls.primary_palette]["300"])
 
     def set_list(self, insMain, ins):
         import re
@@ -450,14 +460,14 @@ class ProxySpeedTestApp(MDApp):
 
         self.scan_list = []
         if self.selLId:
-            for l in scan_list:
-                if not None in l:
+            for slist in scan_list:
+                if not (None in slist):
                     self.scan_list.append({
-                            "IP": l[0],
-                            "SIZE": l[1],
-                            "TIME": l[2],
-                            "SPEED": l[3],
-                            "top3c": l[6]
+                            "IP": slist[0],
+                            "SIZE": slist[1],
+                            "TIME": slist[2],
+                            "SPEED": slist[3],
+                            "top3c": slist[6]
                             })
 
         unsort = self.scan_list
@@ -471,18 +481,18 @@ class ProxySpeedTestApp(MDApp):
         self.configs['protocol'] = protocol
 
         self.root.ids.Slist.text = f"list : {ins.text}".upper()
-        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
+        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"  # noqa
         self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"
         self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
-        
+
         # print(getips)
         toast(ins.text)
         # print(indx)
         self.listSel.dismiss()
-        insMain.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
+        insMain.caller.custom_color = get_color_from_hex(
+            colors[self.theme_cls.primary_palette]["300"])
         if self.tap_target_list_view.state == 'open':
             self.tap_target_list_view.stop()
-
 
     def protPic(self):
         items = [{
@@ -490,7 +500,8 @@ class ProxySpeedTestApp(MDApp):
             "font_style": "Caption",
             "height": 36,
             "top_pad": 35,
-            "bot_pad": 10} for protocol in ['http', 'https', 'socks4', 'socks5']]
+            "bot_pad": 10} for protocol in [
+                'http', 'https', 'socks4', 'socks5']]
         self.protSel = MDDropdownMenu(
             caller=self.root.ids.Sprotocol,
             items=items,
@@ -504,10 +515,11 @@ class ProxySpeedTestApp(MDApp):
 
     def set_protocol(self, insMain, ins):
         self.configs['protocol'] = ins.text.lower()
-        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"
-        
+        self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"  # noqa
+
         toast(self.configs['protocol'])
-        insMain.caller.custom_color = get_color_from_hex(colors[self.theme_cls.primary_palette]["300"])
+        insMain.caller.custom_color = get_color_from_hex(
+            colors[self.theme_cls.primary_palette]["300"])
         self.protSel.dismiss()
 
     def mirrorPic(self):
@@ -535,19 +547,19 @@ class ProxySpeedTestApp(MDApp):
 
     def set_mirror(self, insMain, ins):
         miInx = 0
-        for l in self.configs['mirrors']:
-            if ins.text == parse.urlparse(l[0]).netloc:
+        for lists in self.configs['mirrors']:
+            if ins.text == parse.urlparse(lists[0]).netloc:
                 break
             miInx += 1
-        
+
         self.configs['mirror'] = self.configs['mirrors'][miInx][0]
         self.root.ids.backlayer.ids.Smirror.text = f"Mirror: {ins.text}"
         dbRW.updateConfig("proxysInx", self.selLId)
         dbRW.updateConfig("miInx", miInx)
-        
+
         toast(self.configs['mirror'])
         self.mirrSel.dismiss()
-    
+
     def update_screen(self, dt):
         try:
             while not self.pbar0.empty():
@@ -558,7 +570,7 @@ class ProxySpeedTestApp(MDApp):
                     self.root.ids.progressBar1.value = 0
         except Empty:
             pass
-        
+
         try:
             while not self.pbar1.empty():
                 sp = self.pbar1.get_nowait()
@@ -568,7 +580,7 @@ class ProxySpeedTestApp(MDApp):
                     self.root.ids.progressBar2.value = 0
         except Empty:
             pass
-        
+
         try:
             while not self.pbar2.empty():
                 sp = self.pbar2.get_nowait()
@@ -578,7 +590,7 @@ class ProxySpeedTestApp(MDApp):
                     self.root.ids.progressBar3.value = 0
         except Empty:
             pass
-        
+
         try:
             proxysL = len(self.configs['proxys'])
             while not self.totalpb.empty():
@@ -592,27 +604,25 @@ class ProxySpeedTestApp(MDApp):
                     self.root.ids.totalpb.value = 0
         except Empty:
             pass
-        
 
         self.speedcal()
 
-        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()
-
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()  # noqa
 
     def start_scan(self, instance):
         Logger.debug(instance.icon)
-        
+
         if instance.icon == "play":
             # self.mirrorPic()
             self.listPic()
 
-            self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"
+            self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"  # noqa
             if len(self.configs['proxys']) == 0:
                 try:
                     if self.configs['proxysInx']:
                         self.tap_target_list_view.start()
                         self.listSel.open()
-                        # toast("Pick that list!")        
+                        # toast("Pick that list!")
                         return
                 except:
                     pass
@@ -624,10 +634,10 @@ class ProxySpeedTestApp(MDApp):
             color = "#f44336"
             instance.md_bg_color = get_color_from_hex(color)
             self.theme_cls.primary_palette = "Red"
-            if platform == "android":self._statusBarColor(color)
+            if platform == "android":
+                self._statusBarColor(color)
             self.scaning.put_nowait(1)
             self.running.put_nowait(1)
-            
 
             IndexTime = datetime.now()
             dbRW.updateConfig('proxysInx', IndexTime)
@@ -644,7 +654,7 @@ class ProxySpeedTestApp(MDApp):
             self.selLId = str(IndexTime)
             self.show_List()
             self.upScreen = Clock.schedule_interval(self.update_screen, 0.1)
-            
+
             Logger.debug(f"Proxys : {self.configs['proxys']}")
             Logger.debug(f"Protocol : {self.configs['protocol']}")
             Logger.debug(f"Mirror : {self.configs['mirror']}")
@@ -654,14 +664,13 @@ class ProxySpeedTestApp(MDApp):
                 self.configs['protocol'],
                 self.configs['mirror'],
                 )).start()
-        
+
             # self.proxySpeedTest('start')
         elif instance.icon == "blur":
             toast(f"Waiting for finish {self.root.ids.currentIP.text[8:]}!")
         else:
             while not self.scaning.empty():
                 self.scaning.get_nowait()
-            
 
             if not self.running.empty():
                 instance.icon = "blur"
@@ -669,9 +678,9 @@ class ProxySpeedTestApp(MDApp):
                 color = "#9E9E9E"
                 self.theme_cls.primary_palette = "Gray"
                 instance.md_bg_color = get_color_from_hex(color)
-                if platform == "android":self._statusBarColor(color)
-            
-    
+                if platform == "android":
+                    self._statusBarColor(color)
+
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
         Logger.info(f'Scaning {idx} : Started')
         try:
@@ -697,15 +706,16 @@ class ProxySpeedTestApp(MDApp):
                 for chunk in req.iter_content(chunk_size=chunkSizeUp):
                     end = datetime.now()
                     if 0.1 <= (end-start).seconds:
-                        delta = round(float((end - start).seconds) +
-                                    float(str('0.' + str((end -
-                                                            start).microseconds))), 3)
+                        delta = round(
+                            float((end - start).seconds) +
+                            float(str('0.' + str(
+                                (end - start).microseconds))), 3)
                         speed = round((chunkSize) / delta)
                         # if oldSpeed < speed:
-                            # chunkSizeUp *= 3
+                        #     chunkSizeUp *= 3
                         # else:
                         #     chunkSizeUp = speed
-                        oldSpeed = speed
+                        # oldSpeed = speed
                         start = datetime.now()
                         self.currentSpeed.put_nowait(speed)
                         chunkSize = 0
@@ -723,7 +733,7 @@ class ProxySpeedTestApp(MDApp):
             return False
         except IndexError:
             self.showupdate(idx, 'd')
-            Logger.info(f'Thread {idx} : You must provide a testing IP:PORT proxy')
+            Logger.info(f'Thread {idx} : You must provide a testing IP:PORT proxy')  # noqa
             return False
         except ConnectTimeout:
             self.showupdate(idx, 'd')
@@ -735,14 +745,14 @@ class ProxySpeedTestApp(MDApp):
             return False
         except RuntimeError:
             self.showupdate(idx, 'd')
-            Logger.info(f"Thread {idx} : Set changed size during iteration. {proxy_ip}")
+            Logger.info(f"Thread {idx} : Set changed size during iteration. {proxy_ip}")  # noqa
             return False
         except KeyboardInterrupt:
             self.showupdate(idx, 'd')
             Logger.info(f"Thread no {idx} : Exited by User.")
-        
+
         self.showupdate(idx, 'd')
-    
+
     def showupdate(self, idx, mode='u', error=True):
         if mode == 'u':
             if idx == 0:
@@ -759,9 +769,9 @@ class ProxySpeedTestApp(MDApp):
                 self.pbar1.put_nowait(0)
             elif idx == 2:
                 self.pbar2.put_nowait(0)
-            
+
             self.root.ids.top_text.text = "0 KB/s"
-    
+
     def proxySpeedTest(self, proxys, protocol, mirror):
         filename = 'chunk'
         unsort = list()
@@ -771,9 +781,10 @@ class ProxySpeedTestApp(MDApp):
         self.totalpb.put(0)
         Logger.debug(proxys)
         for c, part in enumerate(proxys):
-            if self.scaning.empty(): break
+            if self.scaning.empty():
+                break
             proxy_ip = part[0].strip()
-            self.root.ids.currentIP.text = f"{proxy_ip} <-> {parse.urlparse(self.configs['mirror']).netloc}"
+            self.root.ids.currentIP.text = f"{proxy_ip} <-> {parse.urlparse(self.configs['mirror']).netloc}"  # noqa
             # Removing before test chunk file
             for i in range(3):
                 if exists(f'{filename}{i}'):
@@ -782,13 +793,14 @@ class ProxySpeedTestApp(MDApp):
             # Starting chunk file downloading
             timeStart = datetime.now()
             downloaders = [
-            Thread(
-                target=self.downloadChunk,
-                args=(idx, proxy_ip, filename, mirror, protocol),
-            )
-            for idx in range(3)]
-            for _ in downloaders:_.start()
-            for _ in downloaders:_.join()
+                Thread(
+                    target=self.downloadChunk,
+                    args=(idx, proxy_ip, filename, mirror, protocol),
+                ) for idx in range(3)]
+            for _ in downloaders:
+                _.start()
+            for _ in downloaders:
+                _.join()
             timeEnd = datetime.now()
 
             filesize = 0
@@ -799,9 +811,9 @@ class ProxySpeedTestApp(MDApp):
                     continue
 
             filesizeM = round(filesize / pow(1024, 2), 2)
-            delta = round(float((timeEnd - timeStart).seconds) +
-                        float(str('0.' + str((timeEnd -
-                                                timeStart).microseconds))), 3)
+            delta = round(
+                float((timeEnd - timeStart).seconds) +
+                float(str('0.' + str((timeEnd - timeStart).microseconds))), 3)
             speed = round(filesize) / delta
 
             for i in range(3):
@@ -809,11 +821,12 @@ class ProxySpeedTestApp(MDApp):
                     remove(f'{filename}{i}')
 
             unsort.append(
-                {'IP': proxy_ip,
-                'SIZE': filesizeM, 
-                'TIME': delta,
-                'SPEED': int(speed),
-                'top3c': part[6]}
+                {
+                    'IP': proxy_ip,
+                    'SIZE': filesizeM,
+                    'TIME': delta,
+                    'SPEED': int(speed),
+                    'top3c': part[6]}
                 )
             sort = self.sort_Type(unsort, showL=False)
             sortLL = len(sort)
@@ -821,7 +834,7 @@ class ProxySpeedTestApp(MDApp):
                 for t in range(sortLL):
                     if t < 3:
                         if sort[t]['SPEED'] != 0:
-                            if not sort[t]['IP'] in astTop3: 
+                            if not sort[t]['IP'] in astTop3:
                                 sort[t]['top3c'] += 1
                                 astTop3.append(sort[t]['IP'])
                     else:
@@ -836,7 +849,7 @@ class ProxySpeedTestApp(MDApp):
             self.totalpb.put(1)
             roundC = c
             # return True
-        
+
         self.save_UpdateDB(sort)
         # print(roundC)
         # print(self.root.ids.totalpb.value)
@@ -848,7 +861,8 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.start_stop.icon = "play"
         self.theme_cls.primary_palette = "LightBlue"
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
-        if platform == "android": self._statusBarColor()
+        if platform == "android":
+            self._statusBarColor()
         while not self.running.empty():
             self.running.get_nowait()
         Logger.info("Scan : Finished!")
@@ -857,21 +871,22 @@ class ProxySpeedTestApp(MDApp):
         if ckid and inst.active:
             self.sort_Type(self.data_lists, mode=inst.text, reverse=False)
             inst.active = False
-        elif ckid and inst.active == False:
+        elif ckid and inst.active is False:
             self.sort_Type(self.data_lists, mode=inst.text, reverse=True)
             inst.active = True
 
-
     def sort_Type(self, unsort, mode='SPEED', reverse=True, showL=True):
-        if mode == 'SERVER': mode = 'IP'
-        if mode == 'TOP3-%':mode = 'top3c'
+        if mode == 'SERVER':
+            mode = 'IP'
+        if mode == 'TOP3-%':
+            mode = 'top3c'
 
         sort = sorted(unsort, key=lambda x: x[mode], reverse=reverse)
         if showL:
             self.show_List(sort)
         return sort
 
-    def show_List(self, data=[]): 
+    def show_List(self, data=[]):
         # if not self.root.ids.backdrop_front_layer.data:
         # print(data)
         # print(len(self.root.ids.backdrop_front_layer.data))
@@ -892,7 +907,7 @@ class ProxySpeedTestApp(MDApp):
         else:
             lenC = len(self.root.ids.backdrop_front_layer.data)
             if lenC < totalP:
-                a =  totalP - lenC
+                a = totalP - lenC
                 for i in range(a):
                     self.root.ids.backdrop_front_layer.data.append(ddict)
 
@@ -902,16 +917,17 @@ class ProxySpeedTestApp(MDApp):
                     self.root.ids.backdrop_front_layer.data[i] = {
                             "viewclass": "ProxyShowList",
                             "text": data[i]['IP'],
-                            "text1": f"{round((data[i]['top3c']/self.configs['totalScan'])*100)} %",
+                            "text1": f"{round((data[i]['top3c']/self.configs['totalScan'])*100)} %",  # noqa
                             "text2": f"{data[i]['SIZE']} MB",
                             "text3": sec_to_mins(float(data[i]['TIME'])),
-                            "text4": f"{size(data[i]['SPEED'], system=alternative)}/s",
-                            "on_release": lambda x=data[i]['IP']: self.copy_proxyip(x),
+                            "text4": f"{size(data[i]['SPEED'], system=alternative)}/s",  # noqa
+                            "on_release": lambda x=data[i]['IP']: self.copy_proxyip(x),  # noqa: E501
                         }
                 except IndexError:
                     self.root.ids.backdrop_front_layer.data[i] = ddict
 
             self.data_lists = data
+
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")
         Clipboard.copy(data)
@@ -925,7 +941,7 @@ class ProxySpeedTestApp(MDApp):
             pass
 
         if speed != 0:
-            self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"
+            self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"  # noqa
 
 
 if __name__ == "__main__":
