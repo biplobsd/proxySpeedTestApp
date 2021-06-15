@@ -63,15 +63,29 @@ BoxLayout:
                         # adaptive_height: True
                         size_hint_y: .2
                         orientation: "vertical"
-                        MDLabel:
-                            id: currentIP
-                            #pos_hint: {"center_y": .35}
-                            text: ""
-                            bold: True
-                            theme_text_color: "Hint"
-                            font_style: "Overline"
-                            halign: "center"
-                            # theme_text_color: "Primary"
+                        MDBoxLayout:
+                            padding: 20, 0, 20, 0
+                            MDLabel:
+                                size_hint_x: .2
+                            MDLabel:
+                                id: currentIP
+                                #pos_hint: {"center_y": .35}
+                                text: ""
+                                bold: True
+                                theme_text_color: "Hint"
+                                font_style: "Overline"
+                                halign: "center"
+                                # theme_text_color: "Primary"
+                            MDLabel:
+                                id: lastScan
+                                size_hint_x: .2
+                                #pos_hint: {"center_y": .35}
+                                text: "@@"
+                                bold: True
+                                theme_text_color: "Hint"
+                                font_style: "Overline"
+                                halign: "right"
+                                # theme_text_color: "Primary"
                         MDLabel:
                             id: top_text
                             #pos_hint: {"center_y": .35}

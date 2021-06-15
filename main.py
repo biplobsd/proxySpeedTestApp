@@ -1,4 +1,6 @@
+from logging import NullHandler
 import sys
+import socket
 from os import environ, sep, remove
 from os.path import join, abspath, dirname, exists, getsize
 from datetime import datetime
@@ -254,69 +256,53 @@ class ProxySpeedTestApp(MDApp):
         # toast("Checking for any updates ...")
         try:
             updateinfo = get(upCURL, verify=False, timeout=1).json()
-        except:
-            updateinfo = {
-                "version": float(self.version),
-                "messages": "",
-                "changelogs": "",
-                "force": "false",
-                "release": {
-                    "win": "",
-                    "linux": "",
-                    "android": "",
-                    "macosx": "",
-                    "unknown": "",
-                    "kivy_build": ""
-                }
-            }
-            # toast("Faild app update check!")
-            return
-        if updateinfo:
-            try:
-                appLink = updateinfo["release"][platform]
-            except KeyError:
-                return
-            title = f"App update v{updateinfo['version']}"
-            msg = "You are already in latest version!"
-            b1 = "CENCEL"
-            force = False
-
-            if updateinfo['version'] > float(self.version) and appLink != "":
-                if updateinfo['messages']:
-                    title = updateinfo['messages']
-                msg = ""
-                b2 = "DOWNLOAD"
-                force = bool(updateinfo['force'])
-                if force:
-                    b1 = "EXIT"
-                ava = True
-            else:
-                b2 = "CHECK"
-
-            self.updateDialog = MDDialog(
-                title=title,
-                text=msg+updateinfo[
-                    'changelogs']+f"\n\n[size=15]Force update: {force}[/size]",
-                auto_dismiss=False,
-                buttons=[
-                    MDFlatButton(
-                        text=b1,
-                        text_color=self.theme_cls.primary_color,
-                        on_release=lambda x:self.updateDialog.dismiss() if b1 == "CENCEL" else self.stop()  # noqa
-                    ),
-                    MDRaisedButton(
-                        text=b2,
-                        on_release=lambda x:open_link(appLink) if b2 == "DOWNLOAD" else self.FCU(self.updateDialog),  # noqa
-                        text_color=self.theme_cls.primary_light,
-                    ),
-                ],
-            )
-            self.updateDialog.ids.title.theme_text_color = "Custom"
-            self.updateDialog.ids.title.text_color = self.theme_cls.primary_light  # noqa
-            if ava:
-                self.updateDialog.open()
-        else:
+        except connError as e:
+            print(e)
             toast("Unable to get updates information")
+            return False
+        try:
+            appLink = updateinfo["release"][platform]
+        except KeyError:
+            appLink = ""
+        title = f"App update v{updateinfo['version']} {platform}"
+        msg = "You are already in latest version!"
+        b1 = "CENCEL"
+        force = False
+
+        if updateinfo['version'] > float(self.version) and appLink != "":
+            if updateinfo['messages']:
+                title = updateinfo['messages']
+            msg = ""
+            b2 = "DOWNLOAD"
+            force = bool(updateinfo['force'])
+            if force:
+                b1 = "EXIT"
+            ava = True
+        else:
+            b2 = "CHECK"
+
+        self.updateDialog = MDDialog(
+            title=title,
+            text=msg+updateinfo[
+                'changelogs']+f"\n\n[size=15]Force update: {force}[/size]",
+            auto_dismiss=False,
+            buttons=[
+                MDFlatButton(
+                    text=b1,
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x:self.updateDialog.dismiss() if b1 == "CENCEL" else self.stop()  # noqa
+                ),
+                MDRaisedButton(
+                    text=b2,
+                    on_release=lambda x:open_link(appLink) if b2 == "DOWNLOAD" else self.FCU(self.updateDialog),  # noqa
+                    text_color=self.theme_cls.primary_light,
+                ),
+            ],
+        )
+        self.updateDialog.ids.title.theme_text_color = "Custom"
+        self.updateDialog.ids.title.text_color = self.theme_cls.primary_light  # noqa
+        if ava:
+            self.updateDialog.open()
 
     def FCU(self, inst):
         inst.dismiss()
@@ -409,8 +395,9 @@ class ProxySpeedTestApp(MDApp):
 
         if proxysInx:
             for i, Inx in enumerate(proxysInx):
+                IPs = len(dbRW.getAllCurrentProxys((Inx[0])))
                 self.ListItems.append({
-                    "text": f'#{i} '+agoConv(Inx[0]),
+                    "text": f'#{i} '+f'{IPs}ip '+agoConv(Inx[0]),
                     "font_style": "Caption",
                     "height": 36,
                     "top_pad": 35,
@@ -426,7 +413,8 @@ class ProxySpeedTestApp(MDApp):
 
         if self.selLId:
             self.selLIdindx = selLIdindxDict[self.selLId]
-        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper() if self.selLId else "list :"  # noqa
+        self.root.ids.lastScan.text = agoConv(self.selLId).upper()
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx}".upper() if self.selLId else "list :"  # noqa
 
         self.listSel = MDDropdownMenu(
             caller=self.root.ids.Slist,
@@ -434,7 +422,8 @@ class ProxySpeedTestApp(MDApp):
             width_mult=4,
             opening_time=0.2,
             position='auto',
-            max_height=0
+            max_height=0,
+            selected_color=self.theme_cls.primary_light
         )
         self.listSel.bind(
             on_release=self.set_list,
@@ -450,7 +439,7 @@ class ProxySpeedTestApp(MDApp):
         # withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
         Logger.debug(self.selLIdindx)
 
-        proxysInx = dbRW.getProxysInx()
+        proxysInx = sorted(dbRW.getProxysInx(), reverse=True)
         self.selLId = proxysInx[self.selLIdindx][0]
         proxys = dbRW.getAllCurrentProxys(self.selLId)
         self.configs['totalScan'] = dbRW.getProxysInxTS(self.selLId)[0]
@@ -480,7 +469,8 @@ class ProxySpeedTestApp(MDApp):
         self.configs['proxys'] = proxys
         self.configs['protocol'] = protocol
 
-        self.root.ids.Slist.text = f"list : {ins.text}".upper()
+        self.root.ids.lastScan.text = agoConv(self.selLId).upper()
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx}".upper()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"  # noqa
         self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"
         self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
@@ -507,7 +497,8 @@ class ProxySpeedTestApp(MDApp):
             items=items,
             width_mult=3,
             opening_time=0.2,
-            position='auto'
+            position='auto',
+            selected_color=self.theme_cls.primary_light
         )
         self.protSel.bind(
             on_release=self.set_protocol,
@@ -539,7 +530,8 @@ class ProxySpeedTestApp(MDApp):
             opening_time=0.2,
             width_mult=5,
             position='auto',
-            max_height=0
+            max_height=0,
+            selected_color=self.theme_cls.primary_light
         )
         self.mirrSel.bind(
             on_release=self.set_mirror,
@@ -606,8 +598,8 @@ class ProxySpeedTestApp(MDApp):
             pass
 
         self.speedcal()
-
-        self.root.ids.Slist.text = f"list : #{self.selLIdindx} {agoConv(self.selLId)}".upper()  # noqa
+        self.root.ids.lastScan.text = agoConv(self.selLId).upper()
+        self.root.ids.Slist.text = f"list : #{self.selLIdindx}".upper()  # noqa
 
     def start_scan(self, instance):
         Logger.debug(instance.icon)
@@ -624,7 +616,7 @@ class ProxySpeedTestApp(MDApp):
                         self.listSel.open()
                         # toast("Pick that list!")
                         return
-                except:
+                except RuntimeError:
                     pass
                 PSTDialogInput().open()
                 toast("First input proxys ip:port list then start scan.")
@@ -850,6 +842,7 @@ class ProxySpeedTestApp(MDApp):
             roundC = c
             # return True
 
+        self.root.ids.currentIP.text = "Scan completed"
         self.save_UpdateDB(sort)
         # print(roundC)
         # print(self.root.ids.totalpb.value)
@@ -865,9 +858,12 @@ class ProxySpeedTestApp(MDApp):
             self._statusBarColor()
         while not self.running.empty():
             self.running.get_nowait()
+        self.root.ids.currentIP.text = ""
         Logger.info("Scan : Finished!")
 
     def sort_Change(self, inst, ckid):
+        if not self.data_lists:
+            toast("Empty list cannot be sorted.")
         if ckid and inst.active:
             self.sort_Type(self.data_lists, mode=inst.text, reverse=False)
             inst.active = False
@@ -926,7 +922,7 @@ class ProxySpeedTestApp(MDApp):
                 except IndexError:
                     self.root.ids.backdrop_front_layer.data[i] = ddict
 
-            self.data_lists = data
+        self.data_lists = data
 
     def copy_proxyip(self, data):
         toast(f"Copied: {data}")

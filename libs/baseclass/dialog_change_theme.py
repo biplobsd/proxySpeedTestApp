@@ -17,6 +17,7 @@ from kivymd.icon_definitions import md_icons
 from kivymd.uix.card import MDCardSwipe
 from kivy.properties import StringProperty, ObjectProperty
 
+
 class KitchenSinkBaseDialog(ThemableBehavior, ModalView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -29,11 +30,12 @@ class KitchenSinkBaseDialog(ThemableBehavior, ModalView):
     #         # print("Back button clicked!")
     #         self.dismiss()
     #         # EventLoop.window.stop()
-    #     return True 
+    #     return True
 
 
 class KitchenSinkDialogDev(KitchenSinkBaseDialog):
     pass
+
 
 class PSTDialogInput(KitchenSinkBaseDialog):
     def __init__(self, **kwargs):
@@ -49,7 +51,7 @@ class PSTDialogInput(KitchenSinkBaseDialog):
 
         #     c.execute("SELECT ip FROM 'proxys' WHERE time=?", [self.selLId])
         #     getips = c.fetchall()
-        
+
         # self.proxys = [ip[0] for ip in getips]
         # currentSavedList = ""
         # for line in self.proxys:
@@ -57,10 +59,8 @@ class PSTDialogInput(KitchenSinkBaseDialog):
         # self.ids.query.text = currentSavedList
 
         self.piced_pro = None
-    
 
     def inputedproxysSave(self):
-
         proxys = findall(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}[\s:\t][0-9]{1,5}",
         self.ids.query.text)
         for line in range(len(proxys)):
@@ -72,7 +72,7 @@ class PSTDialogInput(KitchenSinkBaseDialog):
         currentSave = ""
         for line in proxys:
             currentSave += line+'\n'
-        
+
         IndexTime = datetime.now()
         self.dbRW.createProxysList(proxys, self.piced_pro, IndexTime)
 
@@ -91,7 +91,6 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
         #     with open(self.filename, 'r', encoding="utf-8") as r:
         #         self.ids.query.text = r.read()
 
-        
         self.mirrors = self.dbRW.getAllMirrors()
 
         self.showsInBox = ""
@@ -99,10 +98,7 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
             self.showsInBox += m[0]+'\n'
         self.ids.queryMirror.text = self.showsInBox
 
-
-    
     def inputedMirrorSave(self):
-        
         if self.showsInBox != self.ids.queryMirror.text:
 
             self.dbRW.inputeMirror(self.ids.queryMirror.text.split('\n'))
@@ -111,6 +107,7 @@ class MirrorDialogInput(KitchenSinkBaseDialog):
             toast(f"Saved!")
         else:
             toast('No new updated!')
+
 
 class SwipeToDeleteItem(MDCardSwipe):
     text = StringProperty()
@@ -127,19 +124,20 @@ class proxysDialogRemove(KitchenSinkBaseDialog):
         #     with open(self.filename, 'r', encoding="utf-8") as r:
         #         self.ids.query.text = r.read()
 
-        
-        proxysInx = [p[0] for p in self.dbRW.getProxysInx()][::-1]
+        proxysInx = sorted(
+            [p[0] for p in self.dbRW.getProxysInx()][::-1],
+            reverse=True)
 
         # self.showsInBox = ""
         # for m in self.mirrors:
         #     self.showsInBox += m[0]+'\n'
         # self.ids.queryMirror.text = self.showsInBox
-        
-        for i,p in enumerate(proxysInx):
+
+        for i, p in enumerate(proxysInx):
             self.ids.md_list.add_widget(
                 SwipeToDeleteItem(
-                    text=f"#{i} {agoConv(p)}", 
-                    remove_item=self.remove_item, 
+                    text=f"#{i} {len(self.dbRW.getAllCurrentProxys(p))}ip {agoConv(p)}",  # noqa
+                    remove_item=self.remove_item,
                     date_point=p)
             )
 
