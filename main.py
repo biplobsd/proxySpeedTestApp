@@ -256,8 +256,7 @@ class ProxySpeedTestApp(MDApp):
         # toast("Checking for any updates ...")
         try:
             updateinfo = get(upCURL, verify=False, timeout=1).json()
-        except connError as e:
-            print(e)
+        except:  # noqa
             toast("Unable to get updates information")
             return False
         try:
