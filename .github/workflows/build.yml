@@ -31,29 +31,29 @@ jobs:
         name: package ${{ matrix.name }}
         path: ${{ steps.buildozer.outputs.filename }}
     
-    - name: Changing permission
-      run: |
-        sudo chown -R $(whoami): .
+#     - name: Changing permission
+#       run: |
+#         sudo chown -R $(whoami): .
 
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        path: data
-        ref: screenshort # Branch name
-        persist-credentials: false
+#     - name: Checkout
+#       uses: actions/checkout@v2
+#       with:
+#         path: data
+#         ref: screenshort # Branch name
+#         persist-credentials: false
     
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
-        architecture: x64
+#     - name: Set up Python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.7
+#         architecture: x64
 
-    - name: Push binary to screenshort branch
-      run: |
-        #Use personal token to push (when using GITHUB_TOKEN, it will not allow pushes from PR)
-        cd data && \
-          git config user.name "biplobsd" && \
-          git config user.email biplobsd11@gmail.com && \
-          git remote set-url origin https://biplobsd:${{ secrets.GH_PAT }}@github.com/${{ github.repository }} && \
-          cd ..
-        python master/.ci/move_binary.py "${{ steps.buildozer.outputs.filename }}" master data apk
+#     - name: Push binary to screenshort branch
+#       run: |
+#         #Use personal token to push (when using GITHUB_TOKEN, it will not allow pushes from PR)
+#         cd data && \
+#           git config user.name "biplobsd" && \
+#           git config user.email biplobsd11@gmail.com && \
+#           git remote set-url origin https://biplobsd:${{ secrets.GH_PAT }}@github.com/${{ github.repository }} && \
+#           cd ..
+#         python master/.ci/move_binary.py "${{ steps.buildozer.outputs.filename }}" master data apk
