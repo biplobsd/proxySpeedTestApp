@@ -1,3 +1,4 @@
+from kivy.metrics import dp
 from kivy.properties import ListProperty, StringProperty
 from kivy.uix.widget import Widget
 
@@ -16,8 +17,15 @@ class KitchenSinkOneLineLeftAvatarItem(OneLineAvatarListItem):
     divider = None
     source = StringProperty()
 
+
 class pSTOneLineListItem(OneLineListItem):
     divider = 'Insert'
+
+
+class MenuOneLineListItem(OneLineListItem):
+    divider = 'Full'
+    _txt_bot_pad = dp(10)
+    font_style = "Caption"
 
 
 class KitchenSinkTwoLineLeftAvatarItem(TwoLineAvatarListItem):

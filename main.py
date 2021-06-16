@@ -1,6 +1,5 @@
-from logging import NullHandler
+import re
 import sys
-import socket
 from os import environ, sep, remove
 from os.path import join, abspath, dirname, exists, getsize
 from datetime import datetime
@@ -58,7 +57,7 @@ from hurry.filesize import alternative, size
 from functools import partial
 
 __version__ = "1.5"
-Logger.setLevel(LOG_LEVELS["debug"])
+Logger.setLevel(LOG_LEVELS['debug'])
 Config.set('graphics', 'verify_gl_main_thread', False)
 disable_warnings(exceptions.InsecureRequestWarning)
 
@@ -346,7 +345,6 @@ class ProxySpeedTestApp(MDApp):
 
     def on_start(self):
         """Creates a list of items with examples on start screen."""
-
         unsort = self.scan_list
         # print(unsort)
         self.show_List()
@@ -383,6 +381,7 @@ class ProxySpeedTestApp(MDApp):
             outer_circle_alpha=0.9,
         )
         Thread(target=self.checkUpdates).start()
+        self.root.ids.backdrop.ids.header_button.height = 0
 
     def listPic(self):
         proxysInx = dbRW.getProxysInx()[::-1]
@@ -395,12 +394,15 @@ class ProxySpeedTestApp(MDApp):
         if proxysInx:
             for i, Inx in enumerate(proxysInx):
                 IPs = len(dbRW.getAllCurrentProxys((Inx[0])))
+                intext = f'#{i} '+f'{IPs}ip '+agoConv(Inx[0])
                 self.ListItems.append({
-                    "text": f'#{i} '+f'{IPs}ip '+agoConv(Inx[0]),
-                    "font_style": "Caption",
+                    "text": intext,
                     "height": 36,
-                    "top_pad": 35,
-                    "bot_pad": 10})
+                    "viewclass": "MenuOneLineListItem",
+                    "on_release":
+                        lambda x=intext:
+                        self.set_list(x)
+                    })
                 selLIdindxDict[Inx[0]] = i
         else:
             self.ListItems = [{
@@ -418,23 +420,20 @@ class ProxySpeedTestApp(MDApp):
         self.listSel = MDDropdownMenu(
             caller=self.root.ids.Slist,
             items=self.ListItems,
-            width_mult=4,
+            width_mult=3,
             opening_time=0.2,
             position='auto',
-            max_height=0,
-            selected_color=self.theme_cls.primary_light
+            max_height=0
         )
         self.listSel.bind(
-            on_release=self.set_list,
             on_dismiss=self.manuDismiss)
 
     def manuDismiss(self, ins):
         ins.caller.custom_color = get_color_from_hex(
             colors[self.theme_cls.primary_palette]["300"])
 
-    def set_list(self, insMain, ins):
-        import re
-        self.selLIdindx = int(re.search(r'#(\d+)\s', ins.text).group(1))
+    def set_list(self, ins):
+        self.selLIdindx = int(re.search(r'#(\d+)\s', ins).group(1))
         # withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
         Logger.debug(self.selLIdindx)
 
@@ -475,41 +474,35 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
 
         # print(getips)
-        toast(ins.text)
+        toast(ins)
         # print(indx)
         self.listSel.dismiss()
-        insMain.caller.custom_color = get_color_from_hex(
-            colors[self.theme_cls.primary_palette]["300"])
         if self.tap_target_list_view.state == 'open':
             self.tap_target_list_view.stop()
 
     def protPic(self):
         items = [{
             "text": protocol.upper(),
-            "font_style": "Caption",
+            "viewclass": "MenuOneLineListItem",
             "height": 36,
-            "top_pad": 35,
-            "bot_pad": 10} for protocol in [
+            "on_release": lambda x=protocol: self.set_protocol(x)}
+            for protocol in [
                 'http', 'https', 'socks4', 'socks5']]
         self.protSel = MDDropdownMenu(
             caller=self.root.ids.Sprotocol,
             items=items,
-            width_mult=3,
+            width_mult=2,
             opening_time=0.2,
-            position='auto',
-            selected_color=self.theme_cls.primary_light
+            position='auto'
         )
         self.protSel.bind(
-            on_release=self.set_protocol,
             on_dismiss=self.manuDismiss)
 
-    def set_protocol(self, insMain, ins):
-        self.configs['protocol'] = ins.text.lower()
+    def set_protocol(self, ins):
+        self.configs['protocol'] = ins.lower()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"  # noqa
 
         toast(self.configs['protocol'])
-        insMain.caller.custom_color = get_color_from_hex(
-            colors[self.theme_cls.primary_palette]["300"])
         self.protSel.dismiss()
 
     def mirrorPic(self):
@@ -521,30 +514,29 @@ class ProxySpeedTestApp(MDApp):
             "text": parse.urlparse(mirror[0]).netloc,
             "font_style": "Caption",
             "height": 36,
-            "top_pad": 35,
-            "bot_pad": 10} for mirror in mirrors]
+            "viewclass": "MenuOneLineListItem",
+            "on_release": lambda x=parse.urlparse(mirror[0]).netloc:
+                 self.set_mirror(x)} for mirror in mirrors]
         self.mirrSel = MDDropdownMenu(
             caller=self.root.ids.backlayer.ids.Smirror,
             items=items,
             opening_time=0.2,
             width_mult=5,
             position='auto',
-            max_height=0,
-            selected_color=self.theme_cls.primary_light
+            max_height=0
         )
         self.mirrSel.bind(
-            on_release=self.set_mirror,
             on_dismiss=self.manuDismiss)
 
-    def set_mirror(self, insMain, ins):
+    def set_mirror(self, ins):
         miInx = 0
         for lists in self.configs['mirrors']:
-            if ins.text == parse.urlparse(lists[0]).netloc:
+            if ins == parse.urlparse(lists[0]).netloc:
                 break
             miInx += 1
 
         self.configs['mirror'] = self.configs['mirrors'][miInx][0]
-        self.root.ids.backlayer.ids.Smirror.text = f"Mirror: {ins.text}"
+        self.root.ids.backlayer.ids.Smirror.text = f"Mirror: {ins}"
         dbRW.updateConfig("proxysInx", self.selLId)
         dbRW.updateConfig("miInx", miInx)
 

@@ -47,7 +47,8 @@ BoxLayout:
                     app.listPic()
                 left_action_items: [['menu', lambda x: self.open()]]
                 title: "Proxy speed test"
-                header: False
+                header: True
+                header_text: ""
 
                 MDBackdropBackLayer:
 
@@ -486,7 +487,9 @@ BoxLayout:
                         text: "Input mirror list"
                         icon: "vector-polyline-plus"
                         divider: None
-                        on_release: MirrorDialogInput(app).open()
+                        on_release:
+                            if root.backdrop._front_layer_open: MirrorDialogInput(app).open() 
+                            
 
                     KitchenSinkOneLineIconListItem:
                         text: "Input proxy list"
