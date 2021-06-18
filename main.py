@@ -397,7 +397,6 @@ class ProxySpeedTestApp(MDApp):
                 intext = f'#{i} '+f'{IPs}ip '+agoConv(Inx[0])
                 self.ListItems.append({
                     "text": intext,
-                    "height": 36,
                     "viewclass": "MenuOneLineListItem",
                     "on_release":
                         lambda x=intext:
@@ -408,7 +407,6 @@ class ProxySpeedTestApp(MDApp):
             self.ListItems = [{
                 "text": "None",
                 "font_style": "Caption",
-                "height": 36,
                 "top_pad": 35,
                 "bot_pad": 10}]
 
@@ -423,7 +421,7 @@ class ProxySpeedTestApp(MDApp):
             width_mult=3,
             opening_time=0.2,
             position='auto',
-            max_height=0
+            max_height=dp(50*len(self.ListItems))
         )
         self.listSel.bind(
             on_dismiss=self.manuDismiss)
@@ -484,7 +482,6 @@ class ProxySpeedTestApp(MDApp):
         items = [{
             "text": protocol.upper(),
             "viewclass": "MenuOneLineListItem",
-            "height": 36,
             "on_release": lambda x=protocol: self.set_protocol(x)}
             for protocol in [
                 'http', 'https', 'socks4', 'socks5']]
@@ -493,7 +490,8 @@ class ProxySpeedTestApp(MDApp):
             items=items,
             width_mult=2,
             opening_time=0.2,
-            position='auto'
+            position='auto',
+            max_height=dp(50*len(items))
         )
         self.protSel.bind(
             on_dismiss=self.manuDismiss)
@@ -512,7 +510,6 @@ class ProxySpeedTestApp(MDApp):
         self.configs['mirrors'] = mirrors
         items = [{
             "text": parse.urlparse(mirror[0]).netloc,
-            "height": 36,
             "viewclass": "MenuOneLineListItem",
             "on_release": lambda x=parse.urlparse(mirror[0]).netloc:
                  self.set_mirror(x)} for mirror in mirrors]
@@ -522,7 +519,7 @@ class ProxySpeedTestApp(MDApp):
             opening_time=0.2,
             width_mult=5,
             position='auto',
-            max_height=0
+            max_height=dp(50*len(items))
         )
         self.mirrSel.bind(
             on_dismiss=self.manuDismiss)

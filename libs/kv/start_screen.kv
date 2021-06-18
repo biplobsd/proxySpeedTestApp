@@ -455,7 +455,7 @@ BoxLayout:
                                 size: "48dp", '48dp'
                                 active: True if app.theme_cls.theme_style == "Light" else False
                                 on_active:
-                                    if self.active: app.changeThemeMode("Light")
+                                    if self.active and root.backdrop._front_layer_open: app.changeThemeMode("Light")
                                     root.backdrop.ids._front_layer.md_bg_color = [0, 0, 0, 0]
 
                             Label:
@@ -468,7 +468,7 @@ BoxLayout:
                                 size: "48dp", '48dp'
                                 active: True if app.theme_cls.theme_style == "Dark" else False
                                 on_active:
-                                    if self.active: app.changeThemeMode("Dark")
+                                    if self.active and root.backdrop._front_layer_open: app.changeThemeMode("Dark")
                                     root.backdrop.ids._front_layer.md_bg_color = [0, 0, 0, 0]
 
                             Label:
@@ -489,13 +489,11 @@ BoxLayout:
                         divider: None
                         on_release:
                             if root.backdrop._front_layer_open: MirrorDialogInput(app).open() 
-                            
-
                     KitchenSinkOneLineIconListItem:
                         text: "Input proxy list"
                         icon: "database-plus"
                         divider: None
-                        on_release: PSTDialogInput().open()
+                        on_release: if root.backdrop._front_layer_open: PSTDialogInput().open()
                     
                     MDSeparator:
                     MDLabel:
@@ -509,7 +507,7 @@ BoxLayout:
                         text: "Remove proxy list"
                         icon: "database-minus"
                         divider: None
-                        on_release: proxysDialogRemove(app).open()
+                        on_release: if root.backdrop._front_layer_open: proxysDialogRemove(app).open()
 
                     MDSeparator:
                     MDLabel:
@@ -522,12 +520,12 @@ BoxLayout:
                         text: f"Timeout : {app.configs['timeout']} seconds"
                         icon: "timelapse"
                         divider: None
-                        on_release: TimeoutSet(self).open()
+                        on_release: if root.backdrop._front_layer_open: TimeoutSet(self).open()
                     KitchenSinkOneLineIconListItem:
                         text: f"Filesize : {size(app.configs['fileSize'])}"
                         icon: "cloud-download-outline"
                         divider: None
-                        on_release: FilesizeSet(self).open()
+                        on_release: if root.backdrop._front_layer_open: FilesizeSet(self).open()
                     KitchenSinkOneLineIconListItem:
                         id: Smirror
                         text: f"Mirror: {parse.urlparse(app.configs['mirror']).netloc}"
@@ -536,7 +534,7 @@ BoxLayout:
                         on_release: 
                             if (len(app.configs['proxysInx']) == 0):\
                             toast("First input proxys ip:port list then select mirrors.")
-                            else:app.mirrSel.open()
+                            elif root.backdrop._front_layer_open: app.mirrSel.open()
                     MDSeparator:
                     MDLabel:
                         id: label_theme
@@ -550,13 +548,13 @@ BoxLayout:
                         text: "Developers"
                         icon: "dev-to"
                         divider: None
-                        on_release: KitchenSinkDialogDev().open()
+                        on_release: if root.backdrop._front_layer_open: KitchenSinkDialogDev().open()
 
                     KitchenSinkOneLineIconListItem:
                         text: "License"
                         icon: "license"
                         divider: None
-                        on_release: KitchenSinkDialogLicense().open()
+                        on_release: if root.backdrop._front_layer_open: KitchenSinkDialogLicense().open()
                     
                     MDBoxLayout:
                         adaptive_height: True
@@ -566,7 +564,7 @@ BoxLayout:
                             font_size: sp(10)
                             custom_color: get_color_from_hex(colors[app.theme_cls.primary_palette]["200"])
                             text: f"VERSION : {app.version}"
-                            on_release:app.checkUpdates(True)
+                            on_release: if root.backdrop._front_layer_open: app.checkUpdates(True)
                     Widget:
                         size_hint_y: None
                         height: app.theme_cls.standard_increment

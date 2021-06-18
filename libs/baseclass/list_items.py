@@ -25,6 +25,7 @@ class pSTOneLineListItem(OneLineListItem):
 class MenuOneLineListItem(OneLineListItem):
     divider = 'Full'
     _txt_bot_pad = dp(10)
+    font_style = "Caption"
 
 
 class KitchenSinkTwoLineLeftAvatarItem(TwoLineAvatarListItem):
