@@ -512,7 +512,6 @@ class ProxySpeedTestApp(MDApp):
         self.configs['mirrors'] = mirrors
         items = [{
             "text": parse.urlparse(mirror[0]).netloc,
-            "font_style": "Caption",
             "height": 36,
             "viewclass": "MenuOneLineListItem",
             "on_release": lambda x=parse.urlparse(mirror[0]).netloc:
