@@ -25,7 +25,7 @@ jobs:
       run: |
         pip install opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 Pillow https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip kivy==2.0.0
     - name: Build with pyinstaller for ${{matrix.name}}
-      run: python -m pyinstaller --hidden-import=packaging.version pyinstaller.spec
+      run: pyinstaller --hidden-import=packaging.version pyinstaller.spec
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
