@@ -20,7 +20,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests pysocks hurry.filesize ago urllib3 Pillow https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip kivy==2.0.0
     - name: Build with pyinstaller for ${{matrix.name}}
-      run: pyinstaller pyinstaller.spec
+      run: ls -la;tree
+    - run: pyinstaller ./pyinstaller.spec
+      
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
