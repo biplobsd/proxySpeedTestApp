@@ -2,6 +2,32 @@ name: Build debug apk
 on: [push, pull_request]
 
 jobs:
+  build-windows:
+    name: Build Windows [${{ matrix.name }}]
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [proxySpeedTestApp]
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests pysocks hurry.filesize ago urllib3 Pillow https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip kivy==2.0.0
+    - name: Build with pyinstaller for ${{matrix.name}}
+      run: pyinstaller pyinstaller.spec
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: package ${{ matrix.name }}
+        path: ./dist/*.exe
+    
+
   # Build job. Builds every demo app for Android with Buildozer
   build-android:
     name: Build Android [${{ matrix.name }}]
