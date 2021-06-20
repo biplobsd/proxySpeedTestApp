@@ -10,8 +10,13 @@ jobs:
         include:
           - os: windows-latest
             name: proxySpeedTestApp_win
+            arch: 'x86'
+            spec: pyinstaller.spec
           - os: ubuntu-latest
             name: proxySpeedTestApp_linux
+            arch: ''
+            spec: pyinstallerL.spec
+            
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
@@ -19,7 +24,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-        architecture: 'x86'
+        architecture: ${{ matrix.arch }}
     - name: Install requirements
       run: |
           python -m pip install --upgrade pip
@@ -29,7 +34,7 @@ jobs:
       run: |
         pip install Pillow opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip https://github.com/kivy/kivy/archive/refs/heads/master.zip
     - name: Build with pyinstaller for ${{matrix.name}}
-      run: pyinstaller pyinstaller.spec
+      run: pyinstaller ${{matrix.spec}}
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
