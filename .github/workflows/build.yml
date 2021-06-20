@@ -7,7 +7,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [proxySpeedTestApp]
+        include:
+          - arch: 'x86'
+            name: proxySpeedTestApp_x86
+          - arch: 'x64'
+            name: proxySpeedTestApp_x64
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -15,7 +19,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-        architecture: 'x86'
+        architecture: ${{ matrix.arch }}
     - name: Install requirements
       run: |
           python -m pip install --upgrade pip
@@ -23,14 +27,14 @@ jobs:
           pip install git+https://github.com/pyinstaller/pyinstaller@develop
     - name: Install dependencies
       run: |
-        pip install Pillow opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip kivy==2.0.0
+        pip install Pillow opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip https://github.com/kivy/kivy/archive/refs/heads/master.zip
     - name: Build with pyinstaller for ${{matrix.name}}
-      run: pyinstaller --hidden-import=packaging.version pyinstaller.spec
+      run: pyinstaller pyinstaller.spec
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: package windows ${{ matrix.name }}
-        path: ./dist/*.exe
+        name: package_windows_${{ matrix.name }}
+        path: ./dist/
     
 
   # Build job. Builds every demo app for Android with Buildozer
