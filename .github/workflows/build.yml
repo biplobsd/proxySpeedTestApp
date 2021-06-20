@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   build-windows:
-    name: Build Windows [${{ matrix.name }}]
+    name: Build [${{ matrix.name }}]
     strategy:
       fail-fast: false
       matrix:
@@ -32,7 +32,7 @@ jobs:
           pip install git+https://github.com/pyinstaller/pyinstaller@develop
     - name: Install dependencies
       run: |
-        pip install Pillow opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip https://github.com/kivy/kivy/archive/refs/heads/master.zip
+        pip install Pillow opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip kivy==2.0.0
     - name: Build with pyinstaller for ${{matrix.name}}
       run: pyinstaller ${{matrix.spec}}
     - name: Upload artifacts
