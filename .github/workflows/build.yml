@@ -23,9 +23,7 @@ jobs:
           pip install git+https://github.com/pyinstaller/pyinstaller@develop
     - name: Install dependencies
       run: |
-        pip install opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip kivy==2.0.0
-        pip uninstall pillow
-        pip install Pillow
+        pip install Pillow opencv-python pyenchant requests pysocks hurry.filesize ago urllib3 https://github.com/kivymd/KivyMD/archive/refs/heads/master.zip kivy==2.0.0
     - name: Build with pyinstaller for ${{matrix.name}}
       run: pyinstaller --hidden-import=packaging.version pyinstaller.spec
     - name: Upload artifacts
