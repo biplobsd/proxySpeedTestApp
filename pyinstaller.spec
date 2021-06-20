@@ -25,13 +25,22 @@ a = Analysis(
     datas=[("assets\\", "assets\\"), ("libs\\", "libs\\"), ("LICENSE", ".")],
     hookspath=[kivymd_hooks_path],
     runtime_hooks=runtime_hooks(),
-    excludes=['numpy', 'enchant', 'cv2', 'PIL'],
+    excludes=['numpy', 'enchant', 'cv2', 'win32com', 'altgraph', 'pyinstaller', 'docutils'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=None,
     noarchive=False,
-    hiddenimports=['pysocks'],
+    hiddenimports=['socks', 'sockshandler'],
 )
+excluded_binaries = [
+        'VCRUNTIME140.dll',
+        'msvcp140.dll',
+        'mfc140u.dll',
+		'libcrypto-1_1.dll',
+		'unicodedata.pyd',
+		'ucrtbase.dll',
+		'SDL2.dll']
+a.binaries = TOC([x for x in a.binaries if x[0] not in excluded_binaries])
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=None)
 
