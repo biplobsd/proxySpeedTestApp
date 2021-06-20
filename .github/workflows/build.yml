@@ -8,18 +8,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch: 'x86'
-            name: proxySpeedTestApp_x86
-          - arch: 'x64'
-            name: proxySpeedTestApp_x64
-    runs-on: windows-latest
+          - os: windows-latest
+            name: proxySpeedTestApp_win
+          - os: ubuntu-latest
+            name: proxySpeedTestApp_linux
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-        architecture: ${{ matrix.arch }}
+        architecture: 'x86'
     - name: Install requirements
       run: |
           python -m pip install --upgrade pip
