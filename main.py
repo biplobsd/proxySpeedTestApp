@@ -195,6 +195,7 @@ class ProxySpeedTestApp(MDApp):
         self.scaning = Queue()
         self.running = Queue()
         self.currentSpeed = Queue()
+        self.forceStop = Queue()
 
         self.pbar0 = Queue()
         self.pbar1 = Queue()
@@ -655,7 +656,9 @@ class ProxySpeedTestApp(MDApp):
 
             # self.proxySpeedTest('start')
         elif instance.icon == "blur":
-            toast(f"Waiting for finish {self.root.ids.currentIP.text[8:]}!")
+            toast("Stopping...")
+            if self.forceStop.empty():
+                self.forceStop.put_nowait(1)
         else:
             while not self.scaning.empty():
                 self.scaning.get_nowait()
@@ -668,6 +671,8 @@ class ProxySpeedTestApp(MDApp):
                 instance.md_bg_color = get_color_from_hex(color)
                 if platform == "android":
                     self._statusBarColor(color)
+                toast(
+                    f"Waiting for finish {self.root.ids.currentIP.text[8:]}!")
 
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
         Logger.info(f'Scaning {idx} : Started')
@@ -702,6 +707,8 @@ class ProxySpeedTestApp(MDApp):
                 # oldSpeed = 0
                 chunkSizeUp = 1024
                 for chunk in req.iter_content(chunk_size=chunkSizeUp):
+                    if not self.forceStop.empty():
+                        break
                     end = datetime.now()
                     if 0.1 <= (end-start).seconds:
                         delta = round(
@@ -878,6 +885,8 @@ class ProxySpeedTestApp(MDApp):
             self._wakeScreen(mode="off")
         while not self.running.empty():
             self.running.get_nowait()
+        while not self.forceStop.empty():
+            self.forceStop.get_nowait()
         self.root.ids.currentIP.text = ""
         Logger.info("Scan : Finished!")
 
