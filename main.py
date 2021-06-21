@@ -337,6 +337,14 @@ class ProxySpeedTestApp(MDApp):
         window.setStatusBarColor(Color.parseColor(color))
         window.setNavigationBarColor(Color.parseColor(color))
 
+    @run_on_ui_thread
+    def _wakeScreen(self, mode="on"):
+        window = activity.getWindow()
+        if mode == "on":
+            window.addFlags(WindowManager.FLAG_KEEP_SCREEN_ON)
+        elif mode == "off":
+            window.clearFlags(WindowManager.FLAG_KEEP_SCREEN_ON)
+
     def show_dialog_change_theme(self):
         if not self.dialog_change_theme:
             self.dialog_change_theme = KitchenSinkDialogChangeTheme()
@@ -615,6 +623,7 @@ class ProxySpeedTestApp(MDApp):
             self.theme_cls.primary_palette = "Red"
             if platform == "android":
                 self._statusBarColor(color)
+                self._wakeScreen(mode="on")
             self.scaning.put_nowait(1)
             self.running.put_nowait(1)
 
@@ -662,13 +671,13 @@ class ProxySpeedTestApp(MDApp):
 
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
         Logger.info(f'Scaning {idx} : Started')
-        if idx==0:
+        if idx == 0:
             self.root.ids.progressBar1.start()
             self.root.ids.progressBar1.max = 0
-        elif idx==1:
+        elif idx == 1:
             self.root.ids.progressBar2.start()
             self.root.ids.progressBar2.max = 0
-        elif idx==2:
+        elif idx == 2:
             self.root.ids.progressBar3.start()
             self.root.ids.progressBar3.max = 0
         try:
@@ -761,15 +770,15 @@ class ProxySpeedTestApp(MDApp):
 
             self.root.ids.top_text.text = "0 KB/s"
         if mode == 'as' or mode == 'd':
-            if idx==0:
+            if idx == 0:
                 self.root.ids.progressBar1.stop()
                 self.root.ids.progressBar1.max = 1024
                 self.root.ids.progressBar1.opacity = 1
-            elif idx==1:
+            elif idx == 1:
                 self.root.ids.progressBar2.stop()
                 self.root.ids.progressBar2.max = 1024
                 self.root.ids.progressBar2.opacity = 1
-            elif idx==2:
+            elif idx == 2:
                 self.root.ids.progressBar3.stop()
                 self.root.ids.progressBar3.max = 1024
                 self.root.ids.progressBar3.opacity = 1
@@ -866,6 +875,7 @@ class ProxySpeedTestApp(MDApp):
         self.root.ids.start_stop.md_bg_color = self.theme_cls.primary_color
         if platform == "android":
             self._statusBarColor()
+            self._wakeScreen(mode="off")
         while not self.running.empty():
             self.running.get_nowait()
         self.root.ids.currentIP.text = ""

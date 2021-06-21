@@ -94,7 +94,7 @@ android.presplash_color = black
 #android.presplash_lottie = "assets/presplash.json"
 
 # (list) Permissions
-android.permissions = INTERNET, ACCESS_NETWORK_STATE
+android.permissions = INTERNET, ACCESS_NETWORK_STATE, WAKE_LOCK
 
 # (int) Target Android API, should be as high as possible.
 android.api = 30
@@ -209,7 +209,7 @@ android.accept_sdk_license = True
 
 # (bool) Indicate whether the screen should stay on
 # Don't forget to add the WAKE_LOCK permission if you set this to True
-#android.wakelock = False
+android.wakelock = True
 
 # (list) Android application meta-data to set (key=value format)
 #android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-3940256099942544~3347511713
