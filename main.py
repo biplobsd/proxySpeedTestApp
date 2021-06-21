@@ -662,6 +662,15 @@ class ProxySpeedTestApp(MDApp):
 
     def downloadChunk(self, idx, proxy_ip, filename, mirror, protocol):
         Logger.info(f'Scaning {idx} : Started')
+        if idx==0:
+            self.root.ids.progressBar1.start()
+            self.root.ids.progressBar1.max = 0
+        elif idx==1:
+            self.root.ids.progressBar2.start()
+            self.root.ids.progressBar2.max = 0
+        elif idx==2:
+            self.root.ids.progressBar3.start()
+            self.root.ids.progressBar3.max = 0
         try:
             proxies = {
                 'http': f'{protocol}://{proxy_ip}',
@@ -677,6 +686,7 @@ class ProxySpeedTestApp(MDApp):
                 proxies=proxies,
                 timeout=self.configs['timeout']
             )
+            self.showupdate(idx, 'as')
             with(open(f'{filename}{idx}', 'ab')) as f:
                 start = datetime.now()
                 chunkSize = 0
@@ -750,6 +760,19 @@ class ProxySpeedTestApp(MDApp):
                 self.pbar2.put_nowait(0)
 
             self.root.ids.top_text.text = "0 KB/s"
+        if mode == 'as' or mode == 'd':
+            if idx==0:
+                self.root.ids.progressBar1.stop()
+                self.root.ids.progressBar1.max = 1024
+                self.root.ids.progressBar1.opacity = 1
+            elif idx==1:
+                self.root.ids.progressBar2.stop()
+                self.root.ids.progressBar2.max = 1024
+                self.root.ids.progressBar2.opacity = 1
+            elif idx==2:
+                self.root.ids.progressBar3.stop()
+                self.root.ids.progressBar3.max = 1024
+                self.root.ids.progressBar3.opacity = 1
 
     def proxySpeedTest(self, proxys, protocol, mirror):
         filename = 'chunk'
