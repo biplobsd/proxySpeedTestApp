@@ -201,7 +201,12 @@ class ProxySpeedTestApp(MDApp):
         self.pbar1 = Queue()
         self.pbar2 = Queue()
         self.totalpb = Queue()
+        
+        self.configsUpdate()
 
+    # def on_resume(self):
+    #     self.ads.request_interstitial()
+    def configsUpdate(self):
         configs = dbRW.getAllConfigs()
         mirrors = dbRW.getAllMirrors()
         self.selLId = configs[0][2]
@@ -237,11 +242,10 @@ class ProxySpeedTestApp(MDApp):
             'proxysInx': [],
             'mirrors': mirrors,
             'proxys': getips if self.selLId else[],
-            'totalScan': totalScan if self.selLId else 0
+            'totalScan': totalScan if self.selLId else 0,
+            'autoKill': int(configs[0][5]),
+            'autoKillMode': int(configs[0][6])
             }
-
-    # def on_resume(self):
-    #     self.ads.request_interstitial()
 
     def changeThemeMode(self, inst):
         self.theme_cls.theme_style = inst
@@ -640,6 +644,8 @@ class ProxySpeedTestApp(MDApp):
 
             self.configs['timeout'] = int(configs[0][3])
             self.configs['fileSize'] = int(configs[0][4])
+            self.configs['autoKill'] = int(configs[0][5])
+            self.configs['autoKillMode'] = int(configs[0][6])
             self.selLId = str(IndexTime)
             self.show_List()
             self.upScreen = Clock.schedule_interval(self.update_screen, 0.1)
@@ -728,6 +734,9 @@ class ProxySpeedTestApp(MDApp):
                         chunkSize += sys.getsizeof(chunk)
                         self.showupdate(idx)
                         f.write(chunk)
+                if self.configs['autoKillMode']:
+                    while not self.forceStop.empty():
+                        self.forceStop.get_nowait()
         except ProxyError:
             self.showupdate(idx, 'd')
             Logger.info(f"Thread {idx} : Could not connect to {proxy_ip}")
@@ -966,7 +975,12 @@ class ProxySpeedTestApp(MDApp):
             pass
 
         if speed != 0:
-            self.root.ids.top_text.text = f"{size(speed, system=alternative)}/s"  # noqa
+            convS = size(speed, system=alternative)
+            if self.configs['autoKillMode']:
+                if speed <= self.configs['autoKill']:
+                    Logger.debug(f"autoKill : {convS}")
+                    self.forceStop.put_nowait(1)
+            self.root.ids.top_text.text = f"{convS}/s"  # noqa
 
 
 if __name__ == "__main__":

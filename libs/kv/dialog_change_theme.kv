@@ -377,6 +377,55 @@
                     root.inputedFilesizeSave()
             MDBoxLayout:
 
+<AutoKillSet>:
+    size_hint: None, None
+    height: Window.height * 30 / 100
+    width: Window.width * 50 / 100
+
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: "10dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
+        MDLabel:
+            text: "Auto Kill"
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: self.theme_cls.primary_color
+            font_style: "H4"
+            bold: True
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        MDSeparator:
+
+        MDBoxLayout:
+            padding: 20, 0, 20, 0
+            MDTextField:
+                id: query
+                hint_text: "Bytes"
+                pos_hint: {"center_x": 0.5}
+                size_hint: .8, None
+                multiline: False
+                input_filter: 'int'
+            MDSwitch:
+                id: mode
+                on_active: root.modeActive()
+
+        MDBoxLayout:
+            adaptive_height: True
+            spacing: 15
+            MDBoxLayout:
+            MDRectangleFlatButton:
+                text: "close".upper()
+                on_release:root.dismiss()
+            MDRaisedButton:
+                text: "Save".upper()
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, .8
+                on_release:
+                    root.inputedSizeSave()
+            MDBoxLayout:
+
 <KitchenSinkDialogLicense>:
     size_hint: None, None
     height: Window.height * 90 / 100

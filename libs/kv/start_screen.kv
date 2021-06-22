@@ -5,6 +5,7 @@
 #:import PSTDialogInput libs.baseclass.dialog_change_theme.PSTDialogInput
 #:import TimeoutSet libs.baseclass.dialog_change_theme.TimeoutSet
 #:import FilesizeSet libs.baseclass.dialog_change_theme.FilesizeSet
+#:import AutoKillSet libs.baseclass.dialog_change_theme.AutoKillSet
 #:import MirrorDialogInput libs.baseclass.dialog_change_theme.MirrorDialogInput
 #:import proxysDialogRemove libs.baseclass.dialog_change_theme.proxysDialogRemove
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
@@ -535,6 +536,11 @@ BoxLayout:
                         icon: "cloud-download-outline"
                         divider: None
                         on_release: if root.backdrop._front_layer_open: FilesizeSet(self).open()
+                    KitchenSinkOneLineIconListItem:
+                        text: f"Auto Kill : {size(app.configs['autoKill'])}"
+                        icon: "cloud-download-outline"
+                        divider: None
+                        on_release: if root.backdrop._front_layer_open: AutoKillSet(self).open()
                     KitchenSinkOneLineIconListItem:
                         id: Smirror
                         text: f"Mirror: {parse.urlparse(app.configs['mirror']).netloc}"

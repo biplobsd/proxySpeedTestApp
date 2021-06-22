@@ -3,6 +3,8 @@ from os.path import join
 from re import findall, sub
 from datetime import datetime
 from hurry.filesize import size
+from kivy.metrics import sp
+from kivymd.uix.button import MDIconButton
 from libs.baseclass.database import MyDb
 from libs.baseclass.utils import agoConv
 from kivy.base import EventLoop
@@ -179,16 +181,15 @@ class TimeoutSet(KitchenSinkBaseDialog):
         else:
             toast('No new updated!')
 
+
 class FilesizeSet(KitchenSinkBaseDialog):
-    def __init__(self,updateText, **kwargs):
+    def __init__(self, updateText, **kwargs):
         super().__init__(**kwargs)
 
         self.filesize = self.dbRW.getConfig('fileSize')[0]
         self.updateText = updateText
         self.ids.queryFilesize.text = str(self.filesize)
 
-
-    
     def inputedFilesizeSave(self):
         setFilesize = int(self.ids.queryFilesize.text)
         if self.filesize != setFilesize:
@@ -198,7 +199,33 @@ class FilesizeSet(KitchenSinkBaseDialog):
             self.dismiss()
         else:
             toast('No new updated!')
-        
+
+
+class AutoKillSet(KitchenSinkBaseDialog):
+    def __init__(self, updateText, **kwargs):
+        super().__init__(**kwargs)
+
+        self.autokill = self.dbRW.getConfig('autoKill')[0]
+        self.autokillmode = self.dbRW.getConfig('autoKillMode')[0]
+        self.updateText = updateText
+        self.ids.query.text = str(self.autokill)
+        if self.autokillmode:
+            self.ids.mode.active = True
+
+    def inputedSizeSave(self):
+        setSize = int(self.ids.query.text)
+        if self.autokill != setSize:
+            self.dbRW.updateConfig('autokill', setSize)
+            self.updateText.text = f"Auto Kill : {size(setSize)}"
+            self.dbRW.updateConfig('autokillMode', 1)
+            toast(f"Saved! {size(setSize)}")
+            self.dismiss()
+        else:
+            toast('No new updated!')
+
+    def modeActive(self):
+        self.dbRW.updateConfig('autokillMode', int(self.ids.mode.active))
+        toast(f"Kill Mode: {self.ids.mode.active}")
 
 
 class KitchenSinkDialogLicense(KitchenSinkBaseDialog):

@@ -40,9 +40,16 @@ class MyDb:
                     miInx integer,
                     proxysInx datetime,
                     timeoutD integer,
-                    fileSize integer
+                    fileSize integer,
+                    autoKill integer,
+                    autoKillMode bit
                     )''')
-                c.execute("INSERT INTO configs (themeMode, miInx, timeoutD, fileSize) VALUES ('Dark',0, 5, 1062124)")
+                c.execute(
+                    "INSERT INTO configs \
+                        (themeMode, miInx, timeoutD, fileSize, \
+                            autoKill, autoKillMode) \
+                            VALUES ('Dark',0, 5, 1062124, 50000, 0)"
+                )
             except OperationalError as e:
                 Logger.info(f"Sqlite3 : {e}")
             
