@@ -67,8 +67,13 @@ BoxLayout:
                         orientation: "vertical"
                         MDBoxLayout:
                             padding: 20, 0, 20, 0
-                            MDLabel:
+                            MDBoxLayout:
                                 size_hint_x: .2
+                                MDSpinner:
+                                    id: plying_spin
+                                    size_hint: None, None
+                                    size: dp(46/3), dp(46/3)
+                                    active: False
                             MDLabel:
                                 id: currentIP
                                 #pos_hint: {"center_y": .35}
@@ -538,7 +543,7 @@ BoxLayout:
                         on_release: if root.backdrop._front_layer_open: FilesizeSet(self).open()
                     KitchenSinkOneLineIconListItem:
                         text: f"Auto Kill : {size(app.configs['autoKill'])}"
-                        icon: "cloud-download-outline"
+                        icon: "close-network-outline"
                         divider: None
                         on_release: if root.backdrop._front_layer_open: AutoKillSet(self).open()
                     KitchenSinkOneLineIconListItem:

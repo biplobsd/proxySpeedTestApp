@@ -63,8 +63,9 @@ class PSTDialogInput(KitchenSinkBaseDialog):
         self.piced_pro = None
 
     def inputedproxysSave(self):
-        proxys = findall(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}[\s:\t][0-9]{1,5}",
-        self.ids.query.text)
+        proxys = findall(
+            r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}[\s:\t][0-9]{1,5}",
+            self.ids.query.text)
         for line in range(len(proxys)):
             proxys[line] = sub(r'[\s]', ':', proxys[line])
         if not proxys:
@@ -79,13 +80,13 @@ class PSTDialogInput(KitchenSinkBaseDialog):
         self.dbRW.createProxysList(proxys, self.piced_pro, IndexTime)
 
         self.ids.query.text = currentSave
-        
+
         toast(f"Saved successful!\nInputed {len(proxys)}!")
         self.dismiss()
 
 
 class MirrorDialogInput(KitchenSinkBaseDialog):
-    def __init__(self,mainClass, **kwargs):
+    def __init__(self, mainClass, **kwargs):
         super().__init__(**kwargs)
         # self.filename = 'proxys.txt'
         self.mainClass = mainClass
@@ -146,7 +147,10 @@ class proxysDialogRemove(KitchenSinkBaseDialog):
     def remove_item(self, instance):
         point = instance.date_point
         currentPoint = self.dbRW.getConfig('proxysInx')[0]
-        if self.dbRW.deletePoint('proxysInx', 'proxysInx', point) and self.dbRW.deletePoint('proxys', 'time', point):
+        inx = self.dbRW.deletePoint(
+            'proxysInx', 'proxysInx', point)
+        proxyinx = self.dbRW.deletePoint('proxys', 'time', point)
+        if inx and proxyinx:
             if point == currentPoint:
                 self.dbRW.updateConfig('proxysInx', None)
                 self.dbRW.updateConfig('miInx', 0)
@@ -160,17 +164,13 @@ class proxysDialogRemove(KitchenSinkBaseDialog):
 
 
 class TimeoutSet(KitchenSinkBaseDialog):
-    def __init__(self,updateText, **kwargs):
+    def __init__(self, updateText, **kwargs):
         super().__init__(**kwargs)
-
-
         self.timeoutD = self.dbRW.getConfig('timeoutD')[0]
 
         self.updateText = updateText
         self.ids.queryTimeout.text = str(self.timeoutD)
 
-
-    
     def inputedTimeoutSave(self):
         setTimeout = int(self.ids.queryTimeout.text)
         if self.timeoutD != setTimeout:
@@ -224,7 +224,10 @@ class AutoKillSet(KitchenSinkBaseDialog):
             toast('No new updated!')
 
     def modeActive(self):
-        self.dbRW.updateConfig('autokillMode', int(self.ids.mode.active))
+        mode = self.ids.mode.active
+        self.dbRW.updateConfig('autokillMode', int(mode))
+        self.ids.query.disable = mode
+        self.ids.saveButton.disable = mode
         toast(f"Kill Mode: {self.ids.mode.active}")
 
 

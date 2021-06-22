@@ -386,15 +386,19 @@
         orientation: "vertical"
         spacing: "10dp"
         padding: "10dp", "10dp", "10dp", "10dp"
-        MDLabel:
-            text: "Auto Kill"
-            halign: "center"
-            theme_text_color: "Custom"
-            text_color: self.theme_cls.primary_color
-            font_style: "H4"
-            bold: True
-            size_hint_y: None
-            height: self.texture_size[1]
+        MDBoxLayout:
+            MDLabel:
+                text: "Auto Kill"
+                halign: "center"
+                theme_text_color: "Custom"
+                text_color: self.theme_cls.primary_color
+                font_style: "H4"
+                bold: True
+                size_hint_y: None
+                height: self.texture_size[1]
+            MDSwitch:
+                id: mode
+                on_active: root.modeActive()
 
         MDSeparator:
 
@@ -407,9 +411,7 @@
                 size_hint: .8, None
                 multiline: False
                 input_filter: 'int'
-            MDSwitch:
-                id: mode
-                on_active: root.modeActive()
+                disabled: not root.ids.mode.active
 
         MDBoxLayout:
             adaptive_height: True
@@ -419,9 +421,11 @@
                 text: "close".upper()
                 on_release:root.dismiss()
             MDRaisedButton:
+                id: saveButton
                 text: "Save".upper()
                 theme_text_color: "Custom"
                 text_color: 1, 1, 1, .8
+                disabled: not root.ids.mode.active
                 on_release:
                     root.inputedSizeSave()
             MDBoxLayout:

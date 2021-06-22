@@ -201,11 +201,11 @@ class ProxySpeedTestApp(MDApp):
         self.pbar1 = Queue()
         self.pbar2 = Queue()
         self.totalpb = Queue()
-        
         self.configsUpdate()
 
     # def on_resume(self):
     #     self.ads.request_interstitial()
+
     def configsUpdate(self):
         configs = dbRW.getAllConfigs()
         mirrors = dbRW.getAllMirrors()
@@ -607,7 +607,7 @@ class ProxySpeedTestApp(MDApp):
         if instance.icon == "play":
             # self.mirrorPic()
             self.listPic()
-
+            self.configs['proxys'] = dbRW.getAllCurrentProxys(self.selLId)
             self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"  # noqa
             if len(self.configs['proxys']) == 0:
                 try:
@@ -640,6 +640,7 @@ class ProxySpeedTestApp(MDApp):
             configs = dbRW.getAllConfigs()
             self.configs['totalScan'] = dbRW.getProxysInxTS(IndexTime)[0]
             self.root.ids.Tscan.text = f"scan: {self.configs['totalScan']}"
+            self.root.ids.plying_spin.active = True
             # print(totalScan)
 
             self.configs['timeout'] = int(configs[0][3])
@@ -897,6 +898,7 @@ class ProxySpeedTestApp(MDApp):
         while not self.forceStop.empty():
             self.forceStop.get_nowait()
         self.root.ids.currentIP.text = ""
+        self.root.ids.plying_spin.active = False
         Logger.info("Scan : Finished!")
 
     def sort_Change(self, inst, ckid):
