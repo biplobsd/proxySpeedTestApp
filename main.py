@@ -10,7 +10,6 @@ from kivy.logger import Logger, LOG_LEVELS
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.floatlayout import FloatLayout
 from kivy.utils import get_color_from_hex
-from kivy.core.clipboard import Clipboard
 from kivy.properties import (
     StringProperty,
     NumericProperty,
@@ -40,6 +39,7 @@ from kivymd.uix.behaviors import MagicBehavior, HoverBehavior
 
 from libs.baseclass.dialog_change_theme import KitchenSinkDialogChangeTheme
 from libs.baseclass.dialog_change_theme import PSTDialogInput
+from libs.baseclass.list_items import ProxysDialogHistory
 from libs.baseclass.database import MyDb
 from libs.baseclass.utils import open_link
 from libs.baseclass.utils import agoConv
@@ -611,10 +611,7 @@ class ProxySpeedTestApp(MDApp):
         Logger.debug(instance.icon)
 
         if instance.icon == "play":
-            # self.mirrorPic()
             self.listPic()
-            self.configs['proxys'] = dbRW.getAllCurrentProxys(self.selLId)
-            self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"  # noqa
             if len(self.configs['proxys']) == 0:
                 try:
                     if self.configs['proxysInx']:
@@ -627,7 +624,8 @@ class ProxySpeedTestApp(MDApp):
                 PSTDialogInput().open()
                 toast("First input proxys ip:port list then start scan.")
                 return
-
+            self.configs['proxys'] = dbRW.getAllCurrentProxys(self.selLId)
+            self.root.ids.Tproxys.text = f"proxys: {len(self.configs['proxys'])}"  # noqa
             instance.icon = "stop"
             color = "#f44336"
             instance.md_bg_color = get_color_from_hex(color)
@@ -807,6 +805,7 @@ class ProxySpeedTestApp(MDApp):
                 self.root.ids.progressBar3.opacity = 1
 
     def proxySpeedTest(self, proxys, protocol, mirror):
+        dbRW = MyDb()
         filename = 'chunk'
         unsort = list()
         sort = list()
@@ -854,14 +853,19 @@ class ProxySpeedTestApp(MDApp):
                 if exists(f'{filename}{i}'):
                     remove(f'{filename}{i}')
 
-            unsort.append(
-                {
+            hotData = {
                     'IP': proxy_ip,
                     'SIZE': filesizeM,
                     'TIME': delta,
                     'SPEED': int(speed),
-                    'top3c': part[6]}
-                )
+                    'top3c': part[6]
+                }
+            dbRW.inputProxyHistory(
+                hotData,
+                self.configs['protocol'],
+                self.configs['mirror'])
+
+            unsort.append(hotData)
             sort = self.sort_Type(unsort, showL=False)
             sortLL = len(sort)
             if sortLL >= 3:
@@ -963,16 +967,12 @@ class ProxySpeedTestApp(MDApp):
                             "text2": f"{data[i]['SIZE']} MB",
                             "text3": sec_to_mins(float(data[i]['TIME'])),
                             "text4": f"{size(data[i]['SPEED'], system=alternative)}/s",  # noqa
-                            "on_release": lambda x=data[i]['IP']: self.copy_proxyip(x),  # noqa: E501
+                            "on_release": lambda x=data[i]['IP']: ProxysDialogHistory(x).open(),  # noqa: E501
                         }
                 except IndexError:
                     self.root.ids.backdrop_front_layer.data[i] = ddict
 
         self.data_lists = data
-
-    def copy_proxyip(self, data):
-        toast(f"Copied: {data}")
-        Clipboard.copy(data)
 
     def speedcal(self):
         speed = 0
@@ -994,5 +994,9 @@ class ProxySpeedTestApp(MDApp):
 if __name__ == "__main__":
     dbRW = MyDb()
     dbRW.create()
+    howMannyOpen = "openNo"
+    dbRW.updateConfig(
+        howMannyOpen,
+        dbRW.getConfig(howMannyOpen)[0]+1)
     Logger.info(f"App Version: v{__version__}")
     ProxySpeedTestApp().run()

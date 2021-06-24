@@ -1,6 +1,8 @@
 from ago import human
 from datetime import datetime
 from webbrowser import open as webopen
+from kivymd.toast import toast
+from kivy.core.clipboard import Clipboard
 
 
 def sec_to_mins(seconds):
@@ -33,3 +35,8 @@ def agoConv(datetimeStr):
 def open_link(link):
     webopen(link)
     return True
+
+
+def copy_proxyip(text):
+    toast(f"Copied: {text}")
+    Clipboard.copy(text)

@@ -1,3 +1,7 @@
+#:import Window kivy.core.window.Window
+#:import images_path kivymd.images_path
+#:import copy_proxyip libs.baseclass.utils.copy_proxyip
+
 <KitchenSinkOneLineIconListItem>:
 
     IconLeftWidget:
@@ -41,3 +45,113 @@
                 pos: self.pos
                 size: self.size
 
+
+<ProxysDialogHistory>:
+    background: f"{images_path}/transparent.png"
+    canvas:
+        Color:
+            rgba: root.theme_cls.bg_dark
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [15,]
+    size_hint: None, None
+    height: Window.height * 40 / 100
+    width: Window.width * 60 / 100
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: "5dp"
+        MDBoxLayout:
+            size_hint_y: .3
+            MDBoxLayout:
+            MDTextButton:
+                id: ip
+                text: "192.168.0.1"
+                theme_text_color: "Custom"
+                text_color: self.theme_cls.primary_color
+                font_style: "H4"
+                bold: True
+                size_hint_y: None
+                height: self.texture_size[1]
+                on_release: copy_proxyip(self.text)
+            MDTextButton:
+                id: adds
+                text: ":"
+                halign: "center"
+                theme_text_color: "Hint"
+                text_color: self.theme_cls.accent_color
+                font_style: "H4"
+                bold: True
+                size_hint_y: None
+                height: self.texture_size[1]
+                on_release: copy_proxyip(root.ipaddr)
+            MDTextButton:
+                id: port
+                text: "8080"
+                theme_text_color: "Custom"
+                text_color: self.theme_cls.primary_color
+                font_style: "H4"
+                bold: True
+                size_hint_y: None
+                height: self.texture_size[1]
+                on_release: copy_proxyip(self.text)
+            MDBoxLayout:
+        BoxLayout:
+            orientation: "vertical"
+
+            MDBoxLayout:
+                adaptive_height: True
+                padding: 0, 15, 0, 10
+                id: header_text
+                MDBoxLayout:
+                    size_hint_x: .5
+                    size_hint_y: .1
+                    MDSeparator:
+                    MDTextButton:
+                        pos_hint: {"center_y": .5, "center_x": .5}
+                        font_size: sp(10)
+                        text: "LAST  SCAN"
+                    MDSeparator:
+                MDBoxLayout:
+                    MDBoxLayout:
+                        size_hint_y: .1
+                        MDSeparator:
+                        MDTextButton:
+                            pos_hint: {"center_y": .5, "center_x": .5}
+                            font_size: sp(10)
+                            text: "PROTOCOL"
+                        MDSeparator:
+                    MDBoxLayout:
+                        # size_hint_x: .3
+                        size_hint_y: .1
+                        MDSeparator:
+                        MDTextButton:
+                            pos_hint: {"center_y": .5, "center_x": .5}
+                            font_size: sp(10)
+                            text: "SPEED"
+                        MDSeparator:
+                    MDBoxLayout:
+                        # size_hint_x: .3
+                        size_hint_y: .1
+                        MDSeparator:
+                        MDTextButton:
+                            pos_hint: {"center_y": .5, "center_x": .5}
+                            font_size: sp(10)
+                            text: "SIZE"
+
+                        MDSeparator:
+                    MDBoxLayout:
+                        # size_hint_x: .3
+                        size_hint_y: .1
+                        MDSeparator:
+                        MDTextButton:
+                            pos_hint: {"center_y": .5, "center_x": .5}
+                            font_size: sp(10)
+                            text: "TIME"
+                        MDSeparator:
+            
+            ScrollView:
+                MDList:
+                    id: md_list
+                    padding: 0
