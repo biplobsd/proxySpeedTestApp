@@ -437,13 +437,16 @@ class ProxySpeedTestApp(MDApp):
             max_height=dp(50*len(self.ListItems))
         )
         self.listSel.bind(
+            on_release=self.set_list,
             on_dismiss=self.manuDismiss)
 
     def manuDismiss(self, ins):
         ins.caller.custom_color = get_color_from_hex(
             colors[self.theme_cls.primary_palette]["300"])
 
-    def set_list(self, ins):
+    def set_list(self, ins, insMain=""):
+        if insMain:
+            ins = insMain.text
         self.selLIdindx = int(re.search(r'#(\d+)\s', ins).group(1))
         # withoutHash = re.search(r'#\d\s(.+)', ins.text).group(1)
         Logger.debug(self.selLIdindx)
@@ -507,9 +510,12 @@ class ProxySpeedTestApp(MDApp):
             max_height=dp(50*len(items))
         )
         self.protSel.bind(
+            on_release=self.set_protocol,
             on_dismiss=self.manuDismiss)
 
-    def set_protocol(self, ins):
+    def set_protocol(self, ins, insMain=""):
+        if insMain:
+            ins = insMain.text
         self.configs['protocol'] = ins.lower()
         self.root.ids.Sprotocol.text = f"Protocol: {self.configs['protocol'].upper()}"  # noqa
 
