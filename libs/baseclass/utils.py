@@ -21,7 +21,7 @@ def agoConv(datetimeStr):
         if 'ms' in _ago.split(',')[0]:
             return 'Now'
         elif "s" in _ago.split(',')[0]:
-            return _ago.split(',')[0] 
+            return _ago.split(',')[0]
         elif "y" or "d" or "h" or "m" in _ago.split(',')[0]:
             if ('ms' or 'um') == _ago.split(',')[1][-6:-4]:
                 return _ago.split(',')[0]
@@ -40,3 +40,16 @@ def open_link(link):
 def copy_proxyip(text):
     toast(f"Copied: {text}")
     Clipboard.copy(text)
+
+
+def TrNumBool(number, name, col):
+    value_letters = [(4, "r"), (2, "w"), (1, "x")]
+    cols = [int(n) for n in str(number)]
+    gotoCol = cols[col]
+    for value, letter in value_letters:
+        if gotoCol >= value:
+            gotoCol -= value
+            if name == letter:
+                cols[col] = gotoCol
+                return "".join([str(n) for n in cols])
+    return False

@@ -245,7 +245,7 @@ class ProxySpeedTestApp(MDApp):
             'totalScan': totalScan if self.selLId else 0,
             'autoKill': int(configs[0][5]),
             'autoKillMode': int(configs[0][6])
-            }
+        }
 
     def changeThemeMode(self, inst):
         self.theme_cls.theme_style = inst
@@ -314,10 +314,13 @@ class ProxySpeedTestApp(MDApp):
     def on_pause(self):
         return True
 
-    def save_UpdateDB(self, lists=[]):
+    def save_UpdateDB(self, lists=[], addHistory=[]):
         dbRW = MyDb()
         if lists:
             dbRW.updateScanList(lists, self.selLId)
+        if addHistory:
+            hotData, protocol, mirror = addHistory
+            dbRW.inputProxyHistory(hotData, protocol, mirror)
 
     def build(self):
         if platform == "android":
@@ -414,7 +417,7 @@ class ProxySpeedTestApp(MDApp):
                     "on_release":
                         lambda x=intext:
                         self.set_list(x)
-                    })
+                })
                 selLIdindxDict[Inx[0]] = i
         else:
             self.ListItems = [{
@@ -464,12 +467,12 @@ class ProxySpeedTestApp(MDApp):
             for slist in scan_list:
                 if not (None in slist):
                     self.scan_list.append({
-                            "IP": slist[0],
-                            "SIZE": slist[1],
-                            "TIME": slist[2],
-                            "SPEED": slist[3],
-                            "top3c": slist[6]
-                            })
+                        "IP": slist[0],
+                        "SIZE": slist[1],
+                        "TIME": slist[2],
+                        "SPEED": slist[3],
+                        "top3c": slist[6]
+                    })
 
         unsort = self.scan_list
         # if unsort:
@@ -663,7 +666,7 @@ class ProxySpeedTestApp(MDApp):
                 self.configs['proxys'],
                 self.configs['protocol'],
                 self.configs['mirror'],
-                )).start()
+            )).start()
 
             # self.proxySpeedTest('start')
         elif instance.icon == "blur":
@@ -706,7 +709,7 @@ class ProxySpeedTestApp(MDApp):
                 headers={
                     "Range": "bytes=%s-%s" % (0, self.configs['fileSize']),
                     "user-agent": "Mozilla/5.0",
-                    },
+                },
                 stream=True,
                 proxies=proxies,
                 timeout=self.configs['timeout']
@@ -805,7 +808,6 @@ class ProxySpeedTestApp(MDApp):
                 self.root.ids.progressBar3.opacity = 1
 
     def proxySpeedTest(self, proxys, protocol, mirror):
-        dbRW = MyDb()
         filename = 'chunk'
         unsort = list()
         sort = list()
@@ -854,16 +856,16 @@ class ProxySpeedTestApp(MDApp):
                     remove(f'{filename}{i}')
 
             hotData = {
-                    'IP': proxy_ip,
-                    'SIZE': filesizeM,
-                    'TIME': delta,
-                    'SPEED': int(speed),
-                    'top3c': part[6]
-                }
-            dbRW.inputProxyHistory(
+                'IP': proxy_ip,
+                'SIZE': filesizeM,
+                'TIME': delta,
+                'SPEED': int(speed),
+                'top3c': part[6]
+            }
+            addHistory = [
                 hotData,
                 self.configs['protocol'],
-                self.configs['mirror'])
+                self.configs['mirror']]
 
             unsort.append(hotData)
             sort = self.sort_Type(unsort, showL=False)
@@ -883,7 +885,7 @@ class ProxySpeedTestApp(MDApp):
                                 sort[t]['top3c'] -= 1
                                 break
             self.show_List(sort)
-            self.save_UpdateDB(sort)
+            self.save_UpdateDB(sort, addHistory)
             self.totalpb.put(1)
             roundC = c
             # return True
@@ -994,9 +996,5 @@ class ProxySpeedTestApp(MDApp):
 if __name__ == "__main__":
     dbRW = MyDb()
     dbRW.create()
-    howMannyOpen = "openNo"
-    dbRW.updateConfig(
-        howMannyOpen,
-        dbRW.getConfig(howMannyOpen)[0]+1)
     Logger.info(f"App Version: v{__version__}")
     ProxySpeedTestApp().run()

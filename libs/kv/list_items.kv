@@ -56,14 +56,14 @@
             size: self.size
             radius: [15,]
     size_hint: None, None
-    height: Window.height * 60 / 100
-    width: Window.width * 90 / 100
+    height: Window.height * 40 / 100
+    width: Window.width * 80 / 100
 
     BoxLayout:
         orientation: "vertical"
         spacing: "5dp"
         MDBoxLayout:
-            size_hint_y: .3
+            size_hint_y: .2
             MDBoxLayout:
             MDTextButton:
                 id: ip
@@ -81,7 +81,7 @@
                 halign: "center"
                 theme_text_color: "Hint"
                 text_color: self.theme_cls.accent_color
-                font_style: "H4"
+                font_style: "H5"
                 bold: True
                 size_hint_y: None
                 height: self.texture_size[1]
@@ -129,7 +129,7 @@
                         MDTextButton:
                             pos_hint: {"center_y": .5, "center_x": .5}
                             font_size: sp(10)
-                            text: "SPEED"
+                            text: "TIME"
                         MDSeparator:
                     MDBoxLayout:
                         # size_hint_x: .3
@@ -148,7 +148,7 @@
                         MDTextButton:
                             pos_hint: {"center_y": .5, "center_x": .5}
                             font_size: sp(10)
-                            text: "TIME"
+                            text: "SPEED"
                         MDSeparator:
             
             ScrollView:

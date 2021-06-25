@@ -1,6 +1,6 @@
 from hurry.filesize.filesize import size, alternative
 from kivymd.uix.taptargetview import MDTapTargetView
-from libs.baseclass.utils import agoConv, sec_to_mins
+from libs.baseclass.utils import TrNumBool, agoConv, sec_to_mins
 from kivy.uix.modalview import ModalView
 from kivymd.theming import ThemableBehavior
 from libs.baseclass.database import MyDb
@@ -77,17 +77,19 @@ class ProxysDialogHistory(ThemableBehavior, ModalView):
             self.ids.md_list.add_widget(ProxyShowList(
                 text=f"{agoConv(p[5])}",
                 text1=f"{p[4]}",
-                text2=f" {size(p[3], system=alternative)}/s",
+                text2=f" {sec_to_mins(float((p[2])))}",
                 text3=f" {p[1]} MB",
-                text4=f" {sec_to_mins(float((p[2])))}",
+                text4=f" {size(p[3], system=alternative)}/s",
                 _height=dp(20)
             ))
-        if self.dbRW.getConfig("openNo")[0] == 1:
+        # firstTime = TrNumBool(self.dbRW.getConfig("openNo")[0], 'r', 0)
+        firstTime = '400'
+        if firstTime:
             fulladdrCopyTT = MDTapTargetView(
                 widget=self.ids.adds,
-                title_text="Copy full IP:PORT by tapping ':' semicolon symbol",
-                description_text="That's way you can copy full address faster way.",
-                widget_position="bottom",
+                title_text="Copy IP:PORT by tapping ':'",
+                description_text="That's way you can\ncopy full address faster way.",  # noqa
+                widget_position="left_bottom",
                 outer_radius=dp(250)
             )
             fulladdrCopyTT.bind(
@@ -95,6 +97,7 @@ class ProxysDialogHistory(ThemableBehavior, ModalView):
                 on_close=lambda x: self.textColorChange('c')
             )
             fulladdrCopyTT.start()
+            self.dbRW.updateConfig("openNo", firstTime)
 
     def textColorChange(self, m='o'):
         if m == 'o':
