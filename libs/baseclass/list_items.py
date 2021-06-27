@@ -82,15 +82,13 @@ class ProxysDialogHistory(ThemableBehavior, ModalView):
                 text4=f" {size(p[3], system=alternative)}/s",
                 _height=dp(20)
             ))
-        # firstTime = TrNumBool(self.dbRW.getConfig("openNo")[0], 'r', 0)
-        firstTime = '400'
+        firstTime = TrNumBool(self.dbRW.getConfig("openNo")[0], 'r', 0)
         if firstTime:
             fulladdrCopyTT = MDTapTargetView(
                 widget=self.ids.adds,
                 title_text="Copy IP:PORT by tapping ':'",
-                description_text="That's way you can\ncopy full address faster way.",  # noqa
-                widget_position="left_bottom",
-                outer_radius=dp(250)
+                description_text="That's way you can\ncopy full address \nfaster way.",  # noqa
+                widget_position="left_bottom"
             )
             fulladdrCopyTT.bind(
                 on_open=lambda x: self.textColorChange('o'),

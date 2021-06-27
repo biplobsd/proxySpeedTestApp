@@ -10,6 +10,8 @@ class MyDb:
             dbName = '../database.db' if platform == 'android' else 'database.db'
 
         self.conn = connect(dbName)
+        dest = connect(':memory:')
+        self.conn.backup(dest)
 
     def create(self):
         c = self.conn.cursor()
