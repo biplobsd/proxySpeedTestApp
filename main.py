@@ -56,7 +56,7 @@ from queue import Empty, Queue
 from hurry.filesize import alternative, size
 from functools import partial
 
-__version__ = "1.5"
+__version__ = "1.6"
 Logger.setLevel(LOG_LEVELS['debug'])
 Config.set('graphics', 'verify_gl_main_thread', False)
 disable_warnings(exceptions.InsecureRequestWarning)
