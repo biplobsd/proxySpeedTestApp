@@ -2,7 +2,7 @@ name: Build debug
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  build-windows:
+  build-desktop:
     name: Build [${{ matrix.name }}]
     strategy:
       fail-fast: false
